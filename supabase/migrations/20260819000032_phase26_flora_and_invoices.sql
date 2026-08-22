@@ -39,9 +39,9 @@ CREATE POLICY "Admins can manage flora species"
   TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM public.user_roles ur
-      JOIN public.roles r ON ur.role_id = r.id
-      WHERE ur.user_id = auth.uid() AND r.name = 'admin'
+      SELECT 1 FROM public.profiles 
+      WHERE profiles.id = auth.uid() 
+      AND (profiles.role = 'ADMIN' OR profiles.role = 'SUPER_ADMIN')
     )
   );
 
@@ -84,9 +84,9 @@ CREATE POLICY "Admins can manage all invoices"
   TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM public.user_roles ur
-      JOIN public.roles r ON ur.role_id = r.id
-      WHERE ur.user_id = auth.uid() AND r.name = 'admin'
+      SELECT 1 FROM public.profiles 
+      WHERE profiles.id = auth.uid() 
+      AND (profiles.role = 'ADMIN' OR profiles.role = 'SUPER_ADMIN')
     )
   );
 
