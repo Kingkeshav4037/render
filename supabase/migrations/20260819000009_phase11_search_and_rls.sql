@@ -156,23 +156,60 @@ ALTER TABLE public.road_trips ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.road_trip_stops ENABLE ROW LEVEL SECURITY;
 
 -- Read policies: public can read anything
-CREATE POLICY "Public read content_media" ON public.content_media FOR SELECT USING (true);
-CREATE POLICY "Public read content_relationships" ON public.content_relationships FOR SELECT USING (status = 'PUBLISHED'::public.content_status);
-CREATE POLICY "Public read content_translations" ON public.content_translations FOR SELECT USING (true);
-CREATE POLICY "Public read wildlife_species" ON public.wildlife_species FOR SELECT USING (true);
-CREATE POLICY "Public read wildlife_habitats" ON public.wildlife_habitats FOR SELECT USING (true);
-CREATE POLICY "Public read ski_resorts" ON public.ski_resorts FOR SELECT USING (true);
-CREATE POLICY "Public read aurora_destinations" ON public.aurora_destinations FOR SELECT USING (true);
-CREATE POLICY "Public read road_trips" ON public.road_trips FOR SELECT USING (true);
-CREATE POLICY "Public read road_trip_stops" ON public.road_trip_stops FOR SELECT USING (true);
+DO $$ BEGIN
+    DROP POLICY IF EXISTS "Public read content_media" ON public.content_media;
+    CREATE POLICY "Public read content_media" ON public.content_media FOR SELECT USING (true);
 
--- Write policies: only users with 'manage_content' permission can write
-CREATE POLICY "Admin write content_media" ON public.content_media FOR ALL USING (public.has_permission(auth.uid(), 'manage_content'));
-CREATE POLICY "Admin write content_relationships" ON public.content_relationships FOR ALL USING (public.has_permission(auth.uid(), 'manage_content'));
-CREATE POLICY "Admin write content_translations" ON public.content_translations FOR ALL USING (public.has_permission(auth.uid(), 'manage_content'));
-CREATE POLICY "Admin write wildlife_species" ON public.wildlife_species FOR ALL USING (public.has_permission(auth.uid(), 'manage_content'));
-CREATE POLICY "Admin write wildlife_habitats" ON public.wildlife_habitats FOR ALL USING (public.has_permission(auth.uid(), 'manage_content'));
-CREATE POLICY "Admin write ski_resorts" ON public.ski_resorts FOR ALL USING (public.has_permission(auth.uid(), 'manage_content'));
-CREATE POLICY "Admin write aurora_destinations" ON public.aurora_destinations FOR ALL USING (public.has_permission(auth.uid(), 'manage_content'));
-CREATE POLICY "Admin write road_trips" ON public.road_trips FOR ALL USING (public.has_permission(auth.uid(), 'manage_content'));
-CREATE POLICY "Admin write road_trip_stops" ON public.road_trip_stops FOR ALL USING (public.has_permission(auth.uid(), 'manage_content'));
+    DROP POLICY IF EXISTS "Public read content_relationships" ON public.content_relationships;
+    CREATE POLICY "Public read content_relationships" ON public.content_relationships FOR SELECT USING (status = 'PUBLISHED'::public.content_status);
+
+    DROP POLICY IF EXISTS "Public read content_translations" ON public.content_translations;
+    CREATE POLICY "Public read content_translations" ON public.content_translations FOR SELECT USING (true);
+
+    DROP POLICY IF EXISTS "Public read wildlife_species" ON public.wildlife_species;
+    CREATE POLICY "Public read wildlife_species" ON public.wildlife_species FOR SELECT USING (true);
+
+    DROP POLICY IF EXISTS "Public read wildlife_habitats" ON public.wildlife_habitats;
+    CREATE POLICY "Public read wildlife_habitats" ON public.wildlife_habitats FOR SELECT USING (true);
+
+    DROP POLICY IF EXISTS "Public read ski_resorts" ON public.ski_resorts;
+    CREATE POLICY "Public read ski_resorts" ON public.ski_resorts FOR SELECT USING (true);
+
+    DROP POLICY IF EXISTS "Public read aurora_destinations" ON public.aurora_destinations;
+    CREATE POLICY "Public read aurora_destinations" ON public.aurora_destinations FOR SELECT USING (true);
+
+    DROP POLICY IF EXISTS "Public read road_trips" ON public.road_trips;
+    CREATE POLICY "Public read road_trips" ON public.road_trips FOR SELECT USING (true);
+
+    DROP POLICY IF EXISTS "Public read road_trip_stops" ON public.road_trip_stops;
+    CREATE POLICY "Public read road_trip_stops" ON public.road_trip_stops FOR SELECT USING (true);
+
+    -- Write policies: only users with 'manage_content' permission can write
+    DROP POLICY IF EXISTS "Admin write content_media" ON public.content_media;
+    CREATE POLICY "Admin write content_media" ON public.content_media FOR ALL USING (public.has_permission(auth.uid(), 'manage_content'));
+
+    DROP POLICY IF EXISTS "Admin write content_relationships" ON public.content_relationships;
+    CREATE POLICY "Admin write content_relationships" ON public.content_relationships FOR ALL USING (public.has_permission(auth.uid(), 'manage_content'));
+
+    DROP POLICY IF EXISTS "Admin write content_translations" ON public.content_translations;
+    CREATE POLICY "Admin write content_translations" ON public.content_translations FOR ALL USING (public.has_permission(auth.uid(), 'manage_content'));
+
+    DROP POLICY IF EXISTS "Admin write wildlife_species" ON public.wildlife_species;
+    CREATE POLICY "Admin write wildlife_species" ON public.wildlife_species FOR ALL USING (public.has_permission(auth.uid(), 'manage_content'));
+
+    DROP POLICY IF EXISTS "Admin write wildlife_habitats" ON public.wildlife_habitats;
+    CREATE POLICY "Admin write wildlife_habitats" ON public.wildlife_habitats FOR ALL USING (public.has_permission(auth.uid(), 'manage_content'));
+
+    DROP POLICY IF EXISTS "Admin write ski_resorts" ON public.ski_resorts;
+    CREATE POLICY "Admin write ski_resorts" ON public.ski_resorts FOR ALL USING (public.has_permission(auth.uid(), 'manage_content'));
+
+    DROP POLICY IF EXISTS "Admin write aurora_destinations" ON public.aurora_destinations;
+    CREATE POLICY "Admin write aurora_destinations" ON public.aurora_destinations FOR ALL USING (public.has_permission(auth.uid(), 'manage_content'));
+
+    DROP POLICY IF EXISTS "Admin write road_trips" ON public.road_trips;
+    CREATE POLICY "Admin write road_trips" ON public.road_trips FOR ALL USING (public.has_permission(auth.uid(), 'manage_content'));
+
+    DROP POLICY IF EXISTS "Admin write road_trip_stops" ON public.road_trip_stops;
+    CREATE POLICY "Admin write road_trip_stops" ON public.road_trip_stops FOR ALL USING (public.has_permission(auth.uid(), 'manage_content'));
+EXCEPTION WHEN undefined_table THEN NULL;
+END $$;
