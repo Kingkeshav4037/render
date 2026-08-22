@@ -73,10 +73,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     });
 
     // Listen for auth changes — only re-fetch profile on meaningful events (ISSUE-018)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: string, session: any) => {
       if (session?.user) {
         if (event === 'MFA_CHALLENGE_VERIFIED') {
-           supabase.auth.mfa.getAuthenticatorAssuranceLevel().then(({ data }) => {
+           supabase.auth.mfa.getAuthenticatorAssuranceLevel().then(({ data }: { data: any }) => {
               set({ mfaLevel: (data?.currentLevel as 'aal1' | 'aal2') || 'aal1' });
            });
            return; // don't re-fetch profile for MFA only
