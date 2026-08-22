@@ -1,6 +1,6 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Star, Leaf, Navigation, Activity } from 'lucide-react';
+import { ArrowLeft, MapPin, Star, Leaf, Navigation, Activity, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { mapService } from '../services/map/mapService';
 import type { Location, DestinationScore } from '../services/map/mapService';
@@ -10,6 +10,7 @@ import { DestinationGallery } from '../components/destinations/DestinationGaller
 import { NearbyAttractions } from '../components/destinations/NearbyAttractions';
 import { FavoriteButton } from '../components/common/FavoriteButton';
 import { ReviewSection } from '../components/common/ReviewSection';
+import { googleMaps } from '../lib/googleMaps';
 
 // Map database slugs/names to local images
 const getPlaceholderImage = (name: string) => {
@@ -126,7 +127,19 @@ export const DestinationDetails = () => {
             </div>
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-4">{location.name}</h1>
             <div className="flex flex-wrap gap-4 items-center text-white/80">
-              <span className="flex items-center gap-1.5"><Navigation size={16}/> {location.latitude?.toFixed(2) ?? 'N/A'}Â°N, {location.longitude?.toFixed(2) ?? 'N/A'}Â°E</span>
+              <span className="flex items-center gap-1.5"><Navigation size={16}/> {location.latitude?.toFixed(2) ?? 'N/A'}°N, {location.longitude?.toFixed(2) ?? 'N/A'}°E</span>
+              <a
+                href={googleMaps.getDirectionsUrl({
+                  destination: location.latitude && location.longitude 
+                    ? { lat: location.latitude, lng: location.longitude } 
+                    : location.name
+                })}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white/15 hover:bg-white/25 text-white rounded-xl backdrop-blur-md text-xs font-bold uppercase tracking-wider transition-all border border-white/20 shadow-sm"
+              >
+                <ExternalLink size={13} /> Open in Google Maps
+              </a>
             </div>
           </div>
         </div>
@@ -155,7 +168,21 @@ export const DestinationDetails = () => {
             </section>
 
             <section>
-              <h2 className="text-3xl font-bold text-navy-900 mb-6">Location Map</h2>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-3xl font-bold text-navy-900">Location Map</h2>
+                <a
+                  href={googleMaps.getDirectionsUrl({
+                    destination: location.latitude && location.longitude 
+                      ? { lat: location.latitude, lng: location.longitude } 
+                      : location.name
+                  })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-blue-600 hover:text-blue-800 transition-colors"
+                >
+                  <ExternalLink size={13} /> Get Directions (Google Maps)
+                </a>
+              </div>
               {location.latitude && location.longitude && (
                 <DestinationMap lat={location.latitude} lng={location.longitude} name={location.name} />
               )}

@@ -24,6 +24,26 @@ export const AuthCallback = () => {
         if (sessionError) throw sessionError;
 
         if (data.session) {
+          const user = data.session.user;
+          if (user && user.id) {
+            try {
+              const fullName = user.user_metadata?.full_name || user.user_metadata?.name || '';
+              const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture || '';
+              
+              if (fullName || avatarUrl) {
+                await supabase.from('profiles').upsert({
+                  id: user.id,
+                  email: user.email || '',
+                  full_name: fullName,
+                  avatar_url: avatarUrl,
+                  updated_at: new Date().toISOString(),
+                }, { onConflict: 'id', ignoreDuplicates: true });
+              }
+            } catch (syncErr) {
+              console.warn('Google profile sync note:', syncErr);
+            }
+          }
+
           const hashParams = new URLSearchParams(window.location.hash.substring(1));
           const type = hashParams.get('type') || searchParams.get('type');
           
