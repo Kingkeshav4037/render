@@ -43,7 +43,7 @@ const getPlaceholderImage = (name: string) => {
 const TYPES = ['CITY', 'REGION', 'NATIONAL_PARK', 'FJORD', 'ISLAND', 'BEACH', 'VIEWPOINT', 'MUSEUM', 'LANDMARK', 'WILDLIFE', 'ATTRACTION'];
 
 export const Explore = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   
   const initialQuery = searchParams.get('q') || '';
   const initialType = searchParams.get('type');
@@ -52,9 +52,32 @@ export const Explore = () => {
   const [showFilters, setShowFilters] = useState(false);
 
   const toggleType = (type: string) => {
-    setSelectedTypes(prev => 
-      prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
-    );
+    setSelectedTypes(prev => {
+      const next = prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type];
+      const params: Record<string, string> = {};
+      if (searchQuery) params.q = searchQuery;
+      if (next.length > 0) params.type = next[0];
+      setSearchParams(params, { replace: true });
+      return next;
+    });
+  };
+
+  const handleSearchChange = (val: string) => {
+    setSearchQuery(val);
+    const params: Record<string, string> = {};
+    if (val) params.q = val;
+    if (selectedTypes.length > 0) params.type = selectedTypes[0];
+    setSearchParams(params, { replace: true });
+  };
+
+  const clearAllFilters = () => {
+    setSelectedTypes([]);
+    setSearchQuery('');
+    setSearchParams({}, { replace: true });
+  };
+
+  const removeSingleType = (type: string) => {
+    toggleType(type);
   };
 
   const filters = {
@@ -90,7 +113,7 @@ export const Explore = () => {
                 type="text"
                 placeholder="Search destinations, fjords, peaks..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 className="w-full bg-snow/5 backdrop-blur-xl border border-snow/10 text-snow rounded-none py-6 pl-16 pr-6 outline-none focus:bg-snow/10 focus:border-arctic-gold/50 transition-all placeholder:text-snow/30 font-sans text-lg"
               />
             </div>
@@ -108,8 +131,8 @@ export const Explore = () => {
               <h3 className="text-sm font-sans font-bold uppercase tracking-widest text-snow">Filters</h3>
               {(selectedTypes.length > 0 || searchQuery) && (
                 <button 
-                  onClick={() => { setSelectedTypes([]); setSearchQuery(''); }}
-                  className="text-xs text-nordic-red font-semibold uppercase hover:text-snow transition-colors"
+                  onClick={clearAllFilters}
+                  className="text-xs text-nordic-red font-semibold uppercase hover:text-snow transition-colors cursor-pointer"
                 >
                   Clear
                 </button>
@@ -137,6 +160,35 @@ export const Explore = () => {
 
         {/* Main Grid */}
         <div className="flex-1">
+          {/* Active Filters Pill Bar */}
+          {(selectedTypes.length > 0 || searchQuery) && (
+            <div className="flex flex-wrap items-center gap-2 mb-6 p-4 bg-midnight/80 border border-white/10 rounded-2xl">
+              <span className="text-xs font-bold uppercase tracking-wider text-snow/50 mr-1">Active Filters:</span>
+              {searchQuery && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 text-snow rounded-full text-xs font-medium border border-white/20">
+                  Search: "{searchQuery}"
+                  <button onClick={() => handleSearchChange('')} className="hover:text-nordic-red cursor-pointer">
+                    <X size={12} />
+                  </button>
+                </span>
+              )}
+              {selectedTypes.map(type => (
+                <span key={type} className="inline-flex items-center gap-1.5 px-3 py-1 bg-arctic-gold/20 text-arctic-gold rounded-full text-xs font-medium border border-arctic-gold/30">
+                  {type.replace('_', ' ')}
+                  <button onClick={() => removeSingleType(type)} className="hover:text-snow cursor-pointer">
+                    <X size={12} />
+                  </button>
+                </span>
+              ))}
+              <button
+                onClick={clearAllFilters}
+                className="text-xs text-nordic-red hover:underline ml-auto font-semibold cursor-pointer"
+              >
+                Clear all
+              </button>
+            </div>
+          )}
+
           <div className="mb-8 flex justify-between items-center">
             <h2 className="text-sm font-sans font-medium text-snow/60 uppercase tracking-widest">
               {loading ? 'Searching...' : `${destinations.length} Destinations`}

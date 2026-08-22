@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Compass, Mail, Lock, User, ArrowRight } from 'lucide-react';
+import { Compass, Mail, Lock, User, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { authService } from '../../services/auth/authService';
 
 export const Register = () => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isProvider, setIsProvider] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -167,14 +168,22 @@ export const Register = () => {
                 </div>
                 <input 
                   name="password" 
-                  type="password" 
+                  type={showPassword ? "text" : "password"} 
                   autoComplete="new-password"
                   required 
-                  className="block w-full pl-11 pr-3 py-3.5 border border-white/20 rounded-xl bg-white/5 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-aurora-green/50 focus:border-aurora-green/50 transition-all sm:text-sm backdrop-blur-sm" 
+                  className="block w-full pl-11 pr-11 py-3.5 border border-white/20 rounded-xl bg-white/5 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-aurora-green/50 focus:border-aurora-green/50 transition-all sm:text-sm backdrop-blur-sm" 
                   placeholder="Password" 
                   value={password} 
                   onChange={handlePasswordChange} 
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-white/50 hover:text-white transition-colors cursor-pointer"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
 
               {password.length > 0 && (
