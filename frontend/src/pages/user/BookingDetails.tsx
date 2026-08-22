@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { Calendar, MapPin, CheckCircle2, XCircle, Clock, FileText, Download, AlertTriangle, ArrowLeft, Ticket } from 'lucide-react';
 import { useCurrencyStore } from '../../store/useCurrencyStore';
+import { invoiceService } from '../../services/invoice/invoiceService';
+import { useAuthStore } from '../../store/useAuthStore';
 
 export const BookingDetails = () => {
   const { id = '' } = useParams<{ id: string }>();
@@ -11,6 +13,7 @@ export const BookingDetails = () => {
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState(false);
   const { formatPrice } = useCurrencyStore();
+  const { profile } = useAuthStore();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -55,7 +58,8 @@ export const BookingDetails = () => {
   };
 
   const generateInvoice = () => {
-    alert("Invoice downloaded! (Mocked)");
+    if (!booking) return;
+    invoiceService.downloadInvoiceForBooking(booking, profile);
   };
 
   if (loading) {

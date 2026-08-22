@@ -37,6 +37,7 @@ export const Footer = () => {
             <h4 className="text-snow font-sans font-semibold mb-6 tracking-widest uppercase text-xs">Explore</h4>
             <ul className="space-y-4 text-sm font-sans text-snow/70">
               <li><Link to="/explore" className="hover:text-arctic-gold transition-colors">Destinations</Link></li>
+              <li><Link to="/flora" className="hover:text-arctic-gold transition-colors">Flora & Forests</Link></li>
               <li><Link to="/trails" className="hover:text-arctic-gold transition-colors">Hiking & Nature</Link></li>
               <li><Link to="/stay" className="hover:text-arctic-gold transition-colors">Accommodations</Link></li>
               <li><Link to="/food" className="hover:text-arctic-gold transition-colors">Culinary Scene</Link></li>
@@ -54,8 +55,9 @@ export const Footer = () => {
           </div>
           
           <div>
-            <h4 className="text-snow font-sans font-semibold mb-6 tracking-widest uppercase text-xs">Legal</h4>
+            <h4 className="text-snow font-sans font-semibold mb-6 tracking-widest uppercase text-xs">Legal & Tax</h4>
             <ul className="space-y-4 text-sm font-sans text-snow/70">
+              <li><Link to="/user/invoices" className="hover:text-arctic-gold transition-colors">Invoices & Receipts</Link></li>
               <li><Link to="#" className="hover:text-snow transition-colors">Privacy Policy</Link></li>
               <li><Link to="#" className="hover:text-snow transition-colors">Terms of Service</Link></li>
               <li><Link to="#" className="hover:text-snow transition-colors">Cookie Policy</Link></li>

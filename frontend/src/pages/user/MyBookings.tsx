@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Calendar, MapPin, CheckCircle2, XCircle, Clock, Wallet, Ticket, Navigation, Coffee, Home, Bed, User, FileText, ChevronRight } from 'lucide-react';
+import { Calendar, MapPin, CheckCircle2, XCircle, Clock, Wallet, Ticket, Navigation, Coffee, Home, Bed, User, FileText, ChevronRight, Download } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCurrencyStore } from '../../store/useCurrencyStore';
 import { CinematicBackground } from '../../design/backgrounds/CinematicBackground';
+import { invoiceService } from '../../services/invoice/invoiceService';
+import { useAuthStore } from '../../store/useAuthStore';
 
 export const MyBookings = () => {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -11,6 +13,7 @@ export const MyBookings = () => {
   const [activeTab, setActiveTab] = useState<'UPCOMING' | 'PAST' | 'CANCELLED'>('UPCOMING');
   const navigate = useNavigate();
   const { formatPrice } = useCurrencyStore();
+  const { profile } = useAuthStore();
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -175,13 +178,28 @@ export const MyBookings = () => {
                     </div>
 
                     {/* Price & Action (Right) */}
-                    <div className="w-full md:w-48 bg-white border-t md:border-t-0 md:border-l border-gray-100 p-6 flex md:flex-col justify-between items-center md:items-end md:justify-center">
+                    <div className="w-full md:w-56 bg-white border-t md:border-t-0 md:border-l border-gray-100 p-6 flex md:flex-col justify-between items-center md:items-end md:justify-center gap-3">
                       <div className="text-left md:text-right">
                         <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Total</div>
                         <div className="text-xl font-display font-black text-navy-900">{formatPrice(booking.total_amount)}</div>
                       </div>
-                      <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-navy-900 group-hover:bg-navy-900 group-hover:text-white transition-colors mt-0 md:mt-4">
-                        <ChevronRight size={20} />
+                      
+                      <div className="flex items-center gap-2 mt-0 md:mt-2">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            invoiceService.downloadInvoiceForBooking(booking, profile);
+                          }}
+                          className="px-3 py-1.5 bg-gray-50 hover:bg-aurora-green hover:text-navy-900 text-gray-600 border border-gray-200 text-[11px] font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center gap-1.5 shadow-sm"
+                          title="Download MVA Tax Invoice"
+                        >
+                          <Download size={13} /> Invoice
+                        </button>
+                        <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-navy-900 group-hover:bg-navy-900 group-hover:text-white transition-colors">
+                          <ChevronRight size={18} />
+                        </div>
                       </div>
                     </div>
 

@@ -9,29 +9,36 @@ export const AuthCallback = () => {
 
   useEffect(() => {
     const handleAuthCallback = async () => {
-      const { data, error } = await supabase.auth.getSession();
-      
-      if (error) {
-        console.error('Auth callback error:', error);
-        setError(error.message);
-        setTimeout(() => navigate('/login'), 3000);
-        return;
-      }
-
-      if (data.session) {
-        // Successful login/verification
-        // Check if there's a recovery flow
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        const type = hashParams.get('type');
+      try {
+        const searchParams = new URLSearchParams(window.location.search);
+        const code = searchParams.get('code');
         
-        if (type === 'recovery') {
-          navigate('/reset-password');
-        } else {
-          navigate('/home');
+        if (code) {
+          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+          if (exchangeError) {
+            console.warn('PKCE exchange warning:', exchangeError.message);
+          }
         }
-      } else {
-        // No session
-        navigate('/login');
+
+        const { data, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) throw sessionError;
+
+        if (data.session) {
+          const hashParams = new URLSearchParams(window.location.hash.substring(1));
+          const type = hashParams.get('type') || searchParams.get('type');
+          
+          if (type === 'recovery') {
+            navigate('/reset-password');
+          } else {
+            navigate('/home');
+          }
+        } else {
+          navigate('/login');
+        }
+      } catch (err: any) {
+        console.error('Auth callback error:', err);
+        setError(err.message || 'Authentication verification failed.');
+        setTimeout(() => navigate('/login'), 3000);
       }
     };
 
@@ -41,16 +48,16 @@ export const AuthCallback = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-navy-900 text-white">
       {error ? (
-        <div className="bg-red-500/20 text-red-200 p-4 rounded-xl max-w-md text-center">
-          <p className="font-bold mb-2">Authentication Error</p>
-          <p>{error}</p>
-          <p className="text-sm mt-4 opacity-70">Redirecting to login...</p>
+        <div className="bg-red-500/20 text-red-200 p-6 rounded-2xl max-w-md text-center border border-red-500/30">
+          <p className="font-bold mb-2 text-lg">Authentication Error</p>
+          <p className="text-sm">{error}</p>
+          <p className="text-xs mt-4 opacity-70">Redirecting to login...</p>
         </div>
       ) : (
         <div className="flex flex-col items-center">
           <Loader2 className="w-12 h-12 text-aurora-green animate-spin mb-4" />
           <h2 className="text-xl font-bold">Verifying authentication...</h2>
-          <p className="text-white/70">Please wait while we log you in.</p>
+          <p className="text-white/70 text-sm mt-1">Please wait while we log you into Norway SmartLife.</p>
         </div>
       )}
     </div>

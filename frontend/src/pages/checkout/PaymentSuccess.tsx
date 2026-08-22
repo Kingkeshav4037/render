@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CheckCircle, Calendar, Download, ChevronRight, Check, Loader2 } from 'lucide-react';
 import { useCart } from '../../store/useCartStore';
 import { supabase } from '../../lib/supabase';
+import { invoiceService } from '../../services/invoice/invoiceService';
 
 export const PaymentSuccess = () => {
   const { clearCart } = useCart();
   const [orderId, setOrderId] = useState<string | null>(null);
   const [status, setStatus] = useState<'PROCESSING' | 'PAID' | 'FAILED'>('PROCESSING');
+  const [orderData, setOrderData] = useState<any>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -18,13 +20,16 @@ export const PaymentSuccess = () => {
       const checkStatus = async () => {
         const { data } = await supabase
           .from('orders')
-          .select('status')
+          .select('*')
           .eq('id', id)
           .single();
           
-        if (data && data.status === 'PAID') {
-          setStatus('PAID');
-          clearCart();
+        if (data) {
+          setOrderData(data);
+          if (data.status === 'PAID') {
+            setStatus('PAID');
+            clearCart();
+          }
         }
       };
 
@@ -37,6 +42,23 @@ export const PaymentSuccess = () => {
       return () => clearInterval(interval);
     }
   }, [clearCart]);
+
+  const handleDownloadInvoice = () => {
+    const mockOrderBooking = {
+      id: orderId || 'ORD-98412',
+      total_amount: orderData?.total_amount || 3200,
+      currency: orderData?.currency || 'NOK',
+      item_type: 'Travel Checkout Order',
+      pax: 1,
+      customer_name: orderData?.customer_name || 'Traveler',
+      customer_email: orderData?.customer_email || 'traveler@smartlife.no',
+      created_at: orderData?.created_at || new Date().toISOString(),
+      payment_id: orderId,
+      status: 'CONFIRMED'
+    };
+
+    invoiceService.downloadInvoiceForBooking(mockOrderBooking);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -64,56 +86,61 @@ export const PaymentSuccess = () => {
                 </div>
                 <div className="text-right">
                   <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Status</p>
-                  <div className="inline-flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold uppercase">
+                  <div className="inline-flex items-center gap-1 bg-green-100 text-green-700 px-2.5 py-1 rounded-full text-xs font-bold uppercase">
                     <Check size={12} /> Paid
                   </div>
                 </div>
               </div>
 
-            <div className="space-y-4">
-              <h3 className="font-bold text-navy-900 text-sm uppercase tracking-wider">Next Steps</h3>
-              
-              <button className="w-full flex items-center justify-between p-4 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white rounded-lg text-navy-900 shadow-sm"><Calendar size={20} /></div>
-                  <div className="text-left">
-                    <div className="font-bold text-navy-900 text-sm">Add to Dashboard</div>
-                    <div className="text-xs text-gray-500 mt-0.5">View your itinerary and manage this trip</div>
+              <div className="space-y-4">
+                <h3 className="font-bold text-navy-900 text-sm uppercase tracking-wider">Next Steps</h3>
+                
+                <button 
+                  onClick={() => window.location.href = '/user/bookings'}
+                  className="w-full flex items-center justify-between p-4 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-white rounded-lg text-navy-900 shadow-sm"><Calendar size={20} /></div>
+                    <div className="text-left">
+                      <div className="font-bold text-navy-900 text-sm">Add to Dashboard</div>
+                      <div className="text-xs text-gray-500 mt-0.5">View your itinerary and manage this trip</div>
+                    </div>
                   </div>
-                </div>
-                <ChevronRight size={20} className="text-gray-400" />
-              </button>
+                  <ChevronRight size={20} className="text-gray-400" />
+                </button>
 
-              <button className="w-full flex items-center justify-between p-4 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white rounded-lg text-navy-900 shadow-sm"><Download size={20} /></div>
-                  <div className="text-left">
-                    <div className="font-bold text-navy-900 text-sm">Download Invoice & Receipt</div>
-                    <div className="text-xs text-gray-500 mt-0.5">PDF format for your records</div>
+                <button 
+                  onClick={handleDownloadInvoice}
+                  className="w-full flex items-center justify-between p-4 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-white rounded-lg text-navy-900 shadow-sm group-hover:bg-aurora-green transition-colors"><Download size={20} /></div>
+                    <div className="text-left">
+                      <div className="font-bold text-navy-900 text-sm">Download Invoice & Receipt</div>
+                      <div className="text-xs text-gray-500 mt-0.5">MVA-compliant PDF/Printable format</div>
+                    </div>
                   </div>
-                </div>
-                <ChevronRight size={20} className="text-gray-400" />
-              </button>
-            </div>
+                  <ChevronRight size={20} className="text-gray-400" />
+                </button>
+              </div>
 
-            <div className="pt-6 border-t border-gray-100">
-              <button 
-                onClick={() => window.location.href = '/user/bookings'}
-                className="w-full py-4 bg-navy-900 text-white font-bold rounded-xl hover:bg-navy-800 transition-colors shadow-md"
-              >
-                Continue Exploring Norway
-              </button>
+              <div className="pt-6 border-t border-gray-100">
+                <button 
+                  onClick={() => window.location.href = '/user/bookings'}
+                  className="w-full py-4 bg-navy-900 text-white font-bold rounded-xl hover:bg-navy-800 transition-colors shadow-md cursor-pointer"
+                >
+                  Continue Exploring Norway
+                </button>
+              </div>
             </div>
-          </div>
           </div>
         )}
         
         {status === 'PAID' && (
           <p className="text-center text-sm text-gray-400 mt-6">
-            A confirmation email has been sent to your address.
+            A confirmation email and invoice copy have been sent to your address.
           </p>
         )}
-
       </div>
     </div>
   );

@@ -96,6 +96,8 @@ const ProviderSettings = lazy(() => import('./pages/provider/settings/ProviderSe
 const Impact = lazy(() => import('./pages/user/Impact').then(m => ({ default: m.Impact })));
 const Wildlife = lazy(() => import('./pages/nature/Wildlife').then(m => ({ default: m.Wildlife })));
 const WildlifeDetail = lazy(() => import('./pages/nature/WildlifeDetail').then(m => ({ default: m.WildlifeDetail })));
+const Flora = lazy(() => import('./pages/nature/Flora').then(m => ({ default: m.Flora })));
+const Invoices = lazy(() => import('./pages/user/Invoices').then(m => ({ default: m.Invoices })));
 const LiveWeather = lazy(() => import('./pages/nature/LiveWeather').then(m => ({ default: m.LiveWeather })));
 const AuroraTracker = lazy(() => import('./pages/nature/AuroraTracker').then(m => ({ default: m.AuroraTracker })));
 const SafetyAlerts = lazy(() => import('./pages/nature/SafetyAlerts').then(m => ({ default: m.SafetyAlerts })));
@@ -215,6 +217,8 @@ function App() {
               <Route path="/mountains" element={<Navigate to="/trails" replace />} />
               <Route path="/wildlife" element={<Wildlife />} />
               <Route path="/wildlife/:id" element={<WildlifeDetail />} />
+              <Route path="/flora" element={<Flora />} />
+              <Route path="/nature/flora" element={<Flora />} />
               <Route path="/resorts" element={<WinterSports />} />
               <Route path="/food" element={<Food />} />
               <Route path="/restaurants" element={<Navigate to="/food" replace />} />
@@ -259,6 +263,8 @@ function App() {
               <Route path="/settings/notifications" element={<NotificationSettings />} />
               <Route path="/user/bookings" element={<MyBookings />} />
               <Route path="/user/bookings/:id" element={<BookingDetails />} />
+              <Route path="/invoices" element={<Invoices />} />
+              <Route path="/user/invoices" element={<Invoices />} />
 
               {/* ── GROUP 3: Maps & Smart City ──────────────────────────── */}
               <Route path="/map" element={

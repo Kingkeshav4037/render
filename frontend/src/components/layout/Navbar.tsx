@@ -68,6 +68,7 @@ export const Navbar = () => {
           <div className="bg-snow rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.12)] border border-gray-100 overflow-hidden flex flex-col p-2 text-nordic-charcoal">
             <Link to="/explore" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Explore Places</Link>
             <Link to="/wildlife" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Wildlife</Link>
+            <Link to="/flora" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Flora & Forests</Link>
             <Link to="/aurora" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Aurora Tracker</Link>
             <Link to="/weather" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Live Weather</Link>
             <Link to="/safety" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Safety Alerts</Link>
@@ -244,6 +245,9 @@ export const Navbar = () => {
                     <Link to="/user/bookings" className="px-4 py-2.5 hover:bg-arctic-mist rounded-lg font-sans font-medium text-sm transition-colors">
                       My Bookings
                     </Link>
+                    <Link to="/user/invoices" className="px-4 py-2.5 hover:bg-arctic-mist rounded-lg font-sans font-medium text-sm transition-colors">
+                      Invoices & Receipts
+                    </Link>
                     <Link to="/profile" className="px-4 py-2.5 hover:bg-arctic-mist rounded-lg font-sans font-medium text-sm transition-colors">
                       Profile
                     </Link>
@@ -329,6 +333,7 @@ export const Navbar = () => {
               <div className="flex flex-col space-y-1">
                 <Link to="/explore" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Explore Places</Link>
                 <Link to="/wildlife" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Wildlife</Link>
+                <Link to="/flora" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Flora & Forests</Link>
                 <Link to="/aurora" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Aurora Tracker</Link>
                 <Link to="/weather" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Live Weather</Link>
                 <Link to="/safety" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Safety Alerts</Link>
@@ -386,6 +391,7 @@ export const Navbar = () => {
               <div className="px-3 py-2 text-xs font-bold uppercase tracking-wider text-slate-400">Hi, {firstName}</div>
               <Link to="/dashboard" className="px-3 py-2 font-semibold text-sm text-nordic-charcoal hover:bg-gray-50 rounded-lg" onClick={() => setShowMobileMenu(false)}>My Norway Dashboard</Link>
               <Link to="/user/bookings" className="px-3 py-2 font-semibold text-sm text-nordic-charcoal hover:bg-gray-50 rounded-lg" onClick={() => setShowMobileMenu(false)}>My Bookings</Link>
+              <Link to="/user/invoices" className="px-3 py-2 font-semibold text-sm text-nordic-charcoal hover:bg-gray-50 rounded-lg" onClick={() => setShowMobileMenu(false)}>Invoices & Receipts</Link>
               <Link to="/profile" className="px-3 py-2 font-semibold text-sm text-nordic-charcoal hover:bg-gray-50 rounded-lg" onClick={() => setShowMobileMenu(false)}>Profile Settings</Link>
               <button onClick={handleLogout} className="flex items-center gap-2 px-3 py-2 font-semibold text-sm text-nordic-red hover:bg-red-50 rounded-lg text-left">
                 <LogOut className="w-4 h-4" /> Sign Out
