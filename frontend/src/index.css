@@ -46,6 +46,43 @@ body {
   @apply bg-snow text-nordic-charcoal font-sans antialiased;
 }
 
+/* ─── WCAG Accessibility Utilities & Focus Indicators ────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-royal-fjord, #1D4ED8);
+  outline-offset: 2px;
+}
+
+.skip-to-content {
+  position: absolute;
+  top: -9999px;
+  left: 1rem;
+  z-index: 99999;
+  padding: 0.75rem 1.5rem;
+  background-color: #1D4ED8;
+  color: #FFFFFF;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+  transition: top 0.15s ease-in-out;
+}
+
+.skip-to-content:focus {
+  top: 1rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
