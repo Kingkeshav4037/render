@@ -13,8 +13,8 @@ CREATE INDEX IF NOT EXISTS idx_invoices_booking_id
 CREATE INDEX IF NOT EXISTS idx_invoices_invoice_number 
   ON public.invoices (invoice_number);
 
-CREATE INDEX IF NOT EXISTS idx_invoices_payment_status 
-  ON public.invoices (payment_status);
+CREATE INDEX IF NOT EXISTS idx_invoices_status 
+  ON public.invoices (status);
 
 CREATE INDEX IF NOT EXISTS idx_invoices_created_at 
   ON public.invoices (created_at DESC);
