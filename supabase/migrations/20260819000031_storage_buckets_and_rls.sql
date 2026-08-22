@@ -11,9 +11,6 @@ BEGIN
         VALUES ('avatars', 'avatars', true)
         ON CONFLICT (id) DO NOTHING;
 
-        -- Ensure RLS is active on storage.objects table
-        ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
-
         -- 1. Anyone can view avatar images (Public read)
         DROP POLICY IF EXISTS "Avatar images are publicly accessible" ON storage.objects;
         CREATE POLICY "Avatar images are publicly accessible"
@@ -50,4 +47,7 @@ BEGIN
           AND (auth.uid()::text = (storage.foldername(name))[1])
         );
     END IF;
+EXCEPTION
+    WHEN insufficient_privilege THEN
+        NULL; -- Gracefully handle Supabase cloud managed storage permissions
 END $$;
