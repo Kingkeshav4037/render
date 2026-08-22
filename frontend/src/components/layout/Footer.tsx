@@ -1,0 +1,79 @@
+import { Link } from 'react-router-dom';
+import { Container } from './Container';
+import { Compass } from 'lucide-react';
+
+export const Footer = () => {
+  return (
+    <footer className="bg-deep-night text-snow py-20 border-t border-white/5 mt-auto relative overflow-hidden z-10">
+      {/* Decorative gradient */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-arctic-gold/30 to-transparent"></div>
+      
+      <Container>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
+          
+          <div className="lg:col-span-2 space-y-6">
+            <Link to="/" className="flex items-center gap-3 group inline-block">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-snow text-deep-night shadow-md">
+                <Compass className="w-6 h-6" />
+              </div>
+              <span className="text-2xl font-display font-semibold tracking-wide text-snow">
+                NORDIC LIVING
+              </span>
+            </Link>
+            <p className="text-sm font-sans text-snow/60 leading-relaxed max-w-sm">
+              Discover the beauty, sustainability, and technological innovation of Norway. Your premium guide to exploring and experiencing the Nordic way of life.
+            </p>
+            <div className="flex gap-4 pt-2">
+              <a href="#" className="w-auto h-10 px-6 rounded-none border border-white/20 flex items-center justify-center hover:bg-snow hover:text-deep-night transition-all text-snow text-xs font-sans uppercase tracking-widest font-semibold">
+                Instagram
+              </a>
+              <a href="#" className="w-auto h-10 px-6 rounded-none border border-white/20 flex items-center justify-center hover:bg-snow hover:text-deep-night transition-all text-snow text-xs font-sans uppercase tracking-widest font-semibold">
+                Twitter
+              </a>
+            </div>
+          </div>
+          
+          <div>
+            <h4 className="text-snow font-sans font-semibold mb-6 tracking-widest uppercase text-xs">Explore</h4>
+            <ul className="space-y-4 text-sm font-sans text-snow/70">
+              <li><Link to="/explore" className="hover:text-arctic-gold transition-colors">Destinations</Link></li>
+              <li><Link to="/trails" className="hover:text-arctic-gold transition-colors">Hiking & Nature</Link></li>
+              <li><Link to="/stay" className="hover:text-arctic-gold transition-colors">Accommodations</Link></li>
+              <li><Link to="/food" className="hover:text-arctic-gold transition-colors">Culinary Scene</Link></li>
+            </ul>
+          </div>
+          
+          <div>
+            <h4 className="text-snow font-sans font-semibold mb-6 tracking-widest uppercase text-xs">Insights</h4>
+            <ul className="space-y-4 text-sm font-sans text-snow/70">
+              <li><Link to="/map" className="hover:text-arctic-gold transition-colors">Interactive Map</Link></li>
+              <li><Link to="/impact" className="hover:text-arctic-gold transition-colors">Sustainability</Link></li>
+              <li><Link to="/infrastructure" className="hover:text-arctic-gold transition-colors">Infrastructure</Link></li>
+              <li><Link to="/aurora" className="hover:text-arctic-gold transition-colors">Aurora Forecast</Link></li>
+            </ul>
+          </div>
+          
+          <div>
+            <h4 className="text-snow font-sans font-semibold mb-6 tracking-widest uppercase text-xs">Legal</h4>
+            <ul className="space-y-4 text-sm font-sans text-snow/70">
+              <li><Link to="#" className="hover:text-snow transition-colors">Privacy Policy</Link></li>
+              <li><Link to="#" className="hover:text-snow transition-colors">Terms of Service</Link></li>
+              <li><Link to="#" className="hover:text-snow transition-colors">Cookie Policy</Link></li>
+            </ul>
+          </div>
+          
+        </div>
+        
+        <div className="mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-xs font-sans tracking-wide text-snow/40">
+            © {new Date().getFullYear()} NORDIC LIVING. All rights reserved.
+          </p>
+          <div className="flex items-center gap-2 text-xs font-sans tracking-wide text-snow/40">
+            <span>Powered by</span>
+            <span className="text-arctic-gold font-semibold">Norway SmartLife Ecosystem</span>
+          </div>
+        </div>
+      </Container>
+    </footer>
+  );
+};

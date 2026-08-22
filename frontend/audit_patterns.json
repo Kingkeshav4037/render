@@ -1,0 +1,1147 @@
+﻿[
+    {
+        "Filename":  "ReviewSection.tsx",
+        "LineNumber":  47,
+        "Line":  "      console.error(error);"
+    },
+    {
+        "Filename":  "DestinationMap.tsx",
+        "LineNumber":  6,
+        "Line":  "delete (L.Icon.Default.prototype as any)._getIconUrl;"
+    },
+    {
+        "Filename":  "NearbyAttractions.tsx",
+        "LineNumber":  29,
+        "Line":  "        console.error(\"Failed to fetch nearby attractions\", error);"
+    },
+    {
+        "Filename":  "SmartSearch.tsx",
+        "LineNumber":  144,
+        "Line":  "                    onClick={() =\u003e { setQuery(suggestion.label); setIsExpanded(false); handleSearch(new Event(\u0027submit\u0027) as any); }}"
+    },
+    {
+        "Filename":  "useLocations.ts",
+        "LineNumber":  1,
+        "Line":  "// @ts-nocheck"
+    },
+    {
+        "Filename":  "AdminLogin.tsx",
+        "LineNumber":  49,
+        "Line":  "        } as any, "
+    },
+    {
+        "Filename":  "AdminLogin.tsx",
+        "LineNumber":  51,
+        "Line":  "        user: { id: \u0027adm-001\u0027, email, app_metadata: {}, user_metadata: {}, aud: \u0027authenticated\u0027, created_at: \u0027\u0027 } as any"
+    },
+    {
+        "Filename":  "PlaceEditor.tsx",
+        "LineNumber":  48,
+        "Line":  "      console.error(error);"
+    },
+    {
+        "Filename":  "AdminDeals.tsx",
+        "LineNumber":  16,
+        "Line":  "    setDeals((data as any) || []);"
+    },
+    {
+        "Filename":  "AdminEvents.tsx",
+        "LineNumber":  16,
+        "Line":  "    setEvents((data as any) || []);"
+    },
+    {
+        "Filename":  "ContentManager.tsx",
+        "LineNumber":  24,
+        "Line":  "      return data as any[];"
+    },
+    {
+        "Filename":  "ImportManager.tsx",
+        "LineNumber":  42,
+        "Line":  "          console.error(\"Parse error\", err);"
+    },
+    {
+        "Filename":  "ImportManager.tsx",
+        "LineNumber":  58,
+        "Line":  "      console.error(err);"
+    },
+    {
+        "Filename":  "AdminSecurityEvents.tsx",
+        "LineNumber":  23,
+        "Line":  "      console.error(\u0027Failed to fetch security events:\u0027, error);"
+    },
+    {
+        "Filename":  "AdminPageHealth.tsx",
+        "LineNumber":  31,
+        "Line":  "        const primaryTable = (route.mandatoryGates as any).primaryTable || (route as any).requiredTables?.[0];"
+    },
+    {
+        "Filename":  "AdminPageHealth.tsx",
+        "LineNumber":  43,
+        "Line":  "          const { data, count } = await (supabase as any)"
+    },
+    {
+        "Filename":  "AdminPageHealth.tsx",
+        "LineNumber":  55,
+        "Line":  "            const sample = data[0] as any;"
+    },
+    {
+        "Filename":  "AdminPageHealth.tsx",
+        "LineNumber":  77,
+        "Line":  "            imagesPassed = (route.mandatoryGates as any).images ? true : true; "
+    },
+    {
+        "Filename":  "AdminPageHealth.tsx",
+        "LineNumber":  81,
+        "Line":  "          console.error(`Error checking health for ${primaryTable}:`, error);"
+    },
+    {
+        "Filename":  "AuditLogs.tsx",
+        "LineNumber":  1,
+        "Line":  "// @ts-nocheck"
+    },
+    {
+        "Filename":  "AuditLogs.tsx",
+        "LineNumber":  27,
+        "Line":  "      return data as any[];"
+    },
+    {
+        "Filename":  "UserManager.tsx",
+        "LineNumber":  1,
+        "Line":  "// @ts-nocheck"
+    },
+    {
+        "Filename":  "AdminBookings.tsx",
+        "LineNumber":  25,
+        "Line":  "        console.error(\u0027Failed to load bookings\u0027, error);"
+    },
+    {
+        "Filename":  "AdminDestinations.tsx",
+        "LineNumber":  33,
+        "Line":  "      console.error(\"Failed to load destinations\", err);"
+    },
+    {
+        "Filename":  "AdminUsers.tsx",
+        "LineNumber":  13,
+        "Line":  "        console.error(\u0027Error fetching users:\u0027, error);"
+    },
+    {
+        "Filename":  "HikingTrails.tsx",
+        "LineNumber":  188,
+        "Line":  "                        {(trail as any).description \u0026\u0026 ("
+    },
+    {
+        "Filename":  "HikingTrails.tsx",
+        "LineNumber":  190,
+        "Line":  "                            {(trail as any).description}"
+    },
+    {
+        "Filename":  "HikingTrails.tsx",
+        "LineNumber":  193,
+        "Line":  "                        {(trail as any).highlights \u0026\u0026 (trail as any).highlights.length \u003e 0 \u0026\u0026 ("
+    },
+    {
+        "Filename":  "HikingTrails.tsx",
+        "LineNumber":  195,
+        "Line":  "                            {(trail as any).highlights.map((h: string) =\u003e ("
+    },
+    {
+        "Filename":  "AuthCallback.tsx",
+        "LineNumber":  15,
+        "Line":  "        console.error(\u0027Auth callback error:\u0027, error);"
+    },
+    {
+        "Filename":  "ForgotPassword.tsx",
+        "LineNumber":  22,
+        "Line":  "      console.error(e);"
+    },
+    {
+        "Filename":  "Login.tsx",
+        "LineNumber":  25,
+        "Line":  "      console.error(e);"
+    },
+    {
+        "Filename":  "Login.tsx",
+        "LineNumber":  40,
+        "Line":  "      console.error(e);"
+    },
+    {
+        "Filename":  "Login.tsx",
+        "LineNumber":  54,
+        "Line":  "      console.error(e);"
+    },
+    {
+        "Filename":  "Login.tsx",
+        "LineNumber":  68,
+        "Line":  "      console.error(e);"
+    },
+    {
+        "Filename":  "Register.tsx",
+        "LineNumber":  82,
+        "Line":  "      console.error(e);"
+    },
+    {
+        "Filename":  "ResetPassword.tsx",
+        "LineNumber":  22,
+        "Line":  "      console.error(e);"
+    },
+    {
+        "Filename":  "Checkout.tsx",
+        "LineNumber":  102,
+        "Line":  "      const paymentObject = new (window as any).Razorpay(options);"
+    },
+    {
+        "Filename":  "Checkout.tsx",
+        "LineNumber":  109,
+        "Line":  "      console.error(\u0027Checkout error:\u0027, error);"
+    },
+    {
+        "Filename":  "StayBooking.tsx",
+        "LineNumber":  26,
+        "Line":  "        console.error(err);"
+    },
+    {
+        "Filename":  "TripPlanner.tsx",
+        "LineNumber":  70,
+        "Line":  "      console.error(error);"
+    },
+    {
+        "Filename":  "MyTripsWidget.tsx",
+        "LineNumber":  38,
+        "Line":  "            onClick={() =\u003e setActiveTab(tab as any)}"
+    },
+    {
+        "Filename":  "TravelPreferencesForm.tsx",
+        "LineNumber":  1,
+        "Line":  "// @ts-nocheck"
+    },
+    {
+        "Filename":  "Assistant.tsx",
+        "LineNumber":  67,
+        "Line":  "      console.error(error);"
+    },
+    {
+        "Filename":  "BookingDetails.tsx",
+        "LineNumber":  28,
+        "Line":  "        console.error(err);"
+    },
+    {
+        "Filename":  "BookingDetails.tsx",
+        "LineNumber":  50,
+        "Line":  "      console.error(err);"
+    },
+    {
+        "Filename":  "MyBookings.tsx",
+        "LineNumber":  35,
+        "Line":  "        console.error(err);"
+    },
+    {
+        "Filename":  "Activities.tsx",
+        "LineNumber":  146,
+        "Line":  "                      {(activity as any).availability === \u0027Limited Spots\u0027 \u0026\u0026 ("
+    },
+    {
+        "Filename":  "DestinationDetails.tsx",
+        "LineNumber":  76,
+        "Line":  "        console.error(\"Failed to load details:\", error);"
+    },
+    {
+        "Filename":  "Food.tsx",
+        "LineNumber":  238,
+        "Line":  "                    const foodPrice = getFoodPrice(food.name, (food as any).price);"
+    },
+    {
+        "Filename":  "Food.tsx",
+        "LineNumber":  262,
+        "Line":  "                        {(food as any).category \u0026\u0026 ("
+    },
+    {
+        "Filename":  "Food.tsx",
+        "LineNumber":  265,
+        "Line":  "                              {(food as any).category}"
+    },
+    {
+        "Filename":  "Food.tsx",
+        "LineNumber":  272,
+        "Line":  "                        {(food as any).prep_time \u0026\u0026 ("
+    },
+    {
+        "Filename":  "Food.tsx",
+        "LineNumber":  274,
+        "Line":  "                            \u003cClock className=\"w-3 h-3\" /\u003e {(food as any).prep_time}"
+    },
+    {
+        "Filename":  "Food.tsx",
+        "LineNumber":  352,
+        "Line":  "                            {(restaurant as any).type?.replace(/_/g, \u0027 \u0027) || \u0027Nordic\u0027}"
+    },
+    {
+        "Filename":  "Food.tsx",
+        "LineNumber":  366,
+        "Line":  "                          \u003cspan\u003e{(restaurant as any).location?.name || \u0027Norway\u0027}\u003c/span\u003e"
+    },
+    {
+        "Filename":  "Food.tsx",
+        "LineNumber":  368,
+        "Line":  "                          \u003cspan className=\"font-bold text-[#2C1810]\"\u003e{(restaurant as any).price_range || \u0027$$\u0027}\u003c/span\u003e"
+    },
+    {
+        "Filename":  "Food.tsx",
+        "LineNumber":  370,
+        "Line":  "                        {(restaurant as any).description \u0026\u0026 ("
+    },
+    {
+        "Filename":  "Food.tsx",
+        "LineNumber":  371,
+        "Line":  "                          \u003cp className=\"text-xs text-gray-500 line-clamp-2 mb-auto\"\u003e{(restaurant as any).description}\u003c/p\u003e"
+    },
+    {
+        "Filename":  "FoodDetails.tsx",
+        "LineNumber":  35,
+        "Line":  "  const contact = (restaurant.contact_info || {}) as any;"
+    },
+    {
+        "Filename":  "FoodDetails.tsx",
+        "LineNumber":  36,
+        "Line":  "  const hours = (restaurant.opening_hours || {}) as any;"
+    },
+    {
+        "Filename":  "FoodDetails.tsx",
+        "LineNumber":  37,
+        "Line":  "  const menu = (restaurant.menu || []) as any[];"
+    },
+    {
+        "Filename":  "Stay.tsx",
+        "LineNumber":  225,
+        "Line":  "                            \u003cMapPin className=\"w-3 h-3\" /\u003e {(stay as any).locations?.name || \u0027Norway\u0027}"
+    },
+    {
+        "Filename":  "TransportDetails.tsx",
+        "LineNumber":  62,
+        "Line":  "          const stops = (route.stops as any[]) || [];"
+    },
+    {
+        "Filename":  "TransportDetails.tsx",
+        "LineNumber":  63,
+        "Line":  "          const timetable = (route.timetable as any[]) || [];"
+    },
+    {
+        "Filename":  "TransportDetails.tsx",
+        "LineNumber":  64,
+        "Line":  "          const alerts = (route.alerts as any[]) || [];"
+    },
+    {
+        "Filename":  "adminService.ts",
+        "LineNumber":  1,
+        "Line":  "// @ts-nocheck"
+    },
+    {
+        "Filename":  "dashboardService.ts",
+        "LineNumber":  1,
+        "Line":  "// @ts-nocheck"
+    },
+    {
+        "Filename":  "dashboardService.ts",
+        "LineNumber":  132,
+        "Line":  "      console.error(\u0027Failed to get dashboard data:\u0027, error);"
+    },
+    {
+        "Filename":  "homeContentService.ts",
+        "LineNumber":  115,
+        "Line":  "        category: \u0027Traditional\u0027 as any,"
+    },
+    {
+        "Filename":  "homeContentService.ts",
+        "LineNumber":  134,
+        "Line":  "        category: \u0027Land\u0027 as any,"
+    },
+    {
+        "Filename":  "homeContentService.ts",
+        "LineNumber":  271,
+        "Line":  "    category: d.type ? (d.type.charAt(0) + d.type.slice(1).toLowerCase()) as any : \u0027Landmark\u0027,"
+    },
+    {
+        "Filename":  "homeContentService.ts",
+        "LineNumber":  286,
+        "Line":  "    category: d.type ? (d.type.charAt(0) + d.type.slice(1).toLowerCase()) as any : \u0027Hotel\u0027,"
+    },
+    {
+        "Filename":  "homeContentService.ts",
+        "LineNumber":  287,
+        "Line":  "    city: (d.locations as any)?.name || \u0027\u0027,"
+    },
+    {
+        "Filename":  "homeContentService.ts",
+        "LineNumber":  288,
+        "Line":  "    region: (d.locations as any)?.region || \u0027\u0027,"
+    },
+    {
+        "Filename":  "auroraService.ts",
+        "LineNumber":  41,
+        "Line":  "      console.error(\u0027Failed to fetch aurora forecast:\u0027, err);"
+    },
+    {
+        "Filename":  "routingService.ts",
+        "LineNumber":  67,
+        "Line":  "      console.error(\u0027Failed to fetch route from OSRM:\u0027, err);"
+    },
+    {
+        "Filename":  "weatherService.ts",
+        "LineNumber":  54,
+        "Line":  "      console.error(\u0027Failed to fetch live weather:\u0027, err);"
+    },
+    {
+        "Filename":  "mapService.ts",
+        "LineNumber":  40,
+        "Line":  "    const { data, error } = await supabase.rpc(\u0027get_smart_map_markers\u0027 as any, {"
+    },
+    {
+        "Filename":  "mapService.ts",
+        "LineNumber":  49,
+        "Line":  "      console.error(\u0027Error fetching smart map markers:\u0027, error);"
+    },
+    {
+        "Filename":  "mapService.ts",
+        "LineNumber":  55,
+        "Line":  "    console.error(\u0027MapService.getSmartMapMarkers Error:\u0027, error);"
+    },
+    {
+        "Filename":  "mapService.ts",
+        "LineNumber":  67,
+        "Line":  "    const { data, error } = await supabase.rpc(\u0027get_nearby_locations\u0027 as any, {"
+    },
+    {
+        "Filename":  "mapService.ts",
+        "LineNumber":  75,
+        "Line":  "      console.error(\u0027Error fetching nearby locations:\u0027, error);"
+    },
+    {
+        "Filename":  "mapService.ts",
+        "LineNumber":  81,
+        "Line":  "    console.error(\u0027MapService.getLocationsNearby Error:\u0027, error);"
+    },
+    {
+        "Filename":  "mapService.ts",
+        "LineNumber":  94,
+        "Line":  "        q = q.in(\u0027type\u0027, category as any);"
+    },
+    {
+        "Filename":  "mapService.ts",
+        "LineNumber":  96,
+        "Line":  "        q = q.eq(\u0027type\u0027, category as any);"
+    },
+    {
+        "Filename":  "mapService.ts",
+        "LineNumber":  119,
+        "Line":  "    const { data } = await supabase.rpc(\u0027get_nearby_stays\u0027 as any, { target_lat: lat, target_lng: lng, radius_meters: radiusMeters, max_results: 3 });"
+    },
+    {
+        "Filename":  "mapService.ts",
+        "LineNumber":  120,
+        "Line":  "    return (data as any[]) || [];"
+    },
+    {
+        "Filename":  "mapService.ts",
+        "LineNumber":  123,
+        "Line":  "    const { data } = await supabase.rpc(\u0027get_nearby_restaurants\u0027 as any, { target_lat: lat, target_lng: lng, radius_meters: radiusMeters, max_results: 3 });"
+    },
+    {
+        "Filename":  "mapService.ts",
+        "LineNumber":  124,
+        "Line":  "    return (data as any[]) || [];"
+    },
+    {
+        "Filename":  "mapService.ts",
+        "LineNumber":  127,
+        "Line":  "    const { data } = await supabase.rpc(\u0027get_nearby_activities\u0027 as any, { target_location_id: locationId, max_results: 3 });"
+    },
+    {
+        "Filename":  "mapService.ts",
+        "LineNumber":  128,
+        "Line":  "    return (data as any[]) || [];"
+    },
+    {
+        "Filename":  "mapService.ts",
+        "LineNumber":  131,
+        "Line":  "    const { data } = await supabase.rpc(\u0027get_nearby_locations\u0027 as any, { target_lat: lat, target_lng: lng, radius_meters: radiusMeters, max_results: 3 });"
+    },
+    {
+        "Filename":  "mapService.ts",
+        "LineNumber":  132,
+        "Line":  "    return (data as any[]) || [];"
+    },
+    {
+        "Filename":  "accommodationPreferencesService.ts",
+        "LineNumber":  18,
+        "Line":  "      priceMin: (data as any).price_min ?? undefined,"
+    },
+    {
+        "Filename":  "accommodationPreferencesService.ts",
+        "LineNumber":  19,
+        "Line":  "      priceMax: (data as any).price_max ?? undefined,"
+    },
+    {
+        "Filename":  "accommodationPreferencesService.ts",
+        "LineNumber":  20,
+        "Line":  "      currency: (data as any).currency || \u0027NOK\u0027,"
+    },
+    {
+        "Filename":  "accommodationPreferencesService.ts",
+        "LineNumber":  24,
+        "Line":  "      privateRoom: (data as any).private_room ?? true,"
+    },
+    {
+        "Filename":  "accommodationPreferencesService.ts",
+        "LineNumber":  25,
+        "Line":  "      breakfastRequired: (data as any).breakfast_required ?? false,"
+    },
+    {
+        "Filename":  "accommodationPreferencesService.ts",
+        "LineNumber":  26,
+        "Line":  "      cancellationPreference: ((data as any).cancellation_preference as AccommodationPreferences[\u0027cancellationPreference\u0027]) || \u0027flexible\u0027,"
+    },
+    {
+        "Filename":  "accommodationPreferencesService.ts",
+        "LineNumber":  27,
+        "Line":  "      accessibilityRequired: (data as any).accessibility_required ?? false,"
+    },
+    {
+        "Filename":  "accommodationPreferencesService.ts",
+        "LineNumber":  28,
+        "Line":  "      petFriendly: (data as any).pet_friendly ?? false,"
+    },
+    {
+        "Filename":  "accommodationPreferencesService.ts",
+        "LineNumber":  29,
+        "Line":  "      familyFriendly: (data as any).family_friendly ?? false,"
+    },
+    {
+        "Filename":  "accommodationPreferencesService.ts",
+        "LineNumber":  30,
+        "Line":  "      ecoCertified: (data as any).eco_certified ?? false,"
+    },
+    {
+        "Filename":  "accommodationPreferencesService.ts",
+        "LineNumber":  31,
+        "Line":  "      maxDistanceCenterKm: (data as any).max_distance_center_km ?? undefined,"
+    },
+    {
+        "Filename":  "accommodationPreferencesService.ts",
+        "LineNumber":  32,
+        "Line":  "      maxDistanceTransportKm: (data as any).max_distance_transport_km ?? undefined,"
+    },
+    {
+        "Filename":  "accommodationPreferencesService.ts",
+        "LineNumber":  59,
+        "Line":  "      .upsert(dbData as any, { onConflict: \u0027user_id\u0027 });"
+    },
+    {
+        "Filename":  "emergencyContactsService.ts",
+        "LineNumber":  1,
+        "Line":  "// @ts-nocheck"
+    },
+    {
+        "Filename":  "emergencyContactsService.ts",
+        "LineNumber":  40,
+        "Line":  "        relationship: contact.relationship || (null as any),"
+    },
+    {
+        "Filename":  "emergencyContactsService.ts",
+        "LineNumber":  43,
+        "Line":  "        email: contact.email || (null as any),"
+    },
+    {
+        "Filename":  "emergencyContactsService.ts",
+        "LineNumber":  68,
+        "Line":  "      .update(dbUpdates as any)"
+    },
+    {
+        "Filename":  "emergencyContactsService.ts",
+        "LineNumber":  87,
+        "Line":  "      .update({ is_primary: false } as any)"
+    },
+    {
+        "Filename":  "emergencyContactsService.ts",
+        "LineNumber":  95,
+        "Line":  "      .update({ is_primary: true } as any)"
+    },
+    {
+        "Filename":  "foodPreferencesService.ts",
+        "LineNumber":  35,
+        "Line":  "      .upsert(dbData as any, { onConflict: \u0027user_id\u0027 });"
+    },
+    {
+        "Filename":  "notificationPreferencesService.ts",
+        "LineNumber":  34,
+        "Line":  "      safetyAlerts: parseChannel((data as any).safety_alerts),"
+    },
+    {
+        "Filename":  "notificationPreferencesService.ts",
+        "LineNumber":  51,
+        "Line":  "      .upsert(dbData as any, { onConflict: \u0027user_id\u0027 });"
+    },
+    {
+        "Filename":  "personalizationService.ts",
+        "LineNumber":  1,
+        "Line":  "// @ts-nocheck"
+    },
+    {
+        "Filename":  "personalizationService.ts",
+        "LineNumber":  26,
+        "Line":  "      travelPreferences: (prefs.data as any) || {},"
+    },
+    {
+        "Filename":  "personalizationService.ts",
+        "LineNumber":  27,
+        "Line":  "      foodPreferences: (food.data as any) || {},"
+    },
+    {
+        "Filename":  "personalizationService.ts",
+        "LineNumber":  28,
+        "Line":  "      accommodationPreferences: (acc.data as any) || {},"
+    },
+    {
+        "Filename":  "personalizationService.ts",
+        "LineNumber":  29,
+        "Line":  "      transportPreferences: (trans.data as any) || {},"
+    },
+    {
+        "Filename":  "privacyPreferencesService.ts",
+        "LineNumber":  1,
+        "Line":  "// @ts-nocheck"
+    },
+    {
+        "Filename":  "privacyPreferencesService.ts",
+        "LineNumber":  21,
+        "Line":  "      locationHistory: (data as any).location_history ?? false,"
+    },
+    {
+        "Filename":  "privacyPreferencesService.ts",
+        "LineNumber":  22,
+        "Line":  "      recommendationData: (data as any).recommendation_data ?? true,"
+    },
+    {
+        "Filename":  "privacyPreferencesService.ts",
+        "LineNumber":  23,
+        "Line":  "      marketingCommunications: (data as any).marketing_communications ?? false,"
+    },
+    {
+        "Filename":  "privacyPreferencesService.ts",
+        "LineNumber":  24,
+        "Line":  "      dataSharing: (data as any).data_sharing ?? false,"
+    },
+    {
+        "Filename":  "privacyPreferencesService.ts",
+        "LineNumber":  42,
+        "Line":  "      .upsert(dbData as any, { onConflict: \u0027user_id\u0027 });"
+    },
+    {
+        "Filename":  "profileService.ts",
+        "LineNumber":  1,
+        "Line":  "// @ts-nocheck"
+    },
+    {
+        "Filename":  "profileService.ts",
+        "LineNumber":  23,
+        "Line":  "      console.error(\u0027Error fetching profile:\u0027, error);"
+    },
+    {
+        "Filename":  "profileService.ts",
+        "LineNumber":  51,
+        "Line":  "      console.log(\u0027RBAC permissions not yet available or failed to fetch\u0027, e);"
+    },
+    {
+        "Filename":  "profileService.ts",
+        "LineNumber":  62,
+        "Line":  "        console.error(\u0027Failed to create profile during ensureProfileExists:\u0027, error);"
+    },
+    {
+        "Filename":  "profileService.ts",
+        "LineNumber":  64,
+        "Line":  "        console.log(\u0027Profile created successfully for\u0027, userId);"
+    },
+    {
+        "Filename":  "profileService.ts",
+        "LineNumber":  84,
+        "Line":  "      (key) =\u003e (dbUpdates as any)[key] === undefined \u0026\u0026 delete (dbUpdates as any)[key]"
+    },
+    {
+        "Filename":  "profileService.ts",
+        "LineNumber":  87,
+        "Line":  "    const { error } = await supabase.from(\u0027profiles\u0027).update(dbUpdates as any).eq(\u0027id\u0027, userId);"
+    },
+    {
+        "Filename":  "profileService.ts",
+        "LineNumber":  144,
+        "Line":  "      .update({ avatar_url: avatarUrl } as any)"
+    },
+    {
+        "Filename":  "profileService.ts",
+        "LineNumber":  191,
+        "Line":  "      ((travelData as any).preferred_trip_style?.length \u003e 0 ||"
+    },
+    {
+        "Filename":  "profileService.ts",
+        "LineNumber":  192,
+        "Line":  "        (travelData as any).activity_interests?.length \u003e= 2 ||"
+    },
+    {
+        "Filename":  "profileService.ts",
+        "LineNumber":  193,
+        "Line":  "        (travelData as any).budget_level !== \u0027moderate\u0027);"
+    },
+    {
+        "Filename":  "profileService.ts",
+        "LineNumber":  204,
+        "Line":  "      ((foodData as any).dietary_preferences?.length \u003e 0 ||"
+    },
+    {
+        "Filename":  "profileService.ts",
+        "LineNumber":  205,
+        "Line":  "        (foodData as any).allergies?.length \u003e 0 ||"
+    },
+    {
+        "Filename":  "profileService.ts",
+        "LineNumber":  206,
+        "Line":  "        (foodData as any).favorite_cuisines?.length \u003e 0);"
+    },
+    {
+        "Filename":  "profileService.ts",
+        "LineNumber":  215,
+        "Line":  "    const accFilled = accData \u0026\u0026 ((accData as any).preferred_types?.length \u003e 0);"
+    },
+    {
+        "Filename":  "profileService.ts",
+        "LineNumber":  224,
+        "Line":  "    const transFilled = transData \u0026\u0026 ((transData as any).preferred_modes?.length \u003e 0);"
+    },
+    {
+        "Filename":  "profileService.ts",
+        "LineNumber":  240,
+        "Line":  "    const emergencyFilled = emergency.data \u0026\u0026 (emergency.data as any[]).length \u003e 0;"
+    },
+    {
+        "Filename":  "profileService.ts",
+        "LineNumber":  251,
+        "Line":  "      ((privacyData as any).profile_visibility !== \u0027private\u0027 ||"
+    },
+    {
+        "Filename":  "profileService.ts",
+        "LineNumber":  252,
+        "Line":  "        (privacyData as any).analytics_tracking === false ||"
+    },
+    {
+        "Filename":  "profileService.ts",
+        "LineNumber":  253,
+        "Line":  "        (privacyData as any).personalized_recommendations === false);"
+    },
+    {
+        "Filename":  "transportPreferencesService.ts",
+        "LineNumber":  17,
+        "Line":  "      avoidModes: (data as any).avoid_modes || [],"
+    },
+    {
+        "Filename":  "transportPreferencesService.ts",
+        "LineNumber":  20,
+        "Line":  "      maxWalkingDistanceKm: (data as any).max_walking_distance_km ?? 2,"
+    },
+    {
+        "Filename":  "transportPreferencesService.ts",
+        "LineNumber":  21,
+        "Line":  "      maxTransferCount: (data as any).max_transfer_count ?? 3,"
+    },
+    {
+        "Filename":  "transportPreferencesService.ts",
+        "LineNumber":  22,
+        "Line":  "      rentalCarPreference: (data as any).rental_car_preference ?? false,"
+    },
+    {
+        "Filename":  "transportPreferencesService.ts",
+        "LineNumber":  23,
+        "Line":  "      evPreference: (data as any).ev_preference ?? false,"
+    },
+    {
+        "Filename":  "transportPreferencesService.ts",
+        "LineNumber":  24,
+        "Line":  "      scenicRoutePreference: (data as any).scenic_route_preference ?? false,"
+    },
+    {
+        "Filename":  "transportPreferencesService.ts",
+        "LineNumber":  43,
+        "Line":  "      .upsert(dbData as any, { onConflict: \u0027user_id\u0027 });"
+    },
+    {
+        "Filename":  "travelPreferencesService.ts",
+        "LineNumber":  57,
+        "Line":  "      .upsert(dbData as any, { onConflict: \u0027user_id\u0027 });"
+    },
+    {
+        "Filename":  "realtimeClient.ts",
+        "LineNumber":  103,
+        "Line":  "      console.error(\u0027Failed to fetch initial IoT state\u0027, err);"
+    },
+    {
+        "Filename":  "staysService.ts",
+        "LineNumber":  47,
+        "Line":  "      q = q.eq(\u0027type\u0027, filters.type as any);"
+    },
+    {
+        "Filename":  "staysService.ts",
+        "LineNumber":  68,
+        "Line":  "      console.error(\u0027Error fetching stays:\u0027, error);"
+    },
+    {
+        "Filename":  "staysService.ts",
+        "LineNumber":  71,
+        "Line":  "    return { data: data as any, count: count || 0 };"
+    },
+    {
+        "Filename":  "staysService.ts",
+        "LineNumber":  77,
+        "Line":  "    return data as any;"
+    },
+    {
+        "Filename":  "staysService.ts",
+        "LineNumber":  81,
+        "Line":  "    const { data, error } = await supabase.from(\u0027accommodation_rooms\u0027 as any).select(\u0027id, accommodation_id, name, description, capacity, price_per_night, amenities, image_url, available\u0027).eq(\u0027accommodation_id\u0027, accommodationId);"
+    },
+    {
+        "Filename":  "staysService.ts",
+        "LineNumber":  83,
+        "Line":  "      console.error(\u0027Error fetching rooms:\u0027, error);"
+    },
+    {
+        "Filename":  "staysService.ts",
+        "LineNumber":  86,
+        "Line":  "    return data as any;"
+    },
+    {
+        "Filename":  "staysService.ts",
+        "LineNumber":  90,
+        "Line":  "    const { data, error } = await supabase.from(\u0027accommodation_rooms\u0027 as any).select(\u0027id, accommodation_id, name, description, capacity, price_per_night, amenities, image_url, available\u0027).eq(\u0027id\u0027, roomId).single();"
+    },
+    {
+        "Filename":  "staysService.ts",
+        "LineNumber":  92,
+        "Line":  "    return data as any;"
+    },
+    {
+        "Filename":  "activityService.ts",
+        "LineNumber":  188,
+        "Line":  "      let query = (supabase as any)"
+    },
+    {
+        "Filename":  "activityService.ts",
+        "LineNumber":  216,
+        "Line":  "      console.error(\u0027Error fetching activities:\u0027, e);"
+    },
+    {
+        "Filename":  "activityService.ts",
+        "LineNumber":  227,
+        "Line":  "      const { data, error } = await (supabase as any)"
+    },
+    {
+        "Filename":  "activityService.ts",
+        "LineNumber":  243,
+        "Line":  "      let query = (supabase as any).from(\u0027equipment_rentals\u0027).select(\u0027id, name, description, rental_type, price_per_day, currency, available_stock, image_url\u0027);"
+    },
+    {
+        "Filename":  "api.ts",
+        "LineNumber":  18,
+        "Line":  "    console.error(`Edge Function Error [${functionName}]:`, error);"
+    },
+    {
+        "Filename":  "bookingService.ts",
+        "LineNumber":  1,
+        "Line":  "// @ts-nocheck"
+    },
+    {
+        "Filename":  "bookingService.ts",
+        "LineNumber":  50,
+        "Line":  "      console.error(\u0027Error fetching all bookings:\u0027, error);"
+    },
+    {
+        "Filename":  "checkoutService.ts",
+        "LineNumber":  19,
+        "Line":  "    const { data: orderId, error } = await supabase.rpc(\u0027process_checkout\u0027 as any, {"
+    },
+    {
+        "Filename":  "checkoutService.ts",
+        "LineNumber":  26,
+        "Line":  "      console.error(\u0027Checkout failed:\u0027, error);"
+    },
+    {
+        "Filename":  "checkoutService.ts",
+        "LineNumber":  39,
+        "Line":  "      console.error(\u0027Failed to create payment intent:\u0027, error);"
+    },
+    {
+        "Filename":  "contentService.ts",
+        "LineNumber":  35,
+        "Line":  "      const media = await mediaService.getMediaForEntity(entityType, (entity as any).id);"
+    },
+    {
+        "Filename":  "contentService.ts",
+        "LineNumber":  44,
+        "Line":  "        .eq(\u0027source_id\u0027, (entity as any).id);"
+    },
+    {
+        "Filename":  "contentService.ts",
+        "LineNumber":  51,
+        "Line":  "        ...(entity as any),"
+    },
+    {
+        "Filename":  "contentService.ts",
+        "LineNumber":  58,
+        "Line":  "      console.error(`Error fetching detailed content from ${table} for ${slug}:`, error);"
+    },
+    {
+        "Filename":  "contentService.ts",
+        "LineNumber":  72,
+        "Line":  "      return (data || []) as any as ContentEntity[];"
+    },
+    {
+        "Filename":  "contentService.ts",
+        "LineNumber":  74,
+        "Line":  "      console.error(`Error fetching all content from ${table}:`, error);"
+    },
+    {
+        "Filename":  "dealService.ts",
+        "LineNumber":  24,
+        "Line":  "      console.error(\u0027Error fetching deals:\u0027, error);"
+    },
+    {
+        "Filename":  "dealService.ts",
+        "LineNumber":  40,
+        "Line":  "      console.error(\u0027Error fetching featured deals:\u0027, error);"
+    },
+    {
+        "Filename":  "dealService.ts",
+        "LineNumber":  54,
+        "Line":  "      console.error(\u0027Error fetching published deals:\u0027, error);"
+    },
+    {
+        "Filename":  "destinationService.ts",
+        "LineNumber":  91,
+        "Line":  "      console.error(`Error fetching destination ${slug}:`, error);"
+    },
+    {
+        "Filename":  "destinationService.ts",
+        "LineNumber":  108,
+        "Line":  "      console.error(\u0027Error fetching all destinations:\u0027, error);"
+    },
+    {
+        "Filename":  "eventService.ts",
+        "LineNumber":  21,
+        "Line":  "    const { data, error } = await (supabase as any)"
+    },
+    {
+        "Filename":  "eventService.ts",
+        "LineNumber":  27,
+        "Line":  "      console.error(\u0027Error fetching events:\u0027, error);"
+    },
+    {
+        "Filename":  "eventService.ts",
+        "LineNumber":  34,
+        "Line":  "    const { data, error } = await (supabase as any)"
+    },
+    {
+        "Filename":  "eventService.ts",
+        "LineNumber":  46,
+        "Line":  "    const { data, error } = await (supabase as any)"
+    },
+    {
+        "Filename":  "foodService.ts",
+        "LineNumber":  169,
+        "Line":  "        query = query.eq(\u0027type\u0027, filters.type as any);"
+    },
+    {
+        "Filename":  "importService.ts",
+        "LineNumber":  10,
+        "Line":  "      .from(tableName as any)"
+    },
+    {
+        "Filename":  "importService.ts",
+        "LineNumber":  15,
+        "Line":  "      console.error(\u0027Import Error:\u0027, error);"
+    },
+    {
+        "Filename":  "mapService.ts",
+        "LineNumber":  38,
+        "Line":  "      console.error(\u0027Error fetching smart map markers:\u0027, error);"
+    },
+    {
+        "Filename":  "mapService.ts",
+        "LineNumber":  82,
+        "Line":  "      console.error(\u0027Error fetching wildlife for map:\u0027, err);"
+    },
+    {
+        "Filename":  "mediaService.ts",
+        "LineNumber":  33,
+        "Line":  "      console.error(`Error fetching media for ${entityType} ${entityId}:`, error);"
+    },
+    {
+        "Filename":  "mediaService.ts",
+        "LineNumber":  56,
+        "Line":  "      console.error(`Error fetching hero image for ${entityType} ${entityId}:`, error);"
+    },
+    {
+        "Filename":  "plannerService.ts",
+        "LineNumber":  45,
+        "Line":  "      (supabase as any).from(\u0027locations\u0027).select(\u0027id, name, region, type\u0027).limit(20),"
+    },
+    {
+        "Filename":  "plannerService.ts",
+        "LineNumber":  46,
+        "Line":  "      (supabase as any).from(\u0027activities\u0027).select(\u0027id, location_id, name, type, price\u0027).limit(20),"
+    },
+    {
+        "Filename":  "plannerService.ts",
+        "LineNumber":  47,
+        "Line":  "      (supabase as any).from(\u0027accommodations\u0027).select(\u0027id, location_id, name, type, base_price\u0027).limit(20)"
+    },
+    {
+        "Filename":  "plannerService.ts",
+        "LineNumber":  75,
+        "Line":  "        console.error(\"AI Generation failed at Edge:\", error);"
+    },
+    {
+        "Filename":  "plannerService.ts",
+        "LineNumber":  83,
+        "Line":  "      console.error(\"AI Generation failed:\", error);"
+    },
+    {
+        "Filename":  "plannerService.ts",
+        "LineNumber":  94,
+        "Line":  "      const { data: tripData, error: tripError } = await (supabase as any)"
+    },
+    {
+        "Filename":  "plannerService.ts",
+        "LineNumber":  114,
+        "Line":  "        const { data: dayData, error: dayError } = await (supabase as any)"
+    },
+    {
+        "Filename":  "plannerService.ts",
+        "LineNumber":  130,
+        "Line":  "          await (supabase as any).from(\u0027trip_segments\u0027).insert("
+    },
+    {
+        "Filename":  "plannerService.ts",
+        "LineNumber":  146,
+        "Line":  "          await (supabase as any).from(\u0027trip_stays\u0027).insert("
+    },
+    {
+        "Filename":  "plannerService.ts",
+        "LineNumber":  160,
+        "Line":  "          await (supabase as any).from(\u0027trip_activities\u0027).insert("
+    },
+    {
+        "Filename":  "plannerService.ts",
+        "LineNumber":  176,
+        "Line":  "      console.error(\"Save trip failed:\", err);"
+    },
+    {
+        "Filename":  "providerService.ts",
+        "LineNumber":  10,
+        "Line":  "      console.error(\u0027Failed to get dashboard stats:\u0027, error);"
+    },
+    {
+        "Filename":  "providerService.ts",
+        "LineNumber":  24,
+        "Line":  "      console.error(\u0027Failed to get provider listings:\u0027, error);"
+    },
+    {
+        "Filename":  "providerService.ts",
+        "LineNumber":  54,
+        "Line":  "      console.error(\u0027Failed to get provider bookings:\u0027, error);"
+    },
+    {
+        "Filename":  "resortService.ts",
+        "LineNumber":  35,
+        "Line":  "    const resortDataAny = resortData as any;"
+    },
+    {
+        "Filename":  "searchService.ts",
+        "LineNumber":  28,
+        "Line":  "      const { data, error } = await supabase.rpc(\u0027global_search\u0027 as any, {"
+    },
+    {
+        "Filename":  "searchService.ts",
+        "LineNumber":  38,
+        "Line":  "      console.error(\u0027Global search error:\u0027, error);"
+    },
+    {
+        "Filename":  "translationService.ts",
+        "LineNumber":  100,
+        "Line":  "      console.error(\u0027Error saving translation:\u0027, error);"
+    },
+    {
+        "Filename":  "translationService.ts",
+        "LineNumber":  117,
+        "Line":  "        (translated as any)[key] = value;"
+    },
+    {
+        "Filename":  "transportService.ts",
+        "LineNumber":  20,
+        "Line":  "      query = query.eq(\u0027type\u0027, filters.mode.toUpperCase() as any);"
+    },
+    {
+        "Filename":  "transportService.ts",
+        "LineNumber":  31,
+        "Line":  "      console.error(\u0027Error fetching routes:\u0027, error);"
+    },
+    {
+        "Filename":  "transportService.ts",
+        "LineNumber":  45,
+        "Line":  "      console.error(\u0027Error fetching route details:\u0027, error);"
+    },
+    {
+        "Filename":  "tripService.ts",
+        "LineNumber":  58,
+        "Line":  "      console.error(tripError);"
+    },
+    {
+        "Filename":  "tripService.ts",
+        "LineNumber":  97,
+        "Line":  "      console.error(\u0027Error fetching user trips:\u0027, error);"
+    },
+    {
+        "Filename":  "wildlifeService.ts",
+        "LineNumber":  49,
+        "Line":  "    return (wildlife as any[]).map(w =\u003e {"
+    },
+    {
+        "Filename":  "wildlifeService.ts",
+        "LineNumber":  88,
+        "Line":  "    const mapped = (wildlife as any[]).map(w =\u003e {"
+    },
+    {
+        "Filename":  "auth.test.tsx",
+        "LineNumber":  34,
+        "Line":  "    (supabase.auth.signUp as any).mockResolvedValue({"
+    },
+    {
+        "Filename":  "auth.test.tsx",
+        "LineNumber":  80,
+        "Line":  "    (supabase.auth.signInWithPassword as any).mockResolvedValue({"
+    },
+    {
+        "Filename":  "booking.test.tsx",
+        "LineNumber":  34,
+        "Line":  "    (staysService.getRoomDetails as any).mockResolvedValue({"
+    },
+    {
+        "Filename":  "planner.test.tsx",
+        "LineNumber":  55,
+        "Line":  "    (plannerService.generateAITrip as any).mockResolvedValue({"
+    },
+    {
+        "Filename":  "provider.test.tsx",
+        "LineNumber":  34,
+        "Line":  "    (useAuthStore as any).mockReturnValue({"
+    },
+    {
+        "Filename":  "rls.test.ts",
+        "LineNumber":  57,
+        "Line":  "      console.error(\u0027PROFILES UPSERT ERROR:\u0027, upsertError);"
+    }
+]

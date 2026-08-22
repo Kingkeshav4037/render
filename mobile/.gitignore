@@ -1,0 +1,18 @@
+# Environment & Secrets
+.env
+.env.*
+.env.local
+*.env
+!.env.example
+
+# Flutter / Dart
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# OS & IDE
+.DS_Store
+.idea/
+.vscode/

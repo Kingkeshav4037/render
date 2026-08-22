@@ -1,0 +1,18 @@
+# Environment & Secrets
+.env
+.env.*
+.env.local
+functions/.env
+functions/.env.*
+!.env.example
+!functions/.env.example
+
+# Supabase Local State
+.temp/
+.branches/
+node_modules/
+
+# OS & IDE
+.DS_Store
+.vscode/
+.idea/

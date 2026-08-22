@@ -1,0 +1,106 @@
+# ==============================================================================
+# Norway SmartLife - Root .gitignore
+# ==============================================================================
+
+# ── Environment & Secrets ─────────────────────────────────────────────────────
+.env
+.env.*
+.env.local
+.env.*.local
+*.env
+*.env.local
+**/.env
+**/.env.*
+**/.env.local
+**/.env.*.local
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+
+# Whitelist environment example templates
+!.env.example
+!**/.env.example
+!.env.*.example
+!**/.env.*.example
+
+# ── Dependencies & Package Managers ───────────────────────────────────────────
+node_modules/
+**/node_modules/
+.pnp
+.pnp.js
+
+# ── Python / ML Service ───────────────────────────────────────────────────────
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+venv/
+**/venv/
+.venv/
+**/.venv/
+env/
+ENV/
+
+# ── Frontend & Build Outputs ──────────────────────────────────────────────────
+dist/
+**/dist/
+dist-ssr/
+**/dist-ssr/
+*.tsbuildinfo
+.eslintcache
+
+# ── Supabase & Database Temp ──────────────────────────────────────────────────
+.branches/
+.temp/
+**/.temp/
+tmp-sb/
+**/tmp-sb/
+
+# ── Logs & Debugging ──────────────────────────────────────────────────────────
+logs/
+**/logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ── OS & IDE Artifacts ────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Tt]humbs.db
+.idea/
+**/.idea/
+.vscode/*
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

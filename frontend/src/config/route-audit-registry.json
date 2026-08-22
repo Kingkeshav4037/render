@@ -1,0 +1,69 @@
+{
+  "pages": [
+    {
+      "path": "/explore",
+      "name": "Destinations Overview",
+      "category": "Content",
+      "mandatoryGates": {
+        "records": "MIN_1",
+        "fields": ["name", "slug", "description"],
+        "seo": ["name", "description"],
+        "location": ["latitude", "longitude"],
+        "verification": [],
+        "primaryTable": "locations"
+      }
+    },
+    {
+      "path": "/stay",
+      "name": "Accommodations",
+      "category": "Commerce",
+      "mandatoryGates": {
+        "records": "MIN_1",
+        "fields": ["name", "description", "price_per_night"],
+        "seo": ["name"],
+        "location": ["latitude", "longitude"],
+        "verification": ["verified_status"],
+        "primaryTable": "accommodations"
+      }
+    },
+    {
+      "path": "/wildlife",
+      "name": "Wildlife Explorer",
+      "category": "Content",
+      "mandatoryGates": {
+        "records": "MIN_1",
+        "fields": ["name", "slug", "description"],
+        "seo": ["name"],
+        "location": ["latitude", "longitude"],
+        "verification": [],
+        "primaryTable": "wildlife"
+      }
+    },
+    {
+      "path": "/trails",
+      "name": "Hiking Trails",
+      "category": "Adventure",
+      "mandatoryGates": {
+        "records": "MIN_1",
+        "fields": ["name", "difficulty", "distance_km"],
+        "seo": ["name"],
+        "location": ["latitude", "longitude"],
+        "verification": [],
+        "primaryTable": "hiking_trails"
+      }
+    },
+    {
+      "path": "/admin/users",
+      "name": "User Management",
+      "category": "Admin",
+      "mandatoryGates": {
+        "records": "MIN_1",
+        "fields": ["id", "role"],
+        "seo": [],
+        "location": [],
+        "verification": [],
+        "primaryTable": "profiles"
+      }
+    }
+  ]
+}

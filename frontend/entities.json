@@ -1,0 +1,530 @@
+[
+  {
+    "type": "ski_resort",
+    "slug": "trysil",
+    "name": "Trysil"
+  },
+  {
+    "type": "ski_resort",
+    "slug": "hemsedal",
+    "name": "Hemsedal"
+  },
+  {
+    "type": "ski_resort",
+    "slug": "hafjell",
+    "name": "Hafjell"
+  },
+  {
+    "type": "ski_resort",
+    "slug": "kvitfjell",
+    "name": "Kvitfjell"
+  },
+  {
+    "type": "ski_resort",
+    "slug": "geilo",
+    "name": "Geilo"
+  },
+  {
+    "type": "ski_resort",
+    "slug": "oppdal",
+    "name": "Oppdal"
+  },
+  {
+    "type": "ski_resort",
+    "slug": "voss",
+    "name": "Voss"
+  },
+  {
+    "type": "ski_resort",
+    "slug": "myrkdalen",
+    "name": "Myrkdalen"
+  },
+  {
+    "type": "ski_resort",
+    "slug": "narvikfjellet",
+    "name": "Narvikfjellet"
+  },
+  {
+    "type": "ski_resort",
+    "slug": "hovden",
+    "name": "Hovden"
+  },
+  {
+    "type": "ski_resort",
+    "slug": "norefjell",
+    "name": "Norefjell"
+  },
+  {
+    "type": "ski_resort",
+    "slug": "beitostolen",
+    "name": "Beitostølen"
+  },
+  {
+    "type": "ski_resort",
+    "slug": "gaustablikk",
+    "name": "Gaustablikk"
+  },
+  {
+    "type": "ski_resort",
+    "slug": "skeikampen",
+    "name": "Skeikampen"
+  },
+  {
+    "type": "ski_resort",
+    "slug": "roldal",
+    "name": "Røldal"
+  },
+  {
+    "type": "ski_resort",
+    "slug": "kongberg",
+    "name": "Kongsberg"
+  },
+  {
+    "type": "ski_resort",
+    "slug": "strandafjellet",
+    "name": "Strandafjellet"
+  },
+  {
+    "type": "ski_resort",
+    "slug": "sirdal",
+    "name": "Sirdal"
+  },
+  {
+    "type": "ski_resort",
+    "slug": "tromso-alpinpark",
+    "name": "Tromsø Alpinpark"
+  },
+  {
+    "type": "ski_resort",
+    "slug": "vradal",
+    "name": "Vrådal"
+  },
+  {
+    "type": "ski_resort",
+    "slug": "stryn-sommerski",
+    "name": "Stryn Sommerski"
+  },
+  {
+    "type": "ski_resort",
+    "slug": "bjorli",
+    "name": "Bjorli"
+  },
+  {
+    "type": "ski_resort",
+    "slug": "gola",
+    "name": "Gålå"
+  },
+  {
+    "type": "ski_resort",
+    "slug": "oslo-vinterpark",
+    "name": "Oslo Vinterpark"
+  },
+  {
+    "type": "ski_resort",
+    "slug": "raufjell",
+    "name": "Rauland"
+  },
+  {
+    "type": "road_trip",
+    "slug": "atlantic-ocean-road",
+    "name": "Atlantic Ocean Road"
+  },
+  {
+    "type": "road_trip",
+    "slug": "trollstigen",
+    "name": "Trollstigen"
+  },
+  {
+    "type": "road_trip",
+    "slug": "lofoten-scenic-route",
+    "name": "Lofoten Scenic Route"
+  },
+  {
+    "type": "road_trip",
+    "slug": "helgeland-coast",
+    "name": "Helgeland Coast"
+  },
+  {
+    "type": "road_trip",
+    "slug": "senja-route",
+    "name": "Senja"
+  },
+  {
+    "type": "road_trip",
+    "slug": "hardanger-route",
+    "name": "Hardanger"
+  },
+  {
+    "type": "road_trip",
+    "slug": "aurlandsfjellet",
+    "name": "Aurlandsfjellet"
+  },
+  {
+    "type": "road_trip",
+    "slug": "sognefjellet",
+    "name": "Sognefjellet"
+  },
+  {
+    "type": "road_trip",
+    "slug": "valdresflye",
+    "name": "Valdresflye"
+  },
+  {
+    "type": "road_trip",
+    "slug": "rondane-route",
+    "name": "Rondane"
+  },
+  {
+    "type": "road_trip",
+    "slug": "gamle-strynefjellsvegen",
+    "name": "Gamle Strynefjellsvegen"
+  },
+  {
+    "type": "road_trip",
+    "slug": "ryfylke",
+    "name": "Ryfylke"
+  },
+  {
+    "type": "road_trip",
+    "slug": "jaeren",
+    "name": "Jæren"
+  },
+  {
+    "type": "road_trip",
+    "slug": "andoya",
+    "name": "Andøya"
+  },
+  {
+    "type": "road_trip",
+    "slug": "varanger",
+    "name": "Varanger"
+  },
+  {
+    "type": "road_trip",
+    "slug": "gaularfjellet",
+    "name": "Gaularfjellet"
+  },
+  {
+    "type": "road_trip",
+    "slug": "geiranger-trollstigen",
+    "name": "Geiranger–Trollstigen"
+  },
+  {
+    "type": "road_trip",
+    "slug": "nordkapp-route",
+    "name": "Nordkapp Route"
+  },
+  {
+    "type": "road_trip",
+    "slug": "lyngenfjord",
+    "name": "Lyngenfjord Coastal Drive"
+  },
+  {
+    "type": "road_trip",
+    "slug": "sogn-og-fjordane-explorer",
+    "name": "Sogn og Fjordane Explorer"
+  },
+  {
+    "type": "aurora_destination",
+    "slug": "alta",
+    "name": "Alta"
+  },
+  {
+    "type": "aurora_destination",
+    "slug": "kirkenes",
+    "name": "Kirkenes"
+  },
+  {
+    "type": "aurora_destination",
+    "slug": "svalbard",
+    "name": "Svalbard"
+  },
+  {
+    "type": "aurora_destination",
+    "slug": "lofoten",
+    "name": "Lofoten"
+  },
+  {
+    "type": "aurora_destination",
+    "slug": "vesteralen",
+    "name": "Vesterålen"
+  },
+  {
+    "type": "aurora_destination",
+    "slug": "narvik",
+    "name": "Narvik"
+  },
+  {
+    "type": "aurora_destination",
+    "slug": "bodo",
+    "name": "Bodø"
+  },
+  {
+    "type": "aurora_destination",
+    "slug": "lyngen",
+    "name": "Lyngen"
+  },
+  {
+    "type": "aurora_destination",
+    "slug": "hammerfest",
+    "name": "Hammerfest"
+  },
+  {
+    "type": "aurora_destination",
+    "slug": "nordkapp",
+    "name": "Nordkapp"
+  },
+  {
+    "type": "aurora_destination",
+    "slug": "kautokeino",
+    "name": "Kautokeino"
+  },
+  {
+    "type": "aurora_destination",
+    "slug": "karasjok",
+    "name": "Karasjok"
+  },
+  {
+    "type": "aurora_destination",
+    "slug": "andoya",
+    "name": "Andøya"
+  },
+  {
+    "type": "transport_route",
+    "name": "Oslo–Bergen Railway"
+  },
+  {
+    "type": "transport_route",
+    "name": "Flåm Railway"
+  },
+  {
+    "type": "transport_route",
+    "name": "Raumabanen"
+  },
+  {
+    "type": "transport_route",
+    "name": "Nordland Railway"
+  },
+  {
+    "type": "transport_route",
+    "name": "Hurtigruten Coastal Route"
+  },
+  {
+    "type": "transport_route",
+    "name": "Havila Coastal Route"
+  },
+  {
+    "type": "transport_route",
+    "name": "Oslo to Tromsø Flight"
+  },
+  {
+    "type": "transport_route",
+    "name": "Bergen to Tromsø Flight"
+  },
+  {
+    "type": "transport_route",
+    "name": "Bodø - Lofoten Express Boat"
+  },
+  {
+    "type": "transport_route",
+    "name": "Geirangerfjord Ferry"
+  },
+  {
+    "type": "transport_route",
+    "name": "Sognefjord Express Bus"
+  },
+  {
+    "type": "transport_route",
+    "name": "The Arctic Route (Tromsø - Narvik)"
+  },
+  {
+    "type": "ev_charger",
+    "slug": "oslo",
+    "name": "Oslo"
+  },
+  {
+    "type": "ev_charger",
+    "slug": "bergen",
+    "name": "Bergen"
+  },
+  {
+    "type": "ev_charger",
+    "slug": "tromsø",
+    "name": "Tromsø"
+  },
+  {
+    "type": "ev_charger",
+    "slug": "flåm",
+    "name": "Flåm"
+  },
+  {
+    "type": "ev_charger",
+    "slug": "geiranger",
+    "name": "Geiranger"
+  },
+  {
+    "type": "ev_charger",
+    "slug": "trollstigen viewpoint",
+    "name": "Trollstigen Viewpoint"
+  },
+  {
+    "type": "ev_charger",
+    "slug": "svolvær",
+    "name": "Svolvær"
+  },
+  {
+    "type": "ev_charger",
+    "slug": "nordkapp",
+    "name": "Nordkapp"
+  },
+  {
+    "type": "ev_charger",
+    "slug": "oppdal",
+    "name": "Oppdal"
+  },
+  {
+    "type": "ev_charger",
+    "slug": "stavanger",
+    "name": "Stavanger"
+  },
+  {
+    "type": "ev_charger",
+    "slug": "eldhusøya",
+    "name": "Eldhusøya"
+  },
+  {
+    "type": "ev_charger",
+    "slug": "ev-oslo-s-1",
+    "name": "Oslo S Supercharger"
+  },
+  {
+    "type": "ev_charger",
+    "slug": "ev-bergen-center-1",
+    "name": "Bergen Sentrum Fast Charger"
+  },
+  {
+    "type": "ev_charger",
+    "slug": "ev-tromso-airport-1",
+    "name": "Tromsø Lufthavn Charger"
+  },
+  {
+    "type": "ev_charger",
+    "slug": "ev-flam-1",
+    "name": "Flåm Tourist Charger"
+  },
+  {
+    "type": "ev_charger",
+    "slug": "ev-geiranger-1",
+    "name": "Geirangerfjord Supercharger"
+  },
+  {
+    "type": "ev_charger",
+    "slug": "ev-trollstigen-1",
+    "name": "Trollstigen Base Charger"
+  },
+  {
+    "type": "ev_charger",
+    "slug": "ev-lofoten-svolvaer",
+    "name": "Svolvær Port Charger"
+  },
+  {
+    "type": "ev_charger",
+    "slug": "ev-nordkapp-1",
+    "name": "North Cape Charger"
+  },
+  {
+    "type": "ev_charger",
+    "slug": "ev-e6-oppdal",
+    "name": "E6 Oppdal Highway Charger"
+  },
+  {
+    "type": "ev_charger",
+    "slug": "ev-e39-stavanger",
+    "name": "E39 Stavanger Hub"
+  },
+  {
+    "type": "ev_charger",
+    "slug": "ev-atlantic-road-1",
+    "name": "Atlantic Road Rest Stop"
+  },
+  {
+    "type": "deal",
+    "name": "Norway in a Nutshell: Winter Edition"
+  },
+  {
+    "type": "deal",
+    "name": "Tromsø Northern Lights Cruise"
+  },
+  {
+    "type": "deal",
+    "name": "Oslo Pass - 48 Hours"
+  },
+  {
+    "type": "deal",
+    "name": "Svalbard Polar Bear Safari (Editorial Promo)"
+  },
+  {
+    "type": "deal",
+    "name": "Bergen Card - 72 Hours"
+  },
+  {
+    "type": "deal",
+    "name": "Geirangerfjord RIB Boat Tour"
+  },
+  {
+    "type": "deal",
+    "name": "Lofoten Surfing Weekend Package"
+  },
+  {
+    "type": "deal",
+    "name": "Flåm Railway & Zipline Combo"
+  },
+  {
+    "type": "deal",
+    "name": "Hardangerfjord Cider Tasting Tour"
+  },
+  {
+    "type": "deal",
+    "name": "Vy Train Pass: 7 Days (Editorial Example)"
+  },
+  {
+    "type": "deal",
+    "name": "Hurtigruten Coastal Voyage (Port-to-Port)"
+  },
+  {
+    "type": "deal",
+    "name": "Preikestolen Guided Sunrise Hike"
+  },
+  {
+    "type": "deal",
+    "name": "Dog Sledding in Alta"
+  },
+  {
+    "type": "deal",
+    "name": "Fjord Sauna & Cold Plunge Pass"
+  },
+  {
+    "type": "deal",
+    "name": "Stavanger Museum Multi-Pass"
+  },
+  {
+    "type": "deal",
+    "name": "Jotunheimen Glacier Walk"
+  },
+  {
+    "type": "deal",
+    "name": "Trolltunga Via Ferrata (Editorial Deal)"
+  },
+  {
+    "type": "deal",
+    "name": "Arctic Whale Safari - Andenes"
+  },
+  {
+    "type": "deal",
+    "name": "Trondheim Nidaros Cathedral Tower Tour"
+  },
+  {
+    "type": "deal",
+    "name": "Kautokeino Sami Cultural Experience"
+  }
+]

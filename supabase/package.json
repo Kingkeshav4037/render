@@ -1,0 +1,17 @@
+{
+  "name": "supabase-backend-tests",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:backend": "vitest run"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "devDependencies": {
+    "vitest": "^1.2.0",
+    "typescript": "^5.3.3",
+    "@types/node": "^20.11.0"
+  }
+}
