@@ -97,15 +97,31 @@ UPDATE public.events
 SET image_url = 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1600'
 WHERE image_url IS NULL;
 
--- 5. Fix missing location IDs for Events
--- Distribute events randomly across major cities where location is currently missing
-WITH missing_locs AS (
-  SELECT e.id,
-         (ARRAY(SELECT id FROM public.locations WHERE status = 'PUBLISHED' LIMIT 5))[floor(random() * 5 + 1)] AS random_loc_id
-  FROM public.events e
+-- 5. Fix missing location IDs for Events without causing unique key collisions
+DO $$
+BEGIN
+  -- Delete duplicate null-location events if a valid event with the same name already exists
+  DELETE FROM public.events e1
+  WHERE e1.location_id IS NULL
+    AND EXISTS (
+      SELECT 1 FROM public.events e2 
+      WHERE e2.name = e1.name AND e2.location_id IS NOT NULL
+    );
+
+  -- For any remaining events with null location_id, match to city by name or assign a default published location
+  UPDATE public.events e
+  SET location_id = COALESCE(
+    (SELECT l.id FROM public.locations l WHERE l.name ILIKE '%' || split_part(e.name, ' ', 1) || '%' LIMIT 1),
+    (SELECT l.id FROM public.locations l WHERE l.status = 'PUBLISHED' LIMIT 1)
+  )
   WHERE e.location_id IS NULL
-)
-UPDATE public.events
-SET location_id = missing_locs.random_loc_id
-FROM missing_locs
-WHERE public.events.id = missing_locs.id;
+    AND NOT EXISTS (
+      SELECT 1 FROM public.events e_existing 
+      WHERE e_existing.name = e.name 
+        AND e_existing.location_id = (SELECT l.id FROM public.locations l WHERE l.status = 'PUBLISHED' LIMIT 1)
+        AND e_existing.id != e.id
+    );
+
+  -- Clean up any residual duplicate null rows that cannot be safely mapped
+  DELETE FROM public.events WHERE location_id IS NULL;
+END $$;
