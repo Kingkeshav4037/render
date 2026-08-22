@@ -46,7 +46,8 @@ export const Checkout = () => {
 
   const handleRazorpayMock = async () => {
     if (!user || !profile) {
-      alert("Please log in to checkout.");
+      toast.error("Please log in to checkout.");
+      navigate('/login');
       return;
     }
 

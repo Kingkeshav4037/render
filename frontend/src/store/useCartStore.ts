@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { toast } from './useToastStore';
 
 export interface CartItem {
   id: string; // Internal uuid for cart tracking
@@ -33,6 +34,7 @@ export const useCartStore = create<CartState>()(
       isOpen: false,
       
       addItem: (item) => {
+        toast.success(`${item.name} added to itinerary`);
         set((state) => {
           // If it's a physical product, we can just increment quantity
           if (item.item_type === 'PRODUCT') {

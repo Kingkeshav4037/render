@@ -140,57 +140,98 @@ export const Invoices = () => {
             </button>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-gray-50/80 border-b border-gray-200 text-gray-500 uppercase font-bold tracking-wider">
-                  <tr>
-                    <th className="py-4 px-6">Invoice #</th>
-                    <th className="py-4 px-6">Date</th>
-                    <th className="py-4 px-6">Service & Description</th>
-                    <th className="py-4 px-6">MVA / VAT</th>
-                    <th className="py-4 px-6 text-right">Total Amount</th>
-                    <th className="py-4 px-6 text-center">Status</th>
-                    <th className="py-4 px-6 text-right">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100 font-medium">
-                  {filteredInvoices.map((inv) => (
-                    <tr key={inv.invoiceNumber} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="py-4 px-6 font-bold text-navy-900 font-mono">
-                        {inv.invoiceNumber}
-                      </td>
-                      <td className="py-4 px-6 text-gray-500 flex items-center gap-1.5 pt-5">
-                        <Calendar size={13} className="text-gray-400" />
-                        {inv.invoiceDate}
-                      </td>
-                      <td className="py-4 px-6">
-                        <div className="font-semibold text-navy-900">{inv.items[0]?.description || 'Experience Booking'}</div>
-                        <div className="text-[11px] text-gray-400">{inv.items[0]?.category}</div>
-                      </td>
-                      <td className="py-4 px-6 text-gray-600">
-                        {formatPrice(inv.vatStandard + inv.vatReduced)}
-                      </td>
-                      <td className="py-4 px-6 text-right font-black text-navy-900 text-sm font-display">
-                        {formatPrice(inv.totalAmount)}
-                      </td>
-                      <td className="py-4 px-6 text-center">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 border border-green-200 rounded-full text-[10px] font-bold uppercase tracking-wider">
-                          <CheckCircle2 size={11} /> {inv.status}
-                        </span>
-                      </td>
-                      <td className="py-4 px-6 text-right">
-                        <button
-                          onClick={() => invoiceService.openPrintableInvoice(inv)}
-                          className="px-3.5 py-2 bg-navy-900 hover:bg-aurora-green hover:text-navy-900 text-white font-bold text-[11px] uppercase tracking-wider rounded-lg transition-all inline-flex items-center gap-1.5 shadow-sm cursor-pointer"
-                        >
-                          <Download size={13} /> PDF / Print
-                        </button>
-                      </td>
+          <div className="space-y-6">
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-gray-50/80 border-b border-gray-200 text-gray-500 uppercase font-bold tracking-wider">
+                    <tr>
+                      <th className="py-4 px-6">Invoice #</th>
+                      <th className="py-4 px-6">Date</th>
+                      <th className="py-4 px-6">Service & Description</th>
+                      <th className="py-4 px-6">MVA / VAT</th>
+                      <th className="py-4 px-6 text-right">Total Amount</th>
+                      <th className="py-4 px-6 text-center">Status</th>
+                      <th className="py-4 px-6 text-right">Action</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 font-medium">
+                    {filteredInvoices.map((inv) => (
+                      <tr key={inv.invoiceNumber} className="hover:bg-gray-50/50 transition-colors">
+                        <td className="py-4 px-6 font-bold text-navy-900 font-mono">
+                          {inv.invoiceNumber}
+                        </td>
+                        <td className="py-4 px-6 text-gray-500 flex items-center gap-1.5 pt-5">
+                          <Calendar size={13} className="text-gray-400" />
+                          {inv.invoiceDate}
+                        </td>
+                        <td className="py-4 px-6">
+                          <div className="font-semibold text-navy-900">{inv.items[0]?.description || 'Experience Booking'}</div>
+                          <div className="text-[11px] text-gray-400">{inv.items[0]?.category}</div>
+                        </td>
+                        <td className="py-4 px-6 text-gray-600">
+                          {formatPrice(inv.vatStandard + inv.vatReduced)}
+                        </td>
+                        <td className="py-4 px-6 text-right font-black text-navy-900 text-sm font-display">
+                          {formatPrice(inv.totalAmount)}
+                        </td>
+                        <td className="py-4 px-6 text-center">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 border border-green-200 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                            <CheckCircle2 size={11} /> {inv.status}
+                          </span>
+                        </td>
+                        <td className="py-4 px-6 text-right">
+                          <button
+                            onClick={() => invoiceService.openPrintableInvoice(inv)}
+                            className="px-3.5 py-2 bg-navy-900 hover:bg-aurora-green hover:text-navy-900 text-white font-bold text-[11px] uppercase tracking-wider rounded-lg transition-all inline-flex items-center gap-1.5 shadow-sm cursor-pointer"
+                          >
+                            <Download size={13} /> PDF / Print
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Mobile Cards View */}
+            <div className="md:hidden space-y-4">
+              {filteredInvoices.map((inv) => (
+                <div key={inv.invoiceNumber} className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm space-y-4">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <span className="text-[10px] font-bold font-mono text-gray-400 uppercase tracking-wider block">Invoice Number</span>
+                      <span className="font-bold text-navy-900 font-mono text-sm">{inv.invoiceNumber}</span>
+                    </div>
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 border border-green-200 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                      <CheckCircle2 size={11} /> {inv.status}
+                    </span>
+                  </div>
+
+                  <div className="border-t border-gray-100 pt-3">
+                    <p className="font-semibold text-xs text-navy-900 mb-1">{inv.items[0]?.description || 'Experience Booking'}</p>
+                    <div className="flex justify-between text-xs text-gray-500">
+                      <span>Date: {inv.invoiceDate}</span>
+                      <span>MVA: {formatPrice(inv.vatStandard + inv.vatReduced)}</span>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-gray-100 pt-3 flex justify-between items-center">
+                    <div>
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Total Amount</span>
+                      <span className="text-base font-black text-navy-900 font-display">{formatPrice(inv.totalAmount)}</span>
+                    </div>
+                    <button
+                      onClick={() => invoiceService.openPrintableInvoice(inv)}
+                      className="px-4 py-2.5 bg-navy-900 hover:bg-aurora-green hover:text-navy-900 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all inline-flex items-center gap-1.5 shadow-sm cursor-pointer"
+                    >
+                      <Download size={14} /> PDF / Print
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}

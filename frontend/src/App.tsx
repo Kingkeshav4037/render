@@ -162,6 +162,8 @@ const AdminPageHealth = lazy(() => import('./pages/admin/system/AdminPageHealth'
 const AdminSecurityEvents = lazy(() => import('./pages/admin/security/AdminSecurityEvents').then(m => ({ default: m.AdminSecurityEvents })));
 const SecuritySettings = lazy(() => import('./pages/settings/SecuritySettings').then(m => ({ default: m.SecuritySettings })));
 
+import { ToastContainer } from './components/ui/ToastContainer';
+
 function App() {
   useEffect(() => {
     realtimeClient.initialize();
@@ -173,6 +175,8 @@ function App() {
   return (
     <BrowserRouter>
       <GlobalOfflineBanner />
+      <ToastContainer />
+      <Toaster position="top-right" richColors />
       <Suspense fallback={<GlobalLoader />}>
         <Routes>
           {/* Root redirect — auth-aware (ISSUE-008) */}
