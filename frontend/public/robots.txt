@@ -1,0 +1,36 @@
+# ==============================================================================
+# Norway SmartLife - Robots Configuration
+# https://norway-smartlife.vercel.app
+# ==============================================================================
+
+User-agent: *
+Allow: /
+Allow: /nature/plants-trees
+Allow: /nature/flora
+Allow: /flora
+Allow: /destinations
+Allow: /stays
+Allow: /activities
+Allow: /food
+Allow: /wildlife
+Allow: /winter-sports
+Allow: /road-trips
+Allow: /explore
+Allow: /deals
+Allow: /events
+Allow: /smart-map
+Allow: /smart-ferry
+Allow: /ev-charging
+Allow: /aurora-tracker
+Allow: /weather
+
+# Disallow private and administrative routes
+Disallow: /admin/
+Disallow: /user/
+Disallow: /profile/
+Disallow: /checkout/
+Disallow: /auth/
+Disallow: /portal/
+Disallow: /provider/
+
+Sitemap: https://norway-smartlife.vercel.app/sitemap.xml
