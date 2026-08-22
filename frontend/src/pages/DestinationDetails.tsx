@@ -10,7 +10,7 @@ import { DestinationGallery } from '../components/destinations/DestinationGaller
 import { NearbyAttractions } from '../components/destinations/NearbyAttractions';
 import { FavoriteButton } from '../components/common/FavoriteButton';
 import { ReviewSection } from '../components/common/ReviewSection';
-import { googleMaps } from '../lib/googleMaps';
+import { openStreetMap } from '../lib/openStreetMap';
 
 // Map database slugs/names to local images
 const getPlaceholderImage = (name: string) => {
@@ -129,7 +129,7 @@ export const DestinationDetails = () => {
             <div className="flex flex-wrap gap-4 items-center text-white/80">
               <span className="flex items-center gap-1.5"><Navigation size={16}/> {location.latitude?.toFixed(2) ?? 'N/A'}°N, {location.longitude?.toFixed(2) ?? 'N/A'}°E</span>
               <a
-                href={googleMaps.getDirectionsUrl({
+                href={openStreetMap.getDirectionsUrl({
                   destination: location.latitude && location.longitude 
                     ? { lat: location.latitude, lng: location.longitude } 
                     : location.name
@@ -138,7 +138,7 @@ export const DestinationDetails = () => {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-white/15 hover:bg-white/25 text-white rounded-xl backdrop-blur-md text-xs font-bold uppercase tracking-wider transition-all border border-white/20 shadow-sm"
               >
-                <ExternalLink size={13} /> Open in Google Maps
+                <ExternalLink size={13} /> Open in OpenStreetMap
               </a>
             </div>
           </div>
@@ -171,7 +171,7 @@ export const DestinationDetails = () => {
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-3xl font-bold text-navy-900">Location Map</h2>
                 <a
-                  href={googleMaps.getDirectionsUrl({
+                  href={openStreetMap.getDirectionsUrl({
                     destination: location.latitude && location.longitude 
                       ? { lat: location.latitude, lng: location.longitude } 
                       : location.name
@@ -180,7 +180,7 @@ export const DestinationDetails = () => {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-blue-600 hover:text-blue-800 transition-colors"
                 >
-                  <ExternalLink size={13} /> Get Directions (Google Maps)
+                  <ExternalLink size={13} /> Get Directions (OpenStreetMap)
                 </a>
               </div>
               {location.latitude && location.longitude && (
