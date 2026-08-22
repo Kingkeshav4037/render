@@ -37,6 +37,7 @@ export const SEO: React.FC<SEOProps> = ({
 
     // 2. Standard Meta
     setMetaTag('name', 'description', description);
+    setMetaTag('name', 'theme-color', '#0B1120');
     if (keywords) setMetaTag('name', 'keywords', keywords);
 
     // 3. Open Graph
