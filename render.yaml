@@ -1,0 +1,29 @@
+# ==============================================================================
+# Render Blueprint Configuration — Norway SmartLife Backend Services
+# ==============================================================================
+# Deploy via Render Dashboard -> Blueprints -> New Blueprint Instance
+# ==============================================================================
+
+services:
+  # ── Python FastAPI ML & AI Prediction Backend ──────────────────────────────
+  - type: web
+    name: norway-smartlife-ml
+    runtime: python
+    rootDir: ml-service
+    region: frankfurt
+    plan: free
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: CORS_ORIGINS
+        value: https://norway-smartlife.vercel.app,http://localhost:5173,http://localhost:3000
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false

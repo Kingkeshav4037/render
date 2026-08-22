@@ -10,7 +10,7 @@ def test_health_endpoint():
     response = client.get("/health")
     assert response.status_code == 200
     data = response.json()
-    assert data["status"] == "HEALTHY"
+    assert data["status"] in ["ok", "HEALTHY"]
     assert "version" in data
 
 def test_models_catalog():

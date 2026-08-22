@@ -3,8 +3,9 @@
  */
 import { supabase } from '../lib/supabase';
 
-// Base URL for the local FastAPI ML Service
-export const ML_API_BASE_URL = 'http://localhost:8000/api/v1';
+// Base URL for the FastAPI ML Service (Render in production, localhost in development)
+const rawApiUrl = (import.meta.env.VITE_API_URL || import.meta.env.VITE_ML_API_URL || 'http://localhost:8000').replace(/\/+$/, '');
+export const ML_API_BASE_URL = rawApiUrl.endsWith('/api/v1') ? rawApiUrl : `${rawApiUrl}/api/v1`;
 
 /**
  * Helper to invoke Supabase Edge Functions securely

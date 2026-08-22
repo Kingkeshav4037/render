@@ -4,6 +4,7 @@ import time
 import random
 import httpx
 from fastapi import FastAPI, Request, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List, Dict
 from dotenv import load_dotenv
@@ -21,6 +22,37 @@ app = FastAPI(
     description="Backend API for AI predictions and smart routing.",
     version="2.0.0"
 )
+
+# ─── CORS Middleware Configuration (Render & Local Vercel Support) ────────────
+cors_origins_env = os.environ.get("CORS_ORIGINS", "")
+if cors_origins_env:
+    allowed_origins = [o.strip() for o in cors_origins_env.split(",") if o.strip()]
+else:
+    allowed_origins = [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:3000",
+    ]
+
+# If wildcard is present, allow all, otherwise use explicit list and regex for vercel previews
+if "*" in allowed_origins:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=allowed_origins,
+        allow_origin_regex=r"^https://.*\.vercel\.app$",
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 # Initialize Supabase Client for logging
 supabase: Optional['Client'] = None
@@ -120,7 +152,12 @@ async def add_process_time_header(request: Request, call_next):
 
 @app.get("/health")
 def health_check():
-    return {"status": "HEALTHY", "version": app.version}
+    return {
+        "status": "ok",
+        "state": "HEALTHY",
+        "service": "norway-smartlife-ml",
+        "version": app.version
+    }
 
 @app.get("/models")
 def list_models():
@@ -394,3 +431,10 @@ def predict_fish(loc: LocationInput):
     log_prediction("fish-forecast-v1", req_id, loc.user_id, loc.dict(), result, 0.78, latency)
     
     return {"request_id": req_id, "data": result}
+
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)
+
