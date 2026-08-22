@@ -12,8 +12,10 @@ const NO_RETRY_STATUS_CODES = [
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      refetchOnWindowFocus: true,
+      staleTime: 5 * 60 * 1000, // 5 minutes fresh data window
+      gcTime: 15 * 60 * 1000,   // 15 minutes inactive garbage collection cache
+      refetchOnWindowFocus: false, // Prevent redundant background network requests on tab switch
+      refetchOnReconnect: true,
       retry: (failureCount, error: any) => {
         // Stop retrying after 3 attempts
         if (failureCount >= 3) return false;

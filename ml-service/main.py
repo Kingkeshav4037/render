@@ -239,7 +239,7 @@ def get_recommendations(req: RecommendationInput):
         try:
             # Simple fallback: get random published locations
             # In a full app, we would use embeddings or full-text search on interests
-            locs_res = supabase.table("locations").select("id, name, type, tags").eq("status", "PUBLISHED").execute()
+            locs_res = supabase.table("locations").select("id, name, type, tags").eq("status", "PUBLISHED").limit(50).execute()
             if locs_res.data:
                 # Filter by interest loosely if possible, else take random
                 filtered = [l["name"] for l in locs_res.data if any(i.lower() in str(l.get("tags", "")).lower() or i.lower() in l.get("type", "").lower() for i in req.interests)]
