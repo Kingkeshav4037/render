@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '../../../store/useAuthStore';
-import { Camera, Mail, Phone, Globe, Edit2, Check } from 'lucide-react';
+import { Camera, Mail, Phone, Globe, Edit2, Check, FileText, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export const ProfileOverview = () => {
   const { user, profile } = useAuthStore();
@@ -39,6 +40,25 @@ export const ProfileOverview = () => {
           <h2 className="text-3xl font-display font-bold text-navy-900 mb-2">{profile?.fullName || 'Traveler'}</h2>
           <p className="text-gray-500 font-medium">Oslo, Norway • Member since 2026</p>
         </div>
+      </div>
+
+      {/* Quick Action: Invoices & Tax Receipts */}
+      <div className="bg-emerald-50/70 border border-emerald-100 rounded-2xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-sm shrink-0">
+            <FileText size={22} />
+          </div>
+          <div>
+            <h3 className="font-bold text-navy-900 text-base">Invoices & Tax Receipts (MVA)</h3>
+            <p className="text-xs text-gray-500 mt-0.5">View and download your universal booking receipts and Norwegian tax invoices.</p>
+          </div>
+        </div>
+        <Link 
+          to="/user/invoices"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-navy-900 hover:bg-navy-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm shrink-0"
+        >
+          View Invoices <ArrowRight size={14} />
+        </Link>
       </div>
 
       {/* Completion Tracker */}

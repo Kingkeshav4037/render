@@ -1,3 +1,5 @@
+import { supabase } from '../../lib/supabase';
+
 /**
  * Universal Invoice Generation & Download Service (Phase 26)
  * Generates Norwegian Tax (MVA) compliant invoices and receipts with instant PDF/Print capability.
@@ -13,6 +15,7 @@ export interface InvoiceItem {
 }
 
 export interface InvoiceData {
+  id?: string;
   invoiceNumber: string;
   invoiceDate: string;
   dueDate: string;
@@ -55,7 +58,7 @@ export const invoiceService = {
     const dateRange = endDate ? `${startDate} – ${endDate}` : startDate;
 
     const shortId = (booking.id || '').split('-')[0].toUpperCase();
-    const invoiceNum = `INV-2026-${shortId || Math.floor(10000 + Math.random() * 90000)}`;
+    const invoiceNum = `NSL-2026-${shortId || Math.floor(100000 + Math.random() * 900000)}`;
 
     return {
       invoiceNumber: invoiceNum,
@@ -395,5 +398,93 @@ export const invoiceService = {
   downloadInvoiceForBooking(booking: any, userProfile?: any): void {
     const invoice = this.createInvoiceFromBooking(booking, userProfile);
     this.openPrintableInvoice(invoice);
+  },
+
+  /**
+   * Fetches invoices from Supabase database with fallback
+   */
+  async fetchInvoices(userId?: string): Promise<InvoiceData[]> {
+    try {
+      let query = (supabase as any)
+        .from('invoices')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (userId) {
+        query = query.eq('user_id', userId);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        return data.map((inv: any) => ({
+          id: inv.id,
+          invoiceNumber: inv.invoice_number,
+          invoiceDate: new Date(inv.issued_at || inv.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+          dueDate: new Date(inv.issued_at || inv.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+          customerName: inv.customer_name || 'Customer',
+          customerEmail: inv.customer_email || 'customer@smartlife.no',
+          customerCountry: inv.customer_country || 'Norway',
+          currency: inv.currency || 'NOK',
+          items: Array.isArray(inv.items) ? inv.items : [
+            {
+              description: `Paid Platform Service (${inv.invoice_number})`,
+              category: 'Platform Service',
+              quantity: 1,
+              unitPrice: Number(inv.subtotal_amount || inv.total_amount || 0),
+              taxRatePct: 25,
+              total: Number(inv.subtotal_amount || inv.total_amount || 0)
+            }
+          ],
+          subtotal: Number(inv.subtotal_amount || 0),
+          vatStandard: Number(inv.vat_standard_amount || 0),
+          vatReduced: Number(inv.vat_reduced_amount || 0),
+          totalAmount: Number(inv.total_amount || 0),
+          paymentMethod: inv.payment_method || 'Online Checkout',
+          paymentGatewayRef: inv.payment_intent_id || inv.order_id,
+          bookingRef: inv.booking_id ? `BKG-${inv.booking_id.split('-')[0].toUpperCase()}` : undefined,
+          status: inv.payment_status || 'PAID',
+        }));
+      }
+    } catch (err) {
+      console.warn('Could not fetch invoices from DB:', err);
+    }
+    return [];
+  },
+
+  /**
+   * Persists an immutable invoice record to Supabase
+   */
+  async saveInvoice(invoice: InvoiceData, userId?: string, bookingId?: string): Promise<string | null> {
+    try {
+      const { data, error } = await (supabase as any).from('invoices').insert({
+        invoice_number: invoice.invoiceNumber,
+        user_id: userId,
+        booking_id: bookingId,
+        customer_name: invoice.customerName,
+        customer_email: invoice.customerEmail,
+        customer_country: invoice.customerCountry,
+        currency: invoice.currency,
+        subtotal_amount: invoice.subtotal,
+        vat_standard_amount: invoice.vatStandard,
+        vat_reduced_amount: invoice.vatReduced,
+        total_amount: invoice.totalAmount,
+        payment_status: invoice.status,
+        payment_method: invoice.paymentMethod,
+        payment_intent_id: invoice.paymentGatewayRef,
+        items: invoice.items,
+        issued_at: new Date().toISOString(),
+      }).select('id').single();
+
+      if (error) {
+        console.warn('Failed to insert invoice into DB:', error);
+        return null;
+      }
+      return (data as any)?.id || null;
+    } catch (err) {
+      console.warn('Exception while saving invoice:', err);
+      return null;
+    }
   }
 };
