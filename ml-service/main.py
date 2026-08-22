@@ -2,12 +2,18 @@ import os
 import uuid
 import time
 import random
+import logging
 import httpx
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, status
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List, Dict
 from dotenv import load_dotenv
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("norway-smartlife-api")
 
 # Try to load supabase client if installed
 try:
@@ -22,6 +28,53 @@ app = FastAPI(
     description="Backend API for AI predictions and smart routing.",
     version="2.0.0"
 )
+
+# ─── Standardized Global Exception Handlers ────────────────────────────────────
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    errors = []
+    for err in exc.errors():
+        loc = " -> ".join(str(l) for l in err.get("loc", []))
+        errors.append({"field": loc, "message": err.get("msg")})
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={
+            "success": False,
+            "detail": exc.errors(),
+            "error": {
+                "code": "VALIDATION_ERROR",
+                "message": "Invalid request payload or query parameters.",
+                "details": errors
+            }
+        }
+    )
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "success": False,
+            "error": {
+                "code": f"HTTP_{exc.status_code}",
+                "message": exc.detail
+            }
+        }
+    )
+
+@app.exception_handler(Exception)
+async def generic_exception_handler(request: Request, exc: Exception):
+    logger.error(f"Unhandled server error on {request.url.path}: {exc}", exc_info=True)
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={
+            "success": False,
+            "error": {
+                "code": "INTERNAL_SERVER_ERROR",
+                "message": "An unexpected error occurred while processing your request. Please try again later."
+            }
+        }
+    )
 
 # ─── CORS Middleware Configuration (Render & Local Vercel Support) ────────────
 cors_origins_env = os.environ.get("CORS_ORIGINS", "")
