@@ -140,6 +140,7 @@ const AdminPayments = lazy(() => import('./pages/admin/commerce/AdminPayments').
 const AdminDestinations = lazy(() => import('./pages/admin/AdminDestinations').then(m => ({ default: m.AdminDestinations })));
 const AdminContent = lazy(() => import('./pages/admin/content/AdminContent').then(m => ({ default: m.AdminContent })));
 const AdminWildlifeCMS = lazy(() => import('./pages/admin/content/AdminWildlifeCMS').then(m => ({ default: m.AdminWildlifeCMS })));
+const AdminFloraCMS = lazy(() => import('./pages/admin/content/AdminFloraCMS').then(m => ({ default: m.AdminFloraCMS })));
 const AdminMedia = lazy(() => import('./pages/admin/content/AdminMedia').then(m => ({ default: m.AdminMedia })));
 const PlacesCMS = lazy(() => import('./pages/admin/content/PlacesCMS').then(m => ({ default: m.PlacesCMS })));
 const StaysCMS = lazy(() => import('./pages/admin/content/StaysCMS').then(m => ({ default: m.StaysCMS })));
@@ -223,6 +224,8 @@ function App() {
               <Route path="/wildlife/:id" element={<WildlifeDetail />} />
               <Route path="/flora" element={<Flora />} />
               <Route path="/nature/flora" element={<Flora />} />
+              <Route path="/nature/plants-trees" element={<Flora />} />
+              <Route path="/plants-trees" element={<Navigate to="/nature/plants-trees" replace />} />
               <Route path="/resorts" element={<WinterSports />} />
               <Route path="/food" element={<Food />} />
               <Route path="/restaurants" element={<Navigate to="/food" replace />} />
@@ -384,6 +387,7 @@ function App() {
                 {/* CMS Routes */}
                 <Route path="content" element={<AdminContent />} />
                 <Route path="content/wildlife" element={<AdminWildlifeCMS />} />
+                <Route path="content/flora" element={<AdminFloraCMS />} />
                 <Route path="media" element={<AdminMedia />} />
                 <Route path="content/places" element={<PlacesCMS />} />
                 <Route path="content/stays" element={<StaysCMS />} />

@@ -2,12 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Map, Leaf, Mountain, Utensils, Home, Car, Calendar, 
-  Tag, Sparkles, Snowflake, Network, Languages, Image as ImageIcon 
+  Tag, Sparkles, Snowflake, Network, Languages, Image as ImageIcon, Trees 
 } from 'lucide-react';
 
 const CMS_MODULES = [
   { name: 'Destinations & Places', path: '/admin/content/places', icon: Map, color: 'text-blue-600', count: '148+ locations' },
   { name: 'Wildlife Species', path: '/admin/content/wildlife', icon: Leaf, color: 'text-emerald-600', count: '36+ species' },
+  { name: 'Plants, Trees & Flora', path: '/admin/content/flora', icon: Trees, color: 'text-emerald-700', count: 'Botanical species' },
   { name: 'Activities & Tours', path: '/admin/content/activities', icon: Mountain, color: 'text-purple-600', count: '100+ activities' },
   { name: 'Hiking Trails', path: '/admin/content/trails', icon: Mountain, color: 'text-indigo-600', count: '40+ trails' },
   { name: 'Ski & Winter Resorts', path: '/admin/content/skiresorts', icon: Snowflake, color: 'text-sky-600', count: '25+ resorts' },
