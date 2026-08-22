@@ -29,7 +29,7 @@ CREATE INDEX IF NOT EXISTS idx_flora_species_conservation_status
 CREATE INDEX IF NOT EXISTS idx_flora_species_slug 
   ON public.flora_species (slug);
 
--- ── 3. Bookings & Payments Index Hardening ────────────────────────────────────
+-- ── 3. Bookings & Payment Transactions Index Hardening ────────────────────────
 CREATE INDEX IF NOT EXISTS idx_bookings_user_id 
   ON public.bookings (user_id);
 
@@ -45,6 +45,9 @@ CREATE INDEX IF NOT EXISTS idx_bookings_created_at
 CREATE INDEX IF NOT EXISTS idx_payment_transactions_gateway_order_id 
   ON public.payment_transactions (gateway_order_id);
 
+CREATE INDEX IF NOT EXISTS idx_payment_transactions_booking_id 
+  ON public.payment_transactions (booking_id);
+
 -- ── 4. Content & Locations Directory Optimization ─────────────────────────────
 CREATE INDEX IF NOT EXISTS idx_locations_type 
   ON public.locations (type);
@@ -52,17 +55,38 @@ CREATE INDEX IF NOT EXISTS idx_locations_type
 CREATE INDEX IF NOT EXISTS idx_locations_status 
   ON public.locations (status);
 
+CREATE INDEX IF NOT EXISTS idx_locations_slug 
+  ON public.locations (slug);
+
+CREATE INDEX IF NOT EXISTS idx_locations_region 
+  ON public.locations (region);
+
 CREATE INDEX IF NOT EXISTS idx_accommodations_location_id 
   ON public.accommodations (location_id);
+
+CREATE INDEX IF NOT EXISTS idx_accommodations_status 
+  ON public.accommodations (status);
 
 CREATE INDEX IF NOT EXISTS idx_activities_location_id 
   ON public.activities (location_id);
 
+CREATE INDEX IF NOT EXISTS idx_activities_status 
+  ON public.activities (status);
+
 CREATE INDEX IF NOT EXISTS idx_restaurants_location_id 
   ON public.restaurants (location_id);
 
-CREATE INDEX IF NOT EXISTS idx_hiking_trails_difficulty 
-  ON public.hiking_trails (difficulty);
+CREATE INDEX IF NOT EXISTS idx_restaurants_status 
+  ON public.restaurants (status);
 
-CREATE INDEX IF NOT EXISTS idx_ski_resorts_status 
-  ON public.ski_resorts (status);
+CREATE INDEX IF NOT EXISTS idx_trails_location_id 
+  ON public.trails (location_id);
+
+CREATE INDEX IF NOT EXISTS idx_trails_difficulty 
+  ON public.trails (difficulty);
+
+CREATE INDEX IF NOT EXISTS idx_trails_status 
+  ON public.trails (status);
+
+CREATE INDEX IF NOT EXISTS idx_ski_resorts_location_id 
+  ON public.ski_resorts (location_id);
