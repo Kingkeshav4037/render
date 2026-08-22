@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
-import { FileText, Download, CheckCircle2, ArrowLeft, Search, Calendar, ShieldCheck } from 'lucide-react';
+import { FileText, Download, CheckCircle2, ArrowLeft, Search, Calendar, ShieldCheck, AlertCircle, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCurrencyStore } from '../../store/useCurrencyStore';
 import { useAuthStore } from '../../store/useAuthStore';
@@ -9,43 +9,49 @@ import { invoiceService, InvoiceData } from '../../services/invoice/invoiceServi
 export const Invoices = () => {
   const [invoices, setInvoices] = useState<InvoiceData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
   const { formatPrice } = useCurrencyStore();
   const { profile } = useAuthStore();
 
+  const fetchInvoices = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate('/login');
+        return;
+      }
+
+      // Fetch bookings to derive all invoices
+      const { data: bookingsData, error: dbError } = await supabase
+        .from('bookings')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (dbError) throw dbError;
+
+      if (bookingsData && bookingsData.length > 0) {
+        const generatedInvoices = bookingsData.map(b => invoiceService.createInvoiceFromBooking(b, profile));
+        setInvoices(generatedInvoices);
+      } else {
+        setInvoices([]);
+      }
+    } catch (err: any) {
+      console.error('Failed to load invoices:', err);
+      setError(err?.message || 'Unable to retrieve your invoice records. Please check your connection and try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, [navigate, profile]);
+
   useEffect(() => {
     window.scrollTo(0, 0);
-    const fetchInvoices = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          navigate('/login');
-          return;
-        }
-
-        // Fetch bookings to derive all invoices
-        const { data: bookingsData } = await supabase
-          .from('bookings')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
-
-        if (bookingsData && bookingsData.length > 0) {
-          const generatedInvoices = bookingsData.map(b => invoiceService.createInvoiceFromBooking(b, profile));
-          setInvoices(generatedInvoices);
-        } else {
-          setInvoices([]);
-        }
-      } catch (err) {
-        console.error('Failed to load invoices:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchInvoices();
-  }, [navigate, profile]);
+  }, [fetchInvoices]);
 
   const filteredInvoices = invoices.filter(inv => 
     inv.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -58,8 +64,29 @@ export const Invoices = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] pt-32 pb-24 flex justify-center items-center">
+      <div className="min-h-screen bg-[#F8FAFC] pt-32 pb-24 flex flex-col justify-center items-center gap-3">
         <div className="w-10 h-10 border-4 border-[#E2E8F0] border-t-navy-900 rounded-full animate-spin"></div>
+        <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Loading Tax Invoices...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] pt-32 pb-24 px-6 flex justify-center items-center">
+        <div className="bg-white border border-red-200 rounded-3xl p-10 max-w-lg w-full text-center shadow-lg">
+          <div className="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertCircle size={32} />
+          </div>
+          <h2 className="text-xl font-bold text-navy-900 mb-2">Failed to Load Invoices</h2>
+          <p className="text-gray-600 text-xs mb-6 leading-relaxed">{error}</p>
+          <button
+            onClick={() => fetchInvoices()}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-navy-900 hover:bg-aurora-green hover:text-navy-900 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition-all shadow-md cursor-pointer"
+          >
+            <RefreshCw size={14} /> Try Again
+          </button>
+        </div>
       </div>
     );
   }

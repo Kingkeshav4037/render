@@ -1,31 +1,36 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SEO } from '../../components/shared/SEO';
 import { Container } from '../../components/layout/Container';
 import { floraService, FloraSpecies } from '../../services/floraService';
-import { Search, Trees, Flower2, ShieldAlert, Sparkles, MapPin, Calendar, BookOpen, X, Info, Leaf } from 'lucide-react';
+import { Search, Trees, Flower2, ShieldAlert, Sparkles, MapPin, Calendar, BookOpen, X, Info, Leaf, AlertCircle, RefreshCw } from 'lucide-react';
 
 export const Flora = () => {
   const [floraList, setFloraList] = useState<FloraSpecies[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [activeSpecies, setActiveSpecies] = useState<FloraSpecies | null>(null);
 
+  const loadFlora = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await floraService.getAllFlora();
+      setFloraList(data);
+    } catch (err: any) {
+      console.error('Failed to load flora:', err);
+      setError(err?.message || 'Unable to load Norwegian botanical catalog. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     window.scrollTo(0, 0);
-    const loadFlora = async () => {
-      try {
-        const data = await floraService.getAllFlora();
-        setFloraList(data);
-      } catch (err) {
-        console.error('Failed to load flora:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
     loadFlora();
-  }, []);
+  }, [loadFlora]);
 
   const categories = [
     { id: 'All', label: 'All Botanical Species', icon: Leaf },
@@ -146,8 +151,23 @@ export const Flora = () => {
 
         {/* Botanical Species Grid */}
         {loading ? (
-          <div className="py-24 flex justify-center items-center">
+          <div className="py-24 flex flex-col justify-center items-center gap-3">
             <div className="w-10 h-10 border-4 border-emerald-200 border-t-emerald-800 rounded-full animate-spin"></div>
+            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Loading Botanical Catalog...</p>
+          </div>
+        ) : error ? (
+          <div className="bg-white rounded-3xl p-14 text-center border border-red-200 shadow-sm max-w-lg mx-auto">
+            <div className="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertCircle size={32} />
+            </div>
+            <h3 className="text-xl font-bold text-navy-900 mb-2">Failed to Load Flora</h3>
+            <p className="text-gray-600 text-xs mb-6 leading-relaxed">{error}</p>
+            <button
+              onClick={() => loadFlora()}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-navy-900 hover:bg-aurora-green hover:text-navy-900 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition-all shadow-md cursor-pointer"
+            >
+              <RefreshCw size={14} /> Try Again
+            </button>
           </div>
         ) : filteredFlora.length === 0 ? (
           <div className="bg-white rounded-3xl p-16 text-center border border-gray-200 shadow-sm">
