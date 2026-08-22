@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Lock, Compass, ArrowRight, Phone, RefreshCw, KeyRound, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, Compass, ArrowRight, Phone, RefreshCw, KeyRound, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { supabase } from '../../lib/supabase';
+import { toast } from '../../store/useToastStore';
 import { authService } from '../../services/auth/authService';
 
 const COUNTRY_CODES = [
@@ -95,18 +97,36 @@ export const Login = () => {
 
   const handleOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!otp.trim()) {
-      setError('Please enter the 6-digit verification code');
+    if (!otp.trim() || otp.trim().length < 6) {
+      setError('Please enter the complete 6-digit verification code');
       return;
     }
     try {
       setLoading(true);
       setError(null);
-      await authService.verifyPhoneOtp(fullPhoneNumber, otp.trim());
+      const data = await authService.verifyPhoneOtp(fullPhoneNumber, otp.trim());
+      
+      // Ensure profile is updated with verified phone
+      if (data?.user?.id) {
+        try {
+          await supabase.from('profiles').upsert({
+            id: data.user.id,
+            phone: fullPhoneNumber,
+            phone_verified: true,
+            email: data.user.email || `${fullPhoneNumber.replace(/\+/g, '')}@phone.norwaysmartlife.local`,
+            full_name: data.user.user_metadata?.full_name || `User ${fullPhoneNumber.slice(-4)}`,
+            updated_at: new Date().toISOString(),
+          }, { onConflict: 'id', ignoreDuplicates: true });
+        } catch (profileErr) {
+          console.warn('Phone profile init note:', profileErr);
+        }
+      }
+
+      toast.success('Signed in successfully with phone number');
       setTimeout(() => navigate('/home'), 500);
     } catch (e: any) {
       console.error(e);
-      setError(e.message || 'Invalid or expired verification code');
+      setError(e.message || 'Invalid or expired verification code. Please try again.');
       setLoading(false);
     }
   };
