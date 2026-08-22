@@ -36,11 +36,14 @@ CREATE INDEX IF NOT EXISTS idx_bookings_user_id
 CREATE INDEX IF NOT EXISTS idx_bookings_status 
   ON public.bookings (status);
 
-CREATE INDEX IF NOT EXISTS idx_bookings_payment_intent_id 
-  ON public.bookings (payment_intent_id);
+CREATE INDEX IF NOT EXISTS idx_bookings_provider_id 
+  ON public.bookings (provider_id);
 
 CREATE INDEX IF NOT EXISTS idx_bookings_created_at 
   ON public.bookings (created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_payment_transactions_gateway_order_id 
+  ON public.payment_transactions (gateway_order_id);
 
 -- ── 4. Content & Locations Directory Optimization ─────────────────────────────
 CREATE INDEX IF NOT EXISTS idx_locations_type 
