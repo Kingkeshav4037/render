@@ -1,4 +1,5 @@
 import os
+import re
 import uuid
 import time
 import random
@@ -12,8 +13,25 @@ from pydantic import BaseModel
 from typing import Optional, List, Dict
 from dotenv import load_dotenv
 
-logging.basicConfig(level=logging.INFO)
+class SecretSanitizingFilter(logging.Filter):
+    """
+    Scans and redacts sensitive credentials, tokens, passwords, and secrets from all logs.
+    """
+    SENSITIVE_PATTERNS = [
+        (re.compile(r"Bearer\s+[A-Za-z0-9-_=.]+", re.IGNORECASE), "Bearer [REDACTED]"),
+        (re.compile(r"eyJ[A-Za-z0-9-_]+\.eyJ[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+"), "[JWT_REDACTED]"),
+        (re.compile(r"(password|secret|apikey|api_key|token|otp|cvv|card_number)['\"]?\s*[:=]\s*['\"]?([^'\"\s,]+)", re.IGNORECASE), r"\1=[REDACTED]"),
+    ]
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        if isinstance(record.msg, str):
+            for pattern, replacement in self.SENSITIVE_PATTERNS:
+                record.msg = pattern.sub(replacement, record.msg)
+        return True
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] [%(name)s] %(message)s")
 logger = logging.getLogger("norway-smartlife-api")
+logger.addFilter(SecretSanitizingFilter())
 
 # Try to load supabase client if installed
 try:
