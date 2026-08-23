@@ -57,14 +57,15 @@ export const invoiceService = {
     const endDate = booking.end_time ? new Date(booking.end_time).toLocaleDateString('en-GB') : '';
     const dateRange = endDate ? `${startDate} – ${endDate}` : startDate;
 
-    const shortId = (booking.id || '').split('-')[0].toUpperCase();
-    const invoiceNum = `NSL-2026-${shortId || Math.floor(100000 + Math.random() * 900000)}`;
+    const cleanId = (booking.id || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    const shortId = cleanId.length > 8 ? cleanId.substring(cleanId.length - 8) : cleanId;
+    const invoiceNum = booking.invoice_number || `NSL-2026-${shortId || Math.floor(100000 + Math.random() * 900000)}`;
 
     return {
       invoiceNumber: invoiceNum,
       invoiceDate: new Date(booking.created_at || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
       dueDate: new Date(booking.created_at || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-      customerName: userProfile?.fullName || booking.customer_name || 'Valued Traveler',
+      customerName: userProfile?.fullName || userProfile?.full_name || booking.customer_name || 'Valued Traveler',
       customerEmail: userProfile?.email || booking.customer_email || 'customer@smartlife.no',
       customerCountry: userProfile?.country || 'Norway',
       currency: booking.currency || 'NOK',

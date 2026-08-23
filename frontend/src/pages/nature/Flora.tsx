@@ -41,13 +41,14 @@ export const Flora = () => {
   ];
 
   const filteredFlora = floraList.filter((item) => {
-    const matchesCategory = selectedCategory === 'All' || item.category.toLowerCase() === selectedCategory.toLowerCase();
+    const matchesCategory = selectedCategory === 'All' || (item.category?.toLowerCase() === selectedCategory.toLowerCase());
     const matchesSearch = 
-      item.common_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.norwegian_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.scientific_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.habitat.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.distribution_region.toLowerCase().includes(searchTerm.toLowerCase());
+      (item.common_name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (item.norwegian_name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (item.scientific_name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (item.latin_name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (item.habitat?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (item.distribution_region?.toLowerCase() || '').includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -207,11 +208,11 @@ export const Flora = () => {
                     </div>
                     <div className="absolute top-3.5 right-3.5">
                       <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider backdrop-blur-md shadow-sm ${
-                        item.foraging_status.includes('Edible')
+                        (item.foraging_status?.includes('Edible') || !item.is_protected)
                           ? 'bg-emerald-600/90 text-white'
                           : 'bg-amber-600/90 text-white'
                       }`}>
-                        {item.foraging_status.includes('Edible') ? 'Edible' : 'Protected'}
+                        {item.foraging_status || (item.is_protected ? 'Protected' : 'Wild / Forageable')}
                       </span>
                     </div>
                   </div>
@@ -220,7 +221,7 @@ export const Flora = () => {
                   <div className="p-6">
                     <div className="text-[11px] font-bold text-emerald-800 uppercase tracking-widest mb-1 flex items-center justify-between">
                       <span>{item.norwegian_name}</span>
-                      <span className="italic font-serif text-gray-400 capitalize">{item.scientific_name}</span>
+                      <span className="italic font-serif text-gray-400 capitalize">{item.scientific_name || item.latin_name}</span>
                     </div>
 
                     <h3 className="text-xl font-display font-bold text-navy-900 group-hover:text-emerald-700 transition-colors mb-2">
@@ -238,7 +239,7 @@ export const Flora = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         <Calendar className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                        <span>{item.flowering_season}</span>
+                        <span>{item.flowering_season || item.blooming_season || 'Summer'}</span>
                       </div>
                     </div>
                   </div>
@@ -290,7 +291,7 @@ export const Flora = () => {
                     </span>
                   </div>
                   <h2 className="text-3xl font-display font-black">{activeSpecies.common_name}</h2>
-                  <p className="italic text-xs font-serif text-white/70">{activeSpecies.scientific_name}</p>
+                  <p className="italic text-xs font-serif text-white/70">{activeSpecies.scientific_name || activeSpecies.latin_name}</p>
                 </div>
               </div>
 
@@ -313,11 +314,11 @@ export const Flora = () => {
                     <div className="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1 flex items-center gap-1.5">
                       <Calendar className="w-3.5 h-3.5 text-emerald-600" /> Season & Foraging Status
                     </div>
-                    <div className="text-xs font-semibold text-navy-900">{activeSpecies.flowering_season}</div>
+                    <div className="text-xs font-semibold text-navy-900">{activeSpecies.flowering_season || activeSpecies.blooming_season || 'Summer'}</div>
                     <div className={`text-[11px] font-bold mt-1 ${
-                      activeSpecies.foraging_status.includes('Edible') ? 'text-emerald-700' : 'text-amber-700'
+                      (activeSpecies.foraging_status?.includes('Edible') || !activeSpecies.is_protected) ? 'text-emerald-700' : 'text-amber-700'
                     }`}>
-                      {activeSpecies.foraging_status}
+                      {activeSpecies.foraging_status || (activeSpecies.is_protected ? 'Protected Species' : 'Wild & Forageable')}
                     </div>
                   </div>
                 </div>
