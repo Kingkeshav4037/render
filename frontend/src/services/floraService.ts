@@ -6,12 +6,15 @@ export interface FloraSpecies {
   common_name: string;
   norwegian_name: string;
   scientific_name: string;
+  latin_name?: string;
   category: 'Trees' | 'Alpine' | 'Berries' | 'Wildflowers' | 'Orchids' | string;
   habitat: string;
   distribution_region: string;
   flowering_season: string;
+  blooming_season?: string;
   foraging_status: 'Edible & Forageable' | 'Protected - Do Not Pick' | 'Medicinal' | 'Non-Edible' | string;
   conservation_status: string;
+  is_protected?: boolean;
   description: string;
   ecological_role: string;
   traditional_uses?: string;
