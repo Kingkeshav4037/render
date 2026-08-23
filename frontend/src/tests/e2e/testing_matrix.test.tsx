@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import '@testing-library/jest-dom';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { authService } from '../../services/auth/authService';
@@ -153,8 +154,8 @@ describe('Complete Testing Matrix Verification', () => {
         error: null,
       });
 
-      const res = await authService.loginWithEmail('test@norway.no', 'SecureNordic2026!');
-      expect(res.user.email).toBe('test@norway.no');
+      const res: any = await authService.loginWithEmail('test@norway.no', 'SecureNordic2026!');
+      expect(res?.user?.email).toBe('test@norway.no');
       expect(supabase.auth.signInWithPassword).toHaveBeenCalledWith({
         email: 'test@norway.no',
         password: 'SecureNordic2026!',
@@ -293,10 +294,10 @@ describe('Complete Testing Matrix Verification', () => {
         error: null,
       });
 
-      const { data } = await supabase.rpc('process_payment_webhook', {
+      const rpcResult: any = await supabase.rpc('process_payment_webhook', {
         p_gateway_order_id: 'order_test_rzp_999'
       });
-      expect(data.already_processed).toBe(true);
+      expect(rpcResult.data?.already_processed).toBe(true);
     });
 
     it('Invalid webhook signature is safely rejected', async () => {
