@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
-import { Loader2 } from 'lucide-react';
+import { LoadingState } from '../../components/ui/LoadingState';
 
 export const AuthCallback = () => {
   const navigate = useNavigate();
@@ -26,22 +26,7 @@ export const AuthCallback = () => {
         if (data.session) {
           const user = data.session.user;
           if (user && user.id) {
-            try {
-              const fullName = user.user_metadata?.full_name || user.user_metadata?.name || '';
-              const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture || '';
-              
-              if (fullName || avatarUrl) {
-                await supabase.from('profiles').upsert({
-                  id: user.id,
-                  email: user.email || '',
-                  full_name: fullName,
-                  avatar_url: avatarUrl,
-                  updated_at: new Date().toISOString(),
-                }, { onConflict: 'id', ignoreDuplicates: true });
-              }
-            } catch (syncErr) {
-              console.warn('Google profile sync note:', syncErr);
-            }
+            // User session verified. Profile creation is handled securely via backend trigger on auth.users insert.
           }
 
           const hashParams = new URLSearchParams(window.location.hash.substring(1));
@@ -50,7 +35,9 @@ export const AuthCallback = () => {
           if (type === 'recovery') {
             navigate('/reset-password');
           } else {
-            navigate('/home');
+            const returnTo = sessionStorage.getItem('returnTo') || '/home';
+            sessionStorage.removeItem('returnTo');
+            navigate(returnTo);
           }
         } else {
           navigate('/login');
@@ -66,20 +53,34 @@ export const AuthCallback = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-navy-900 text-white">
-      {error ? (
-        <div className="bg-red-500/20 text-red-200 p-6 rounded-2xl max-w-md text-center border border-red-500/30">
-          <p className="font-bold mb-2 text-lg">Authentication Error</p>
-          <p className="text-sm">{error}</p>
-          <p className="text-xs mt-4 opacity-70">Redirecting to login...</p>
-        </div>
-      ) : (
-        <div className="flex flex-col items-center">
-          <Loader2 className="w-12 h-12 text-aurora-green animate-spin mb-4" />
-          <h2 className="text-xl font-bold">Verifying authentication...</h2>
-          <p className="text-white/70 text-sm mt-1">Please wait while we log you into Norway SmartLife.</p>
-        </div>
-      )}
+    <div className="min-h-screen relative flex items-center justify-center overflow-hidden bg-deep-night">
+      <div 
+        className="absolute inset-0 z-0 bg-cover bg-center transition-all duration-1000 opacity-20"
+        style={{ backgroundImage: "url('/images/northern_lights.jpg')" }}
+      >
+        <div className="absolute inset-0 bg-navy-900/50 backdrop-blur-[4px]"></div>
+      </div>
+
+      <div className="relative z-10">
+        {error ? (
+          <div 
+            className="bg-red-500/10 text-red-300 p-6 rounded-2xl max-w-md text-center border border-red-500/30 backdrop-blur-xl"
+            role="alert"
+            aria-live="assertive"
+          >
+            <p className="font-bold mb-2 text-lg">Authentication Error</p>
+            <p className="text-sm">{error}</p>
+            <p className="text-xs mt-4 opacity-70">Redirecting to login...</p>
+          </div>
+        ) : (
+          <LoadingState 
+            message="Verifying authentication..." 
+            submessage="Please wait while we log you into Norway SmartLife."
+          />
+        )}
+      </div>
     </div>
   );
 };
+
+export default AuthCallback;
