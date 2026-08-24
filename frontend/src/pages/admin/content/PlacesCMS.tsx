@@ -12,10 +12,6 @@ export const PlacesCMS = () => {
   const [editRow, setEditRow] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    fetchLocations();
-  }, []);
-
   const fetchLocations = async () => {
     setLoading(true);
     // Fetch canonical locations table from Phase A
@@ -27,6 +23,11 @@ export const PlacesCMS = () => {
     if (data) setLocations(data);
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchLocations();
+  }, []);
+
 
   const columns: ColumnDef[] = [
     { key: 'name', header: 'Name', render: (val) => <div className="font-bold text-navy-900">{val}</div> },

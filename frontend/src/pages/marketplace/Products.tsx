@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingCart, Leaf, Star, ArrowRight, Plus, Minus, Loader2 } from 'lucide-react';
+import { ShoppingCart, Leaf, Star, ArrowRight, Plus, Minus, Loader2, AlertCircle, RefreshCw, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useCartStore } from '../../store/useCartStore';
 import { supabase } from '../../lib/supabase';
 import { Database } from '../../lib/database.types';
+import { CinematicBackground } from '../../design/backgrounds/CinematicBackground';
+import { OptimizedImage } from '../../components/shared/OptimizedImage';
+import { EmptyState } from '../../components/ui/EmptyState';
+import { Button } from '../../components/ui/Button';
 
 export const Products = () => {
   const navigate = useNavigate();
@@ -16,22 +20,29 @@ export const Products = () => {
   const [sortBy, setSortBy] = useState('Featured');
   const [showCart, setShowCart] = useState(false);
 
-
   const [products, setProducts] = useState<Database['public']['Tables']['products']['Row'][]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      const { data, error } = await supabase
+  const fetchProducts = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data, error: dbError } = await supabase
         .from('products')
         .select('*');
       
-      if (!error && data) {
-        setProducts(data);
-      }
+      if (dbError) throw dbError;
+      setProducts(data || []);
+    } catch (err: any) {
+      console.error('Failed to load products:', err);
+      setError(err?.message || 'Unable to retrieve marketplace products.');
+    } finally {
       setLoading(false);
-    };
-    
+    }
+  };
+
+  useEffect(() => {
     fetchProducts();
   }, []);
 
@@ -54,46 +65,53 @@ export const Products = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-deep-night min-h-screen text-snow font-sans">
       {/* Premium Header */}
-      <div className="bg-navy-900 text-white py-12 px-4 md:px-12 relative overflow-hidden mb-12 rounded-b-3xl">
-        <div className="absolute inset-0 opacity-20 bg-[url('/images/infra_windfarm.jpg')] bg-cover bg-center"></div>
-        <div className="relative z-10 max-w-7xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-8">
-          <div>
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 mb-6 backdrop-blur-md">
-              <Leaf className="w-5 h-5 text-aurora-green" />
-              <span className="text-sm font-semibold tracking-wider uppercase text-white/90">Eco-Marketplace</span>
-            </motion.div>
-            <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-3xl md:text-5xl font-black mb-4">
-              Smart Products for a <span className="text-transparent bg-clip-text bg-gradient-to-r from-aurora-green to-blue-400">Green Life</span>
-            </motion.h1>
-            <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-xl text-blue-100 max-w-2xl">
-              Shop curated, sustainable Norwegian tech and gear. Every purchase offsets your carbon footprint.
-            </motion.p>
-          </div>
-          
-          <div className="w-full md:w-96 flex flex-col gap-4">
-            <input 
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full py-4 px-6 outline-none focus:bg-white/20 transition-all placeholder:text-gray-400"
-            />
+      <CinematicBackground 
+        imageUrl="https://images.unsplash.com/photo-1522204523234-8729aa6e3d5f?w=1600"
+        gradient="aurora"
+        overlayOpacity={0.7}
+        className="h-[60vh] flex items-end pb-12 mb-12"
+        animate={false}
+      >
+        <div className="max-w-[1440px] mx-auto px-6 md:px-12 w-full pt-32">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div>
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 mb-6 backdrop-blur-md">
+                <Leaf className="w-4 h-4 text-arctic-gold" />
+                <span className="text-xs font-bold tracking-widest uppercase text-snow/90">Eco-Marketplace</span>
+              </motion.div>
+              <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-5xl md:text-7xl font-display font-semibold mb-4 text-snow">
+                Smart Products for a <span className="text-transparent bg-clip-text bg-gradient-to-r from-arctic-gold to-snow">Green Life</span>
+              </motion.h1>
+              <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-lg text-snow/70 max-w-2xl font-sans">
+                Shop curated, sustainable Norwegian tech and gear. Every purchase offsets your carbon footprint.
+              </motion.p>
+            </div>
+            
+            <div className="w-full md:w-96 flex flex-col gap-4">
+              <input 
+                type="text"
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-snow/5 backdrop-blur-xl border border-snow/10 text-snow rounded-none py-5 px-6 outline-none focus:bg-snow/10 focus:border-arctic-gold/50 transition-all placeholder:text-snow/30 font-sans text-base"
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </CinematicBackground>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
+      <div className="max-w-[1440px] mx-auto px-6 md:px-12 -mt-8 relative z-10">
         
         {/* Navigation & Cart Toggle */}
-        <div className="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-2xl shadow-md border border-gray-100 mb-8 gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-center bg-midnight/80 backdrop-blur-md p-4 rounded-none border border-white/5 mb-12 gap-4">
           <div className="flex gap-2 overflow-x-auto w-full md:w-auto pb-2 sm:pb-0 hide-scrollbar" style={{ scrollbarWidth: 'none' }}>
             {['All', 'Smart Home', 'EV Accessories', 'Outdoor Gear', 'Lifestyle'].map(cat => (
               <button 
                 key={cat}
                 onClick={() => setFilter(cat)}
-                className={`px-6 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all border ${filter === cat ? 'bg-navy-900 text-white border-navy-900 shadow-md' : 'bg-white text-gray-600 border-gray-200 hover:border-aurora-green'}`}
+                className={`px-6 py-2.5 text-sm font-sans font-bold uppercase tracking-widest transition-all border ${filter === cat ? 'bg-arctic-gold text-deep-night border-arctic-gold' : 'bg-transparent text-snow/70 border-white/10 hover:border-arctic-gold hover:text-snow'}`}
               >
                 {cat}
               </button>
@@ -103,35 +121,72 @@ export const Products = () => {
             <select 
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="bg-white border border-gray-200 text-gray-700 text-sm rounded-xl px-4 py-2.5 outline-none font-semibold hover:border-aurora-green transition-colors cursor-pointer"
+              className="bg-deep-night border border-white/10 text-snow text-sm uppercase tracking-widest px-4 py-2.5 outline-none font-sans font-bold hover:border-arctic-gold transition-colors cursor-pointer"
             >
               <option>Featured</option>
               <option>Price: Low to High</option>
               <option>Price: High to Low</option>
               <option>Top Rated</option>
             </select>
-          <button 
-            onClick={() => setShowCart(!showCart)}
-            className="flex items-center gap-2 bg-aurora-green text-navy-900 px-6 py-2.5 rounded-xl font-bold hover:bg-green-400 transition-colors shadow-sm w-full sm:w-auto justify-center relative"
-          >
-            <ShoppingCart className="w-5 h-5" />
-            Cart
-            {cart.length > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-black rounded-full h-6 w-6 flex items-center justify-center border-2 border-white">
-                {cart.reduce((total, item) => total + item.quantity, 0)}
-              </span>
-            )}
-          </button>
+            <button 
+              onClick={() => setShowCart(!showCart)}
+              className="flex items-center gap-2 bg-arctic-gold text-deep-night px-6 py-2.5 font-sans font-bold uppercase tracking-widest hover:bg-snow hover:text-deep-night transition-colors shadow-sm w-full sm:w-auto justify-center relative"
+            >
+              <ShoppingCart className="w-5 h-5" />
+              Cart
+              {cart.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-nordic-red text-white text-[10px] font-black h-5 w-5 flex items-center justify-center border border-deep-night">
+                  {cart.reduce((total, item) => total + item.quantity, 0)}
+                </span>
+              )}
+            </button>
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8 pb-20">
+        <div className="flex flex-col lg:flex-row gap-12 pb-24">
           
           {/* Product Grid */}
-          <div className={`grid grid-cols-1 sm:grid-cols-2 ${showCart ? 'lg:grid-cols-2' : 'lg:grid-cols-4'} gap-6 flex-grow transition-all duration-300`}>
+          <div className={`grid grid-cols-1 sm:grid-cols-2 ${showCart ? 'lg:grid-cols-2' : 'lg:grid-cols-4'} gap-8 flex-grow transition-all duration-300`}>
             {loading ? (
-              <div className="col-span-full flex items-center justify-center py-20">
-                <Loader2 className="w-10 h-10 animate-spin text-aurora-green" />
+              // Skeleton Loading Cards
+              [1, 2, 3, 4, 5, 6, 7, 8].map(n => (
+                <div key={n} className="bg-midnight border border-white/5 overflow-hidden flex flex-col h-[420px] animate-pulse">
+                  <div className="h-64 bg-white/5" />
+                  <div className="p-8 flex flex-col flex-grow">
+                    <div className="h-3 bg-white/10 w-20 mb-3" />
+                    <div className="h-6 bg-white/10 w-3/4 mb-3" />
+                    <div className="h-4 bg-white/5 w-1/2 mb-6" />
+                    <div className="mt-auto flex justify-between items-center">
+                      <div className="h-6 bg-white/10 w-1/3" />
+                      <div className="h-10 w-10 bg-white/10" />
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : error ? (
+              <div className="col-span-full py-16 px-6 bg-red-500/10 border border-red-500/20 rounded-3xl text-center flex flex-col items-center justify-center max-w-xl mx-auto">
+                <div className="w-14 h-14 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center mb-4 border border-red-500/30">
+                  <AlertCircle size={28} />
+                </div>
+                <h3 className="text-xl font-bold text-snow mb-2">Unable to Load Products</h3>
+                <p className="text-sm text-snow/70 mb-6 leading-relaxed">{error}</p>
+                <Button variant="primary" onClick={fetchProducts} className="flex items-center gap-2">
+                  <RefreshCw size={16} /> Try Again
+                </Button>
+              </div>
+            ) : filteredProducts.length === 0 ? (
+              <div className="col-span-full">
+                <EmptyState 
+                  title="No Eco-Products Found"
+                  message={searchQuery 
+                    ? `We couldn't find any products matching "${searchQuery}" in the ${filter} category.` 
+                    : `There are currently no products available under the ${filter} category.`}
+                  actionLabel="Clear Search & Filters"
+                  onAction={() => {
+                    setSearchQuery('');
+                    setFilter('All');
+                  }}
+                />
               </div>
             ) : (
               <AnimatePresence>
@@ -142,26 +197,33 @@ export const Products = () => {
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
-                    className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all group flex flex-col"
+                    className="bg-midnight border border-white/5 hover:border-white/20 overflow-hidden transition-all duration-500 group flex flex-col relative"
                   >
-                  <div className="relative h-64 overflow-hidden bg-gray-100">
-                    <img src={product.img} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
-                      <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                      <span className="text-xs font-bold text-navy-900">{product.rating}</span>
+                  <div className="relative h-64 overflow-hidden bg-black">
+                    <OptimizedImage 
+                      src={product.img} 
+                      alt={product.name} 
+                      category="product"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 opacity-85 group-hover:opacity-100" 
+                      containerClassName="w-full h-full"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-midnight via-transparent to-transparent opacity-80 pointer-events-none" />
+                    <div className="absolute top-4 right-4 bg-deep-night/80 backdrop-blur-md px-3 py-1 flex items-center gap-1 border border-white/10 z-10">
+                      <Star className="w-3 h-3 text-arctic-gold fill-arctic-gold" />
+                      <span className="text-[10px] font-bold text-snow">{product.rating}</span>
                     </div>
                   </div>
-                  <div className="p-6 flex flex-col flex-grow">
-                    <div className="text-xs font-bold text-aurora-green uppercase tracking-wider mb-2">{product.category}</div>
-                    <h3 className="text-lg font-bold text-navy-900 mb-2 leading-tight">{product.name}</h3>
+                  <div className="p-8 flex flex-col flex-grow relative z-20">
+                    <div className="text-[10px] font-sans font-bold text-arctic-gold uppercase tracking-widest mb-3">{product.category}</div>
+                    <h3 className="text-xl font-display font-semibold text-snow mb-3 leading-tight">{product.name}</h3>
                     
-                    <div className="flex items-center gap-2 mb-6">
-                      <Leaf className="w-4 h-4 text-green-500" />
-                      <span className="text-sm font-medium text-gray-500">Offsets {Math.abs(product.co2)}kg CO₂</span>
+                    <div className="flex items-center gap-2 mb-8">
+                      <Leaf className="w-4 h-4 text-snow/50" />
+                      <span className="text-sm font-sans font-medium text-snow/50">Offsets {Math.abs(product.co2)}kg CO₂</span>
                     </div>
 
                     <div className="mt-auto flex items-center justify-between">
-                      <span className="text-2xl font-black text-navy-900">{product.price} <span className="text-sm font-medium text-gray-500">NOK</span></span>
+                      <span className="text-2xl font-display font-semibold text-snow">{product.price} <span className="text-xs font-sans font-bold uppercase text-snow/50">NOK</span></span>
                       <button 
                         onClick={() => {
                           addItem({
@@ -175,15 +237,15 @@ export const Products = () => {
                           });
                           setShowCart(true);
                         }}
-                        className="bg-gray-100 hover:bg-navy-900 hover:text-white p-3 rounded-xl transition-colors"
+                        className="bg-white/5 hover:bg-arctic-gold hover:text-deep-night border border-white/10 hover:border-arctic-gold p-3 transition-colors group/btn cursor-pointer"
                       >
-                        <ShoppingCart className="w-5 h-5" />
+                        <ShoppingCart className="w-5 h-5 text-snow group-hover/btn:text-deep-night" />
                       </button>
                     </div>
                   </div>
                 </motion.div>
               ))}
-            </AnimatePresence>
+              </AnimatePresence>
             )}
           </div>
 
@@ -192,35 +254,46 @@ export const Products = () => {
             <motion.div 
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="w-full lg:w-96 bg-white rounded-2xl border border-gray-100 shadow-lg p-6 h-fit sticky top-24 shrink-0"
+              className="w-full lg:w-[400px] bg-midnight border border-white/10 p-8 h-fit sticky top-32 shrink-0 flex flex-col"
             >
-              <h2 className="text-xl font-bold text-navy-900 mb-6 flex items-center gap-2">
-                <ShoppingCart className="w-6 h-6 text-aurora-green" /> Your Cart
-              </h2>
+              <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-6">
+                <h2 className="text-lg font-sans font-bold uppercase tracking-widest text-snow flex items-center gap-3">
+                  <ShoppingCart className="w-5 h-5 text-arctic-gold" /> Your Cart
+                </h2>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-snow/50 bg-white/5 px-2 py-1">{cart.length} ITEMS</span>
+              </div>
               
               {cart.length === 0 ? (
-                <div className="text-center py-10 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                  <ShoppingCart className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-                  <p className="text-gray-500 font-medium">Your cart is empty.</p>
+                <div className="text-center py-16">
+                  <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/10">
+                    <ShoppingCart className="w-8 h-8 text-snow/30" />
+                  </div>
+                  <p className="text-snow/50 font-sans text-sm">Your cart is empty.</p>
                 </div>
               ) : (
                 <>
-                  <div className="space-y-4 mb-6 max-h-[50vh] overflow-y-auto pr-2">
+                  <div className="space-y-4 mb-8 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
                     {cart.map((item) => (
-                      <div key={item.id} className="flex gap-4 items-center bg-gray-50 p-3 rounded-xl border border-gray-100">
-                        <img src={item.image} alt={item.name} className="w-16 h-16 rounded-lg object-cover bg-white" />
+                      <div key={item.id} className="flex gap-4 items-center bg-white/5 p-4 border border-white/5 hover:border-white/10 transition-colors">
+                        <OptimizedImage 
+                          src={item.image} 
+                          alt={item.name} 
+                          category="product"
+                          className="w-full h-full object-cover" 
+                          containerClassName="w-16 h-16 shrink-0 bg-black"
+                        />
                         <div className="flex-1 min-w-0">
-                          <h4 className="text-sm font-bold text-navy-900 truncate">{item.name}</h4>
-                          <p className="text-xs text-gray-500 mb-2">{item.unit_price} NOK</p>
+                          <h4 className="text-sm font-sans font-medium text-snow truncate mb-1">{item.name}</h4>
+                          <p className="text-xs font-sans font-bold text-arctic-gold mb-3">{item.unit_price} NOK</p>
                           <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2 bg-white rounded-lg border border-gray-200">
-                              <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-1 text-gray-500 hover:text-navy-900"><Minus size={14}/></button>
-                              <span className="text-xs font-bold w-4 text-center">{item.quantity}</span>
-                              <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-1 text-gray-500 hover:text-navy-900"><Plus size={14}/></button>
+                            <div className="flex items-center gap-2 bg-deep-night border border-white/10 px-2 py-1">
+                              <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-1 text-snow/50 hover:text-snow"><Minus size={12}/></button>
+                              <span className="text-xs font-bold w-4 text-center text-snow">{item.quantity}</span>
+                              <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-1 text-snow/50 hover:text-snow"><Plus size={12}/></button>
                             </div>
                             <button 
                               onClick={() => removeItem(item.id)}
-                              className="text-xs font-bold text-red-500 hover:text-red-700"
+                              className="text-[10px] font-bold uppercase tracking-widest text-nordic-red hover:text-red-400 transition-colors"
                             >
                               Remove
                             </button>
@@ -230,16 +303,16 @@ export const Products = () => {
                     ))}
                   </div>
                   
-                  <div className="border-t border-gray-100 pt-4 space-y-3 mb-6">
-                    <div className="flex justify-between text-sm text-gray-600">
+                  <div className="border-t border-white/10 pt-6 space-y-4 mb-8">
+                    <div className="flex justify-between text-sm font-sans text-snow/70">
                       <span>Subtotal</span>
-                      <span className="font-bold">{getCartTotal()} NOK</span>
+                      <span className="font-bold text-snow">{getCartTotal()} NOK</span>
                     </div>
-                    <div className="flex justify-between text-sm text-gray-600">
+                    <div className="flex justify-between text-sm font-sans text-snow/70">
                       <span>Shipping</span>
-                      <span className="font-bold text-green-600">Free (Eco-Delivery)</span>
+                      <span className="font-bold text-arctic-gold uppercase tracking-widest text-[10px]">Free (Eco-Delivery)</span>
                     </div>
-                    <div className="flex justify-between text-lg font-black text-navy-900 pt-2 border-t border-gray-100">
+                    <div className="flex justify-between text-xl font-display font-semibold text-snow pt-4 border-t border-white/10">
                       <span>Total</span>
                       <span>{getCartTotal()} NOK</span>
                     </div>
@@ -248,16 +321,16 @@ export const Products = () => {
                   {user ? (
                     <button 
                       onClick={handleCheckoutClick}
-                      className="w-full flex items-center justify-center gap-2 bg-navy-900 text-white py-4 rounded-xl font-bold hover:bg-navy-800 transition-colors"
+                      className="w-full flex items-center justify-center gap-3 bg-arctic-gold text-deep-night py-4 font-sans font-bold uppercase tracking-widest hover:bg-snow hover:text-deep-night transition-colors"
                     >
                       Secure Checkout <ArrowRight className="w-5 h-5" />
                     </button>
                   ) : (
-                    <div className="text-center">
-                      <p className="text-sm text-gray-500 mb-3">Please log in to checkout.</p>
+                    <div className="text-center p-4 bg-white/5 border border-white/10">
+                      <p className="text-xs font-sans font-medium text-snow/70 mb-4">Please log in to checkout.</p>
                       <button 
                         onClick={() => navigate('/login')}
-                        className="w-full bg-gray-100 text-navy-900 py-4 rounded-xl font-bold hover:bg-gray-200 transition-colors"
+                        className="w-full bg-snow text-deep-night py-3 font-sans font-bold uppercase tracking-widest hover:bg-gray-200 transition-colors text-xs"
                       >
                         Log In
                       </button>
@@ -273,3 +346,4 @@ export const Products = () => {
     </div>
   );
 };
+

@@ -10,10 +10,6 @@ export const SkiResortsCMS = () => {
   const [editRow, setEditRow] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    fetchItems();
-  }, []);
-
   const fetchItems = async () => {
     setLoading(true);
     const { data } = await supabase
@@ -24,6 +20,11 @@ export const SkiResortsCMS = () => {
     if (data) setItems(data);
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
 
   const columns: ColumnDef[] = [
     { key: 'name', header: 'Resort Name', render: (val) => <div className="font-bold text-navy-900">{val}</div> },

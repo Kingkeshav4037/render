@@ -1,27 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CinematicBackground } from '../../design/backgrounds/CinematicBackground';
 import { Container } from '../../components/layout/Container';
 import { Map, Mountain, Clock, TrendingUp, AlertTriangle, ShieldCheck, ArrowLeft, Navigation, MapPin } from 'lucide-react';
+import { trailService, Trail } from '../../services/trailService';
+import { SEO } from '../../components/shared/SEO';
 
 export const TrailDetails = () => {
-  const { id } = useParams();
-  
-  // Dummy data based on Trolltunga
-  const trail = {
-    name: 'Trolltunga',
-    description: 'Norwegian wilderness above the fjords.',
-    difficulty: 'Hard',
-    distance: '27 km',
-    duration: '10–12 hrs',
-    elevation: '1,100 m',
-    best_season: 'Jun–Sep',
-    image: '/images/trolltunga_1786936111320.jpg'
-  };
+  const { id } = useParams<{ id: string }>();
+  const [trail, setTrail] = useState<Trail | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (id) {
+      trailService.getTrailById(id).then(data => {
+        setTrail(data);
+        setIsLoading(false);
+      });
+    } else {
+      trailService.getTrailById('tr-002').then(data => {
+        setTrail(data);
+        setIsLoading(false);
+      });
+    }
+  }, [id]);
+
+  if (isLoading || !trail) {
+    return (
+      <div className="min-h-screen bg-nordic-sage flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-nordic-sage text-white pb-24">
+      <SEO 
+        title={`${trail.name} | Hiking in Norway`}
+        description={trail.description || `${trail.name} trail in ${trail.location}. Distance: ${trail.distance_km}km, Difficulty: ${trail.difficulty}.`}
+        ogImage={trail.image}
+      />
       {/* Full-screen Hero */}
       <div className="relative h-screen">
         <CinematicBackground 
@@ -49,7 +68,7 @@ export const TrailDetails = () => {
               transition={{ delay: 0.1 }}
               className="text-2xl md:text-4xl text-gray-200 font-light max-w-3xl drop-shadow-xl"
             >
-              {trail.description}
+              {trail.description || 'Experience the raw grandeur of the Norwegian landscape.'}
             </motion.p>
           </Container>
         </div>
@@ -69,15 +88,15 @@ export const TrailDetails = () => {
               </div>
               <div className="flex flex-col">
                 <span className="text-xs text-gray-400 uppercase tracking-wider mb-1">Distance</span>
-                <span className="text-xl font-bold text-white flex items-center gap-2"><Navigation className="w-5 h-5 text-gray-400"/> {trail.distance}</span>
+                <span className="text-xl font-bold text-white flex items-center gap-2"><Navigation className="w-5 h-5 text-gray-400"/> {trail.distance_km} km</span>
               </div>
               <div className="flex flex-col">
                 <span className="text-xs text-gray-400 uppercase tracking-wider mb-1">Duration</span>
-                <span className="text-xl font-bold text-white flex items-center gap-2"><Clock className="w-5 h-5 text-gray-400"/> {trail.duration}</span>
+                <span className="text-xl font-bold text-white flex items-center gap-2"><Clock className="w-5 h-5 text-gray-400"/> {trail.duration_hrs} hrs</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-xs text-gray-400 uppercase tracking-wider mb-1">Elevation</span>
-                <span className="text-xl font-bold text-white flex items-center gap-2"><Mountain className="w-5 h-5 text-gray-400"/> +{trail.elevation}</span>
+                <span className="text-xs text-gray-400 uppercase tracking-wider mb-1">Elevation Gain</span>
+                <span className="text-xl font-bold text-white flex items-center gap-2"><Mountain className="w-5 h-5 text-gray-400"/> +{trail.elevation_gain_m}m</span>
               </div>
               <div className="flex flex-col">
                 <span className="text-xs text-gray-400 uppercase tracking-wider mb-1">Best Season</span>
@@ -101,8 +120,8 @@ export const TrailDetails = () => {
                   <AlertTriangle className="w-8 h-8" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-display font-bold text-white mb-2">Check Conditions Before You Go</h3>
-                  <p className="text-red-200 mb-6">Current weather warning: Heavy rainfall expected in the afternoon. Trail surfaces may be slippery. Proper hiking boots and waterproof layers are mandatory.</p>
+                  <h3 className="text-2xl font-display font-bold text-white mb-2">Check Mountain Safety Before Departure</h3>
+                  <p className="text-red-200 mb-6">Mountain weather in Norway changes rapidly. Always carry waterproof windbreakers, sturdy boots, and check live safety notices before departing.</p>
                   
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                     <div className="bg-black/40 rounded-xl p-4 border border-white/10">
@@ -111,13 +130,13 @@ export const TrailDetails = () => {
                     </div>
                     <div className="bg-black/40 rounded-xl p-4 border border-white/10">
                       <span className="text-xs text-gray-400 uppercase tracking-wider block mb-1">Trail Status</span>
-                      <span className="font-bold text-green-400">Open</span>
+                      <span className="font-bold text-green-400">{trail.weather_status || 'Open'}</span>
                     </div>
                   </div>
                   
-                  <button className="bg-red-500 hover:bg-red-600 text-white font-bold px-6 py-3 rounded-xl transition-colors">
+                  <Link to="/safety" className="inline-block bg-red-500 hover:bg-red-600 text-white font-bold px-6 py-3 rounded-xl transition-colors">
                     View Detailed Safety Report
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -158,8 +177,8 @@ export const TrailDetails = () => {
                   {/* X Axis Labels */}
                   <div className="absolute bottom-0 left-0 w-full flex justify-between text-xs text-gray-400 px-2 font-mono">
                     <span>0 km</span>
-                    <span>14 km</span>
-                    <span>27 km</span>
+                    <span>{(trail.distance_km / 2).toFixed(1)} km</span>
+                    <span>{trail.distance_km} km</span>
                   </div>
                 </div>
               </div>
@@ -169,22 +188,22 @@ export const TrailDetails = () => {
 
           {/* Sidebar Area */}
           <div className="flex flex-col gap-8">
-            {/* Interactive Map Placeholder */}
-            <div className="glass-panel rounded-3xl overflow-hidden h-[400px] flex flex-col relative">
-               <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=800')] bg-cover bg-center opacity-40 mix-blend-luminosity" />
+            {/* Interactive Map Link */}
+            <div className="glass-panel rounded-3xl overflow-hidden h-[400px] flex flex-col relative group">
+               <div className="absolute inset-0 bg-[url('/images/besseggen_1786936349992.jpg')] bg-cover bg-center opacity-40 mix-blend-luminosity group-hover:scale-105 transition-transform duration-700" />
                <div className="absolute inset-0 bg-nordic-sage/20 mix-blend-overlay" />
-               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                 <div className="bg-black/60 backdrop-blur-md px-6 py-3 rounded-full border border-white/20 text-white font-bold flex items-center gap-2">
-                   <MapPin className="w-5 h-5 text-nordic-sage" /> Map Loading...
+               <Link to="/map" className="absolute inset-0 flex items-center justify-center z-20">
+                 <div className="bg-black/70 backdrop-blur-md px-6 py-3 rounded-full border border-white/20 text-white font-bold flex items-center gap-2 group-hover:bg-nordic-sage group-hover:text-pine-forest transition-colors shadow-2xl">
+                   <MapPin className="w-5 h-5" /> View on Interactive Map
                  </div>
-               </div>
+               </Link>
                
-               <div className="mt-auto p-4 relative z-10 bg-gradient-to-t from-black/80 to-transparent pt-12">
-                 <h4 className="font-bold text-lg text-white mb-2">Trail Route</h4>
+               <div className="mt-auto p-4 relative z-10 bg-gradient-to-t from-black/90 to-transparent pt-12">
+                 <h4 className="font-bold text-lg text-white mb-2">Trail Location</h4>
                  <ul className="text-sm text-gray-300 flex flex-col gap-2">
-                   <li className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-nordic-sage" /> Starting point: Skjeggedal</li>
-                   <li className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-amber-400" /> 3 Viewpoints</li>
-                   <li className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-red-400" /> 2 Emergency points</li>
+                   <li className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-nordic-sage" /> Region: {trail.location}</li>
+                   <li className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-amber-400" /> Season: {trail.best_season}</li>
+                   <li className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-400" /> Weather Status: {trail.weather_status}</li>
                  </ul>
                </div>
             </div>
@@ -197,23 +216,23 @@ export const TrailDetails = () => {
               <ul className="space-y-4">
                 <li className="flex items-start gap-3">
                   <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center shrink-0 mt-0.5">✓</div>
-                  <span className="text-gray-300 text-sm">Sturdy hiking boots (mandatory)</span>
+                  <span className="text-gray-300 text-sm">Sturdy hiking boots with ankle support</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center shrink-0 mt-0.5">✓</div>
-                  <span className="text-gray-300 text-sm">Wind and waterproof outerwear</span>
+                  <span className="text-gray-300 text-sm">Wind and waterproof shell jacket</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center shrink-0 mt-0.5">✓</div>
-                  <span className="text-gray-300 text-sm">Warm layers (wool or fleece)</span>
+                  <span className="text-gray-300 text-sm">Thermal base layers (Merino wool)</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center shrink-0 mt-0.5">✓</div>
-                  <span className="text-gray-300 text-sm">Headlamp with extra batteries</span>
+                  <span className="text-gray-300 text-sm">Headlamp with backup batteries</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center shrink-0 mt-0.5">✓</div>
-                  <span className="text-gray-300 text-sm">First aid kit and map/compass</span>
+                  <span className="text-gray-300 text-sm">Map, compass, and first aid kit</span>
                 </li>
               </ul>
             </div>
@@ -223,3 +242,5 @@ export const TrailDetails = () => {
     </div>
   );
 };
+
+export default TrailDetails;

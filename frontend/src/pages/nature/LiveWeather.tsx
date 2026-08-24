@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { CinematicBackground } from '../../design/backgrounds/CinematicBackground';
 import { Container } from '../../components/layout/Container';
@@ -6,6 +6,17 @@ import { Cloud, Sun, Wind, Droplets, Eye, Thermometer, CloudRain, Sunrise, Sunse
 
 export const LiveWeather = () => {
   const [activeLayer, setActiveLayer] = useState('Temperature');
+
+  const windParticles = useMemo(() => {
+    return [...Array(20)].map((_, i) => ({
+      id: i,
+      top: `${Math.random() * 100}%`,
+      left: `${Math.random() * 100}%`,
+      delay: `${Math.random() * 2}s`,
+      duration: `${1 + Math.random()}s`
+    }));
+  }, []);
+
 
   const forecast = [
     { day: 'Mon', icon: <Sun className="w-8 h-8 text-amber-400" />, temp: '12°C', low: '6°C', rain: '0%', wind: '3 m/s', sunrise: '06:15', sunset: '20:45' },
@@ -121,16 +132,16 @@ export const LiveWeather = () => {
                 {activeLayer === 'Wind' && (
                   <div className="absolute inset-0 overflow-hidden">
                      {/* Fake wind particles using simple divs */}
-                     {[...Array(20)].map((_, i) => (
+                     {windParticles.map((particle) => (
                        <div 
-                         key={i} 
+                         key={particle.id} 
                          className="absolute w-20 h-0.5 bg-white/20 blur-[1px] rounded-full animate-pulse"
                          style={{ 
-                           top: `${Math.random() * 100}%`, 
-                           left: `${Math.random() * 100}%`,
+                           top: particle.top, 
+                           left: particle.left,
                            transform: 'rotate(-15deg)',
-                           animationDelay: `${Math.random() * 2}s`,
-                           animationDuration: `${1 + Math.random()}s`
+                           animationDelay: particle.delay,
+                           animationDuration: particle.duration
                          }} 
                        />
                      ))}

@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { HomeAnimal } from '../../types/home';
 import { Leaf } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { OptimizedImage } from '../shared/OptimizedImage';
 
 interface WildlifeSectionProps {
   wildlife: HomeAnimal[];
@@ -19,13 +20,13 @@ export const WildlifeSection = ({ wildlife }: WildlifeSectionProps) => {
               <Leaf size={20} />
               <span className="font-bold uppercase tracking-wider text-sm">Arctic Fauna</span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-black mb-4">Norwegian Wildlife</h2>
+            <h2 className="text-4xl md:text-5xl font-black mb-4">Native Wildlife</h2>
             <p className="text-gray-400 text-lg">
-              Discover the incredible animals that call Norway home, from the majestic moose in the deep forests to the intelligent orcas navigating the arctic fjords.
+              Encounter majestic creatures roaming freely across Norway's national parks, fjords, and arctic tundra.
             </p>
           </div>
-          <Link to="/wildlife" className="mt-6 md:mt-0 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-full font-bold transition-colors">
-            Explore All Wildlife
+          <Link to="/wildlife" className="mt-6 md:mt-0 text-emerald-400 font-bold hover:text-emerald-300 transition-colors flex items-center gap-2">
+            Explore All Species &rarr;
           </Link>
         </div>
 
@@ -40,11 +41,12 @@ export const WildlifeSection = ({ wildlife }: WildlifeSectionProps) => {
               className="group bg-white/5 rounded-3xl overflow-hidden border border-white/10 flex flex-col sm:flex-row hover:bg-white/10 transition-colors cursor-pointer"
             >
               <div className="w-full sm:w-2/5 h-64 sm:h-auto relative overflow-hidden">
-                <img 
+                <OptimizedImage 
                   src={animal.image} 
                   alt={animal.name}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  loading="lazy"
+                  category="wildlife"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  containerClassName="absolute inset-0 w-full h-full"
                 />
               </div>
               <div className="w-full sm:w-3/5 p-8 flex flex-col justify-center">

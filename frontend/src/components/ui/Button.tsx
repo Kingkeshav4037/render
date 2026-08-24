@@ -30,10 +30,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const baseStyles = "inline-flex items-center justify-center font-bold tracking-wide uppercase transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer select-none";
     
     const variants = {
-      primary: "bg-aurora-green text-navy-900 hover:bg-green-400 focus:ring-aurora-green shadow-[0_0_15px_rgba(0,255,135,0.3)] hover:shadow-[0_0_20px_rgba(0,255,135,0.5)] rounded-xl border border-aurora-green/30",
-      secondary: "bg-navy-800 text-white hover:bg-navy-700 focus:ring-navy-600 border border-white/10 rounded-xl shadow-sm",
-      outline: "border-2 border-aurora-green text-aurora-green hover:bg-aurora-green/10 focus:ring-aurora-green rounded-xl",
-      ghost: "text-navy-900 dark:text-white hover:bg-black/5 dark:hover:bg-white/10 focus:ring-gray-400 rounded-xl",
+      primary: "bg-royal-fjord text-white hover:bg-polar-indigo focus:ring-royal-fjord shadow-[0_0_15px_rgba(29,78,216,0.3)] hover:shadow-[0_0_20px_rgba(29,78,216,0.5)] rounded-xl border border-white/10",
+      secondary: "bg-white/10 text-white hover:bg-white/20 focus:ring-white/30 border border-white/10 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.2)]",
+      outline: "border-2 border-white/20 text-white hover:bg-white/10 focus:ring-white/30 rounded-xl",
+      ghost: "text-white hover:bg-white/10 focus:ring-white/20 rounded-xl",
       danger: "bg-red-600 text-white hover:bg-red-500 focus:ring-red-500 shadow-[0_0_15px_rgba(239,68,68,0.3)] rounded-xl",
       gold: "bg-arctic-gold text-deep-night hover:bg-amber-400 focus:ring-arctic-gold shadow-md rounded-xl font-black",
       emerald: "bg-emerald-600 text-white hover:bg-emerald-500 focus:ring-emerald-500 shadow-md rounded-xl",

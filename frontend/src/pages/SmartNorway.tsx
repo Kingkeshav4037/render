@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Container } from '../components/layout/Container';
 import { Activity, Radio, Database, Shield, Zap, Server, Bus, CloudLightning, ArrowUpRight } from 'lucide-react';
@@ -7,6 +7,18 @@ import { useRealtimeStore } from '../store/useRealtimeStore';
 export const SmartNorway = () => {
   const { connectionStatus, alerts, evChargers, ferries } = useRealtimeStore();
   const [pulse, setPulse] = useState(false);
+
+  const logTimestamps = useMemo(() => {
+    const base = Date.now();
+    return {
+      current: new Date(base).toISOString().split('T')[1].substring(0, 8),
+      offset1200: new Date(base - 1200).toISOString().split('T')[1].substring(0, 8),
+      offset2400: new Date(base - 2400).toISOString().split('T')[1].substring(0, 8),
+      offset3600: new Date(base - 3600).toISOString().split('T')[1].substring(0, 8),
+      offset4800: new Date(base - 4800).toISOString().split('T')[1].substring(0, 8),
+    };
+  }, []);
+
 
   // Simulate data heartbeat
   useEffect(() => {
@@ -116,27 +128,27 @@ export const SmartNorway = () => {
               <div className="flex-1 overflow-y-auto hide-scrollbar space-y-2 text-gray-400 flex flex-col-reverse">
                 {/* Mock data lines */}
                 <div className="flex gap-4 opacity-100">
-                  <span className="text-northern-cyan shrink-0">[{new Date().toISOString().split('T')[1].substring(0,8)}]</span>
+                  <span className="text-northern-cyan shrink-0">[{logTimestamps.current}]</span>
                   <span className="text-green-400 shrink-0">INSERT</span>
                   <span className="truncate">public.iot_telemetry (device_id: "oslo-hub-1", payload: &#123;temp: -2.4, status: "OK"&#125;)</span>
                 </div>
                 <div className="flex gap-4 opacity-80">
-                  <span className="text-northern-cyan shrink-0">[{new Date(Date.now()-1200).toISOString().split('T')[1].substring(0,8)}]</span>
+                  <span className="text-northern-cyan shrink-0">[{logTimestamps.offset1200}]</span>
                   <span className="text-amber-400 shrink-0">UPDATE</span>
                   <span className="truncate">public.ferries (id: "f-89", lat: 60.1, lng: 5.2, speed: 18.4)</span>
                 </div>
                 <div className="flex gap-4 opacity-60">
-                  <span className="text-northern-cyan shrink-0">[{new Date(Date.now()-2400).toISOString().split('T')[1].substring(0,8)}]</span>
+                  <span className="text-northern-cyan shrink-0">[{logTimestamps.offset2400}]</span>
                   <span className="text-green-400 shrink-0">INSERT</span>
                   <span className="truncate">public.weather_snapshots (location: "Tromsø", condition: "SNOW")</span>
                 </div>
                 <div className="flex gap-4 opacity-40">
-                  <span className="text-northern-cyan shrink-0">[{new Date(Date.now()-3600).toISOString().split('T')[1].substring(0,8)}]</span>
+                  <span className="text-northern-cyan shrink-0">[{logTimestamps.offset3600}]</span>
                   <span className="text-green-400 shrink-0">INSERT</span>
                   <span className="truncate">public.ev_chargers (id: "ev-402", status: "CHARGING", kw: 150)</span>
                 </div>
                 <div className="flex gap-4 opacity-20">
-                  <span className="text-northern-cyan shrink-0">[{new Date(Date.now()-4800).toISOString().split('T')[1].substring(0,8)}]</span>
+                  <span className="text-northern-cyan shrink-0">[{logTimestamps.offset4800}]</span>
                   <span className="text-red-400 shrink-0">DELETE</span>
                   <span className="truncate">public.temporary_locks (id: "lock-992")</span>
                 </div>

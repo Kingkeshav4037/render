@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Trip } from '../../../types/dashboard';
 import { MapPin, Calendar, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { OptimizedImage } from '../../../components/shared/OptimizedImage';
 
 interface Props {
   trips: Trip[];
@@ -57,9 +58,15 @@ export const MyTripsWidget: React.FC<Props> = ({ trips }) => {
           {filteredTrips.map(trip => (
             <Link key={trip.id} to={`/dashboard/trips/${trip.id}`} className="group block bg-white border border-gray-100 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
               <div className="h-32 relative overflow-hidden">
-                <img src={trip.coverImage || '/images/placeholder.jpg'} alt={trip.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                <h4 className="absolute bottom-3 left-4 text-white font-bold">{trip.destinationName || trip.title}</h4>
+                <OptimizedImage 
+                  src={trip.coverImage} 
+                  alt={trip.title} 
+                  category="landscape"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                  containerClassName="w-full h-full"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"></div>
+                <h4 className="absolute bottom-3 left-4 text-white font-bold z-10">{trip.destinationName || trip.title}</h4>
               </div>
               <div className="p-4">
                 <p className="text-sm font-semibold text-navy-900 mb-2 truncate">{trip.title}</p>

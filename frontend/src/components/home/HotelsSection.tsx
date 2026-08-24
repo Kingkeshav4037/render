@@ -6,6 +6,7 @@ import { homeContentService } from '../../services/home/homeContentService';
 import { Container } from '../layout/Container';
 import { Skeleton } from '../ui/Skeleton';
 import { SectionErrorBoundary } from '../shared/SectionErrorBoundary';
+import { OptimizedImage } from '../shared/OptimizedImage';
 
 export const HotelsSection = () => {
   const { data: hotels, isLoading, error } = useQuery({
@@ -18,15 +19,23 @@ export const HotelsSection = () => {
   }
 
   return (
-    <section className="py-20 bg-gray-50 dark:bg-navy-800/50">
+    <section className="py-24 bg-white dark:bg-navy-900">
       <Container>
         <div className="flex justify-between items-end mb-12">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-black text-navy-900 dark:text-white mb-2 tracking-tight">Incredible Stays</h2>
-            <p className="text-gray-500 dark:text-gray-400">From glass igloos to historic fjord hotels</p>
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-wider mb-4 border border-blue-500/20">
+              Accommodations
+            </div>
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-navy-900 dark:text-white">
+              Extraordinary Places to Stay
+            </h2>
           </div>
-          <Link to="/stay" className="hidden md:flex items-center gap-1 text-aurora-green font-bold hover:text-emerald-500 transition-colors">
-            View all stays <ArrowRight className="w-4 h-4" />
+          <Link 
+            to="/stay"
+            className="hidden md:inline-flex items-center gap-2 text-sm font-bold text-aurora-green hover:underline group"
+          >
+            Browse all stays
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
@@ -45,14 +54,14 @@ export const HotelsSection = () => {
               className="bg-white dark:bg-navy-900 rounded-3xl overflow-hidden shadow-sm border border-gray-100 dark:border-white/10 hover:shadow-xl hover:border-aurora-green/30 transition-all flex flex-col sm:flex-row group"
             >
               <div className="sm:w-2/5 h-48 sm:h-auto relative overflow-hidden">
-                <img 
+                <OptimizedImage 
                   src={hotel.image} 
                   alt={hotel.name}
-                  loading="lazy"
-                  decoding="async"
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  category="stay"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  containerClassName="w-full h-full"
                 />
-                <div className="absolute top-4 left-4 bg-white/90 dark:bg-navy-900/90 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold text-navy-900 dark:text-white shadow-sm flex items-center gap-1 border border-white/10">
+                <div className="absolute top-4 left-4 bg-white/90 dark:bg-navy-900/90 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold text-navy-900 dark:text-white shadow-sm flex items-center gap-1 border border-white/10 z-10">
                   <Star size={12} className="text-yellow-500 fill-current" /> {hotel.rating}
                 </div>
               </div>

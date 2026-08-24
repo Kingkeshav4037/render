@@ -7,15 +7,16 @@ export const AdminEvents = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-
   const fetchEvents = async () => {
     const { data } = await supabase.from('events').select('*').order('start_date', { ascending: true });
     setEvents((data as any) || []);
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
 
   const deleteEvent = async (id: string) => {
     if (!confirm('Are you sure you want to delete this event?')) return;

@@ -11,10 +11,6 @@ export const AdminFloraCMS = () => {
   const [editRow, setEditRow] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    fetchSpecies();
-  }, []);
-
   const fetchSpecies = async () => {
     setLoading(true);
     try {
@@ -32,6 +28,11 @@ export const AdminFloraCMS = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchSpecies();
+  }, []);
+
 
   const handleSave = async (updatedJson: any) => {
     try {

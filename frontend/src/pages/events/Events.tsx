@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { eventService, Event } from '../../services/eventService';
 import { Calendar, MapPin, Tag } from 'lucide-react';
 import { useCart } from '../../store/useCartStore';
+import { OptimizedImage } from '../../components/shared/OptimizedImage';
 
 const CATEGORIES = ['All', 'Festival', 'Concert', 'Sports', 'Cultural', 'Seasonal'];
 
@@ -73,12 +74,14 @@ export const Events = () => {
                 className="bg-white/5 rounded-2xl overflow-hidden border border-white/10 hover:border-purple-500/30 hover:bg-white/10 transition-all flex flex-col md:flex-row"
               >
                 <div className="md:w-1/3 h-48 md:h-auto relative">
-                  <img 
-                    src={event.image_url || 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=800'} 
+                  <OptimizedImage 
+                    src={event.image_url} 
                     alt={event.name}
+                    category="aurora"
                     className="w-full h-full object-cover"
+                    containerClassName="w-full h-full"
                   />
-                  <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-lg text-center border border-white/10">
+                  <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-lg text-center border border-white/10 z-10">
                     <div className="text-xs text-purple-400 font-bold uppercase">{new Date(event.start_date).toLocaleString('default', { month: 'short' })}</div>
                     <div className="text-2xl text-white font-bold">{new Date(event.start_date).getDate()}</div>
                   </div>

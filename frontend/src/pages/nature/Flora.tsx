@@ -4,6 +4,7 @@ import { SEO } from '../../components/shared/SEO';
 import { Container } from '../../components/layout/Container';
 import { floraService, FloraSpecies } from '../../services/floraService';
 import { Search, Trees, Flower2, ShieldAlert, Sparkles, MapPin, Calendar, BookOpen, X, Info, Leaf, AlertCircle, RefreshCw } from 'lucide-react';
+import { OptimizedImage } from '../../components/shared/OptimizedImage';
 
 export const Flora = () => {
   const [floraList, setFloraList] = useState<FloraSpecies[]>([]);
@@ -196,17 +197,18 @@ export const Flora = () => {
                 <div>
                   {/* Photo Container */}
                   <div className="relative h-52 overflow-hidden bg-gray-100">
-                    <img
+                    <OptimizedImage
                       src={item.image_url}
                       alt={item.common_name}
+                      category="flora"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute top-3.5 left-3.5">
+                    <div className="absolute top-3.5 left-3.5 z-10">
                       <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-navy-900/80 text-white backdrop-blur-md border border-white/20">
                         {item.category}
                       </span>
                     </div>
-                    <div className="absolute top-3.5 right-3.5">
+                    <div className="absolute top-3.5 right-3.5 z-10">
                       <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider backdrop-blur-md shadow-sm ${
                         (item.foraging_status?.includes('Edible') || !item.is_protected)
                           ? 'bg-emerald-600/90 text-white'
@@ -275,13 +277,14 @@ export const Flora = () => {
               </button>
 
               <div className="relative h-64 sm:h-72">
-                <img
+                <OptimizedImage
                   src={activeSpecies.image_url}
                   alt={activeSpecies.common_name}
+                  category="flora"
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-900/40 to-transparent"></div>
-                <div className="absolute bottom-6 left-6 right-6 text-white">
+                <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-900/40 to-transparent pointer-events-none"></div>
+                <div className="absolute bottom-6 left-6 right-6 text-white z-10">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-aurora-green text-navy-900">
                       {activeSpecies.category}

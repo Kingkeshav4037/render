@@ -10,6 +10,7 @@ import { SEO } from '../components/shared/SEO';
 import { OptimizedImage } from '../components/shared/OptimizedImage';
 import { useCartStore } from '../store/useCartStore';
 import { useCurrencyStore } from '../store/useCurrencyStore';
+import { PageHeader } from '../components/ui/PageHeader';
 
 const CUISINES = [
   { id: 'all', label: 'All Experiences', icon: <Utensils className="w-4 h-4"/> },
@@ -88,72 +89,64 @@ export const Food = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDF8F5] text-[#2C1810] font-sans pb-24 selection:bg-[#FF7F50]/20">
+    <div className="min-h-screen bg-deep-night text-snow font-sans pb-24 selection:bg-arctic-gold/30">
       <SEO 
         title="Culinary & Dining"
         description="Reserve a table at world-class New Nordic restaurants, coastal seafood huts, and traditional dining rooms across Norway."
         ogImage="/images/food_salmon_1787013684123.jpg"
       />
       
-      {/* Coral Theme Hero */}
-      <CinematicBackground 
-        imageUrl="/images/food_salmon_1787013684123.jpg"
-        gradient="dark"
-        overlayOpacity={0.4}
-        className="h-[60vh] flex items-center"
+      {/* Coral Theme Hero -> Standard PageHeader */}
+      <PageHeader
+        title="A Taste of Norway"
+        description="Reserve a table at world-class New Nordic restaurants, coastal seafood huts, and traditional dining rooms."
+        breadcrumb={
+          <>
+            <Utensils className="w-4 h-4" /> Culinary Scene
+          </>
+        }
+        backgroundImage="/images/food_salmon_1787013684123.jpg"
       >
-        <div className="max-w-[1440px] mx-auto px-6 md:px-12 w-full pt-32">
-          <div className="max-w-4xl text-white">
-            <span className="text-[#FF7F50] font-sans text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2 drop-shadow-md">
-              <Utensils className="w-4 h-4" /> Culinary Scene
-            </span>
-            <h1 className="text-5xl md:text-7xl font-display font-semibold mb-6 drop-shadow-lg">A Taste of Norway</h1>
-            <p className="text-lg md:text-xl font-sans text-white/90 max-w-2xl mb-12 leading-relaxed drop-shadow-md">
-              Reserve a table at world-class New Nordic restaurants, coastal seafood huts, and traditional dining rooms.
-            </p>
-
-            {/* Smart Booking Bar (Coral Tinted) */}
-            <div className="bg-white/95 backdrop-blur-2xl border border-[#FF7F50]/20 p-2 flex flex-col md:flex-row gap-2 max-w-5xl shadow-2xl rounded-sm">
-              <div className="flex-1 flex items-center gap-4 px-6 py-4 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer group text-[#2C1810]">
-                <MapPin className="w-5 h-5 text-[#FF7F50] group-hover:scale-110 transition-transform shrink-0" />
-                <div className="flex flex-col">
-                  <span className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">City</span>
-                  <input type="text" placeholder="Bergen, Oslo..." className="bg-transparent text-sm outline-none placeholder:text-gray-400 w-full font-medium" />
-                </div>
-              </div>
-              <div className="flex-1 flex items-center gap-4 px-6 py-4 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer group text-[#2C1810]">
-                <Calendar className="w-5 h-5 text-[#FF7F50] group-hover:scale-110 transition-transform shrink-0" />
-                <div className="flex flex-col">
-                  <span className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Date</span>
-                  <span className="text-sm font-medium">Select Date</span>
-                </div>
-              </div>
-              <div className="flex-1 flex items-center gap-4 px-6 py-4 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer group text-[#2C1810]">
-                <Clock className="w-5 h-5 text-[#FF7F50] group-hover:scale-110 transition-transform shrink-0" />
-                <div className="flex flex-col">
-                  <span className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Time</span>
-                  <span className="text-sm font-medium">19:00</span>
-                </div>
-              </div>
-              <div className="flex-1 flex items-center gap-4 px-6 py-4 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer group text-[#2C1810]">
-                <Users className="w-5 h-5 text-[#FF7F50] group-hover:scale-110 transition-transform shrink-0" />
-                <div className="flex flex-col">
-                  <span className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Guests</span>
-                  <span className="text-sm font-medium">2 Guests</span>
-                </div>
-              </div>
-              <button className="h-auto py-4 px-10 bg-[#FF7F50] text-white font-bold hover:bg-[#E86A3E] transition-colors flex items-center justify-center gap-2 uppercase tracking-widest text-xs shrink-0 rounded-sm">
-                <Search className="w-4 h-4" /> Find Table
-              </button>
+        {/* Smart Booking Bar (Dark Theme) */}
+        <div className="bg-white/5 backdrop-blur-2xl border border-white/10 p-2 flex flex-col md:flex-row gap-2 max-w-5xl shadow-2xl rounded-sm">
+          <div className="flex-1 flex items-center gap-4 px-6 py-4 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer group text-snow">
+            <MapPin className="w-5 h-5 text-arctic-gold group-hover:scale-110 transition-transform shrink-0" />
+            <div className="flex flex-col">
+              <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">City</span>
+              <input type="text" placeholder="Bergen, Oslo..." className="bg-transparent text-sm outline-none placeholder:text-slate-500 w-full font-medium" />
             </div>
           </div>
+          <div className="flex-1 flex items-center gap-4 px-6 py-4 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer group text-snow">
+            <Calendar className="w-5 h-5 text-arctic-gold group-hover:scale-110 transition-transform shrink-0" />
+            <div className="flex flex-col">
+              <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Date</span>
+              <span className="text-sm font-medium">Select Date</span>
+            </div>
+          </div>
+          <div className="flex-1 flex items-center gap-4 px-6 py-4 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer group text-snow">
+            <Clock className="w-5 h-5 text-arctic-gold group-hover:scale-110 transition-transform shrink-0" />
+            <div className="flex flex-col">
+              <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Time</span>
+              <span className="text-sm font-medium">19:00</span>
+            </div>
+          </div>
+          <div className="flex-1 flex items-center gap-4 px-6 py-4 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer group text-snow">
+            <Users className="w-5 h-5 text-arctic-gold group-hover:scale-110 transition-transform shrink-0" />
+            <div className="flex flex-col">
+              <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Guests</span>
+              <span className="text-sm font-medium">2 Guests</span>
+            </div>
+          </div>
+          <button className="h-auto py-4 px-10 bg-arctic-gold text-deep-night font-bold hover:bg-snow transition-colors flex items-center justify-center gap-2 uppercase tracking-widest text-xs shrink-0 rounded-sm">
+            <Search className="w-4 h-4" /> Find Table
+          </button>
         </div>
-      </CinematicBackground>
+      </PageHeader>
 
       <div className="max-w-[1440px] mx-auto px-6 md:px-12 -mt-8 relative z-20">
         
         {/* Navigation Categories */}
-        <div className="flex flex-wrap items-center gap-4 border-b border-[#2C1810]/10 mb-12 pb-6 bg-[#FDF8F5]">
+        <div className="flex flex-wrap items-center gap-4 border-b border-white/10 mb-12 pb-6 bg-deep-night">
           {CUISINES.map(cat => (
             <button
               key={cat.id}

@@ -10,10 +10,6 @@ export const AdminWildlifeCMS = () => {
   const [editRow, setEditRow] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    fetchSpecies();
-  }, []);
-
   const fetchSpecies = async () => {
     setLoading(true);
     const { data, error } = await supabase
@@ -26,6 +22,11 @@ export const AdminWildlifeCMS = () => {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchSpecies();
+  }, []);
+
 
   const columns: ColumnDef[] = [
     {

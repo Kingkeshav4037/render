@@ -10,10 +10,6 @@ export const RoadTripsCMS = () => {
   const [editRow, setEditRow] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    fetchItems();
-  }, []);
-
   const fetchItems = async () => {
     setLoading(true);
     const { data } = await supabase
@@ -24,6 +20,11 @@ export const RoadTripsCMS = () => {
     if (data) setItems(data);
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
 
   const columns: ColumnDef[] = [
     { key: 'name', header: 'Route Name', render: (val) => <div className="font-bold text-navy-900">{val}</div> },

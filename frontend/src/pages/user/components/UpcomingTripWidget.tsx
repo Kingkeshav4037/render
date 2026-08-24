@@ -2,6 +2,7 @@ import React from 'react';
 import { Trip } from '../../../types/dashboard';
 import { Map, Calendar, Settings, Plane } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { OptimizedImage } from '../../../components/shared/OptimizedImage';
 
 interface Props {
   trip: Trip | null;
@@ -35,13 +36,15 @@ export const UpcomingTripWidget: React.FC<Props> = ({ trip, isActive }) => {
   return (
     <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm flex flex-col md:flex-row group">
       <div className="w-full md:w-2/5 h-48 md:h-auto relative overflow-hidden">
-        <img 
-          src={trip.coverImage || '/images/placeholder.jpg'} 
+        <OptimizedImage 
+          src={trip.coverImage} 
           alt={trip.title} 
+          category="landscape"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+          containerClassName="w-full h-full"
         />
         {isActive && (
-          <div className="absolute top-4 left-4 bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-2 animate-pulse">
+          <div className="absolute top-4 left-4 bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-2 animate-pulse z-10">
             <span className="w-2 h-2 bg-white rounded-full"></span> HAPPENING NOW
           </div>
         )}

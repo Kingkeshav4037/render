@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useCurrencyStore } from '../../store/useCurrencyStore';
 import { useAuthStore } from '../../store/useAuthStore';
+import { OptimizedImage } from '../../components/shared/OptimizedImage';
 
 const TABS = ['For You', 'Adventure', 'Food & Dining', 'Scenic', 'Hidden Gems'];
 
@@ -206,10 +207,16 @@ export const Recommendations = () => {
               className="group relative rounded-[28px] overflow-hidden cursor-pointer min-h-[480px] md:min-h-[560px]"
               onClick={() => navigate('/activities/1')}
             >
-              <img src={featured.image} alt={featured.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
-              <div className="absolute inset-0 bg-gradient-to-r from-[#0D1117]/95 via-[#0D1117]/50 to-transparent" />
+              <OptimizedImage 
+                src={featured.image} 
+                alt={featured.title} 
+                category="activity"
+                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
+                containerClassName="absolute inset-0 w-full h-full"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0D1117]/95 via-[#0D1117]/50 to-transparent pointer-events-none" />
 
-              <div className="relative p-8 md:p-14 h-full flex flex-col justify-end max-w-xl">
+              <div className="relative p-8 md:p-14 h-full flex flex-col justify-end max-w-xl z-10">
                 <div className="flex flex-wrap gap-2 mb-4">
                   {featured.tags.map(tag => (
                     <span key={tag} className="px-3 py-1 bg-emerald-500/20 border border-emerald-500/30 rounded-full text-xs font-bold text-emerald-300">{tag}</span>
@@ -262,13 +269,17 @@ export const Recommendations = () => {
               >
                 {/* Image */}
                 <div className="relative h-48 overflow-hidden">
-                  <img src={rec.image} alt={rec.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    onError={(e) => { (e.target as HTMLImageElement).src = '/images/fjords_1786935800026.jpg'; }}
+                  <OptimizedImage 
+                    src={rec.image} 
+                    alt={rec.title} 
+                    category="landscape"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    containerClassName="w-full h-full"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#161B22] via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#161B22] via-transparent to-transparent pointer-events-none" />
                   <button
                     onClick={e => { e.stopPropagation(); toggleSave(rec.id); }}
-                    className={`absolute top-3 right-3 p-2 rounded-full transition-all ${saved.includes(rec.id) ? 'bg-red-500/30' : 'bg-black/30 hover:bg-black/50'}`}
+                    className={`absolute top-3 right-3 p-2 rounded-full transition-all z-10 ${saved.includes(rec.id) ? 'bg-red-500/30' : 'bg-black/30 hover:bg-black/50'}`}
                   >
                     <Heart size={14} className={saved.includes(rec.id) ? 'text-red-400 fill-red-400' : 'text-white'} />
                   </button>

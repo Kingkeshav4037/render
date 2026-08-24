@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Map, CloudSun, MapPin, Navigation, Calendar, Plus } from 'lucide-react';
+import { OptimizedImage } from '../../../components/shared/OptimizedImage';
 
 export const TripDetails = () => {
   const { id } = useParams();
@@ -11,8 +12,14 @@ export const TripDetails = () => {
       
       {/* Hero Header */}
       <div className="relative h-[50vh] min-h-[400px] w-full">
-        <img src="https://images.unsplash.com/photo-1513519107127-1ea506ce3c53?auto=format&fit=crop&q=80" alt="Lofoten" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#FDFDFD] via-navy-900/40 to-navy-900/60"></div>
+        <OptimizedImage 
+          src="https://images.unsplash.com/photo-1513519107127-1ea506ce3c53?auto=format&fit=crop&q=80" 
+          alt="Lofoten" 
+          category="landscape"
+          className="w-full h-full object-cover" 
+          containerClassName="w-full h-full"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#FDFDFD] via-navy-900/40 to-navy-900/60 pointer-events-none"></div>
         
         <div className="absolute top-0 left-0 w-full p-6 md:p-12 flex justify-between items-center z-10">
           <button onClick={() => navigate('/trips')} className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white hover:text-navy-900 transition-colors">

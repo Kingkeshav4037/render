@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { Container } from '../layout/Container';
 import { Skeleton } from '../ui/Skeleton';
 import { SectionErrorBoundary } from '../shared/SectionErrorBoundary';
+import { OptimizedImage } from '../shared/OptimizedImage';
 
 interface PlacesSectionProps {
   title: string;
@@ -53,14 +54,14 @@ export const PlacesSection = ({ title, subtitle, queryKey, queryFn, viewAllLink 
               className="min-w-[300px] md:min-w-[400px] bg-white dark:bg-navy-800 rounded-3xl shadow-sm border border-gray-100 dark:border-white/10 overflow-hidden flex-shrink-0 group cursor-pointer hover:shadow-xl transition-all hover:-translate-y-1"
             >
               <div className="h-56 overflow-hidden relative">
-                <img 
+                <OptimizedImage 
                   src={place.image} 
                   alt={place.name}
-                  loading="lazy"
-                  decoding="async" 
+                  category="landscape"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  containerClassName="w-full h-full"
                 />
-                <div className="absolute top-4 left-4 bg-white/90 dark:bg-navy-900/90 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold text-navy-900 dark:text-white border border-gray-100 dark:border-white/10">
+                <div className="absolute top-4 left-4 bg-white/90 dark:bg-navy-900/90 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold text-navy-900 dark:text-white border border-gray-100 dark:border-white/10 z-10">
                   {place.category}
                 </div>
               </div>

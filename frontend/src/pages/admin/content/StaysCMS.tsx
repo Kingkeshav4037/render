@@ -7,10 +7,6 @@ export const StaysCMS = () => {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchItems();
-  }, []);
-
   const fetchItems = async () => {
     setLoading(true);
     const { data } = await supabase
@@ -21,6 +17,11 @@ export const StaysCMS = () => {
     if (data) setItems(data);
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
 
   const columns: ColumnDef[] = [
     { key: 'name', header: 'Name', render: (val) => <div className="font-bold text-navy-900">{val}</div> },

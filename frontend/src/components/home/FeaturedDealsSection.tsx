@@ -6,6 +6,7 @@ import { homeContentService } from '../../services/home/homeContentService';
 import { Container } from '../layout/Container';
 import { Skeleton } from '../ui/Skeleton';
 import { SectionErrorBoundary } from '../shared/SectionErrorBoundary';
+import { OptimizedImage } from '../shared/OptimizedImage';
 
 export const FeaturedDealsSection = () => {
   const { data: deals, isLoading, error } = useQuery({
@@ -18,26 +19,28 @@ export const FeaturedDealsSection = () => {
   }
 
   if (!isLoading && (!deals || deals.length === 0)) {
-    return null; // Don't show the section if there are no deals
+    return null;
   }
 
   return (
-    <section className="py-16 bg-emerald-50 dark:bg-emerald-900/10 border-y border-emerald-100 dark:border-emerald-900/30">
+    <section className="py-20 bg-emerald-950 text-white">
       <Container>
-        <div className="flex flex-col md:flex-row gap-8 items-center">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-12">
           <div className="md:w-1/3">
-            <div className="inline-flex items-center justify-center p-3 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-2xl mb-4">
-              <Tag className="w-6 h-6" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold uppercase tracking-wider mb-4 border border-emerald-500/30">
+              <Tag className="w-3.5 h-3.5" /> Limited Time
             </div>
-            <h2 className="text-3xl font-black text-navy-900 dark:text-white mb-4 tracking-tight">Featured Deals</h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              Exclusive offers on premium Norwegian experiences, hotels, and travel packages.
+            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">
+              Special Offers & Travel Deals
+            </h2>
+            <p className="text-emerald-100/70 text-base mb-8">
+              Take advantage of exclusive seasonal discounts on fjord cruises, hotel stays, and guided expeditions.
             </p>
             <Link 
               to="/deals" 
-              className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
+              className="inline-flex items-center gap-2 text-sm font-bold text-emerald-400 hover:text-emerald-300 transition-colors group"
             >
-              See all offers <ArrowRight className="w-4 h-4" />
+              See all offers <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
           
@@ -55,14 +58,20 @@ export const FeaturedDealsSection = () => {
                 transition={{ delay: index * 0.1 }}
                 className="relative h-48 rounded-3xl overflow-hidden group cursor-pointer shadow-md"
               >
-                <img src={deal.image} alt={deal.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-gradient-to-r from-navy-900/90 to-navy-900/40"></div>
+                <OptimizedImage 
+                  src={deal.image} 
+                  alt={deal.title} 
+                  category="landscape"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                  containerClassName="absolute inset-0 w-full h-full"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-navy-900/90 to-navy-900/40 pointer-events-none"></div>
                 
-                <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full font-black text-sm shadow-lg rotate-3 group-hover:rotate-6 transition-transform">
+                <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full font-black text-sm shadow-lg rotate-3 group-hover:rotate-6 transition-transform z-10">
                   {deal.discount}
                 </div>
                 
-                <div className="absolute inset-0 p-6 flex flex-col justify-end">
+                <div className="absolute inset-0 p-6 flex flex-col justify-end z-10">
                   <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">{deal.type}</span>
                   <h3 className="text-xl font-bold text-white mb-1 leading-tight group-hover:text-emerald-400 transition-colors">{deal.title}</h3>
                   <p className="text-sm text-gray-300 line-clamp-1">{deal.description}</p>

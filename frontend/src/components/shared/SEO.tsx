@@ -7,6 +7,7 @@ interface SEOProps {
   ogImage?: string;
   ogType?: 'website' | 'article' | 'profile';
   keywords?: string;
+  schema?: Record<string, any>;
 }
 
 export const SEO = ({ 
@@ -15,7 +16,8 @@ export const SEO = ({
   canonicalUrl, 
   ogImage = '/images/logo.jpg', 
   ogType = 'website',
-  keywords 
+  keywords,
+  schema
 }: SEOProps) => {
   const siteTitle = `${title} | Norway Smart Life`;
   
@@ -40,6 +42,13 @@ export const SEO = ({
       
       {/* Canonical URL */}
       {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+
+      {/* Schema.org JSON-LD */}
+      {schema && (
+        <script type="application/ld+json">
+          {JSON.stringify(schema)}
+        </script>
+      )}
     </Helmet>
   );
 };

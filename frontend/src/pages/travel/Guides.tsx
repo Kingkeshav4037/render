@@ -2,6 +2,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen, Compass, ArrowRight, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { OptimizedImage } from '../../components/shared/OptimizedImage';
+import { SEO } from '../../components/shared/SEO';
 
 export const Guides = () => {
   const articles = [
@@ -12,6 +14,7 @@ export const Guides = () => {
       author: 'Lars O.',
       readTime: '8 min read',
       image: '/images/northern_lights.jpg',
+      route: '/aurora',
       excerpt: 'Everything you need to know about when, where, and how to spot the elusive Aurora Borealis in Northern Norway.'
     },
     {
@@ -21,6 +24,7 @@ export const Guides = () => {
       author: 'Ingrid M.',
       readTime: '6 min read',
       image: '/images/preikestolen_1786936002797.jpg',
+      route: '/trails/tr-001',
       excerpt: 'Prepare for the iconic hike to Pulpit Rock with our comprehensive guide covering trails, gear, and safety tips.'
     },
     {
@@ -30,6 +34,7 @@ export const Guides = () => {
       author: 'Henrik V.',
       readTime: '5 min read',
       image: '/images/food_salmon_1787013684123.jpg',
+      route: '/food',
       excerpt: 'Discover the rich seafood traditions and modern Nordic cuisine hidden within the historic streets of Bergen.'
     },
     {
@@ -39,12 +44,17 @@ export const Guides = () => {
       author: 'Sofie H.',
       readTime: '7 min read',
       image: '/images/fjords.jpg',
+      route: '/mobility/ferry',
       excerpt: 'Tips and tricks for booking and traveling on Norway’s extensive network of ferries and express boats.'
     }
   ];
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
+      <SEO 
+        title="Travel Guides & Expert Tips | Norway SmartLife"
+        description="Expert advice, local secrets, and comprehensive guides to help you plan the perfect Norwegian journey."
+      />
       {/* Hero Section */}
       <div className="bg-navy-900 text-white pt-32 pb-24 px-4 md:px-12 relative overflow-hidden mb-12 rounded-b-3xl shadow-xl">
         <div className="absolute inset-0 bg-[url('/images/kjeragbolten_1786936275605.jpg')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
@@ -67,19 +77,19 @@ export const Guides = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1 }}
-              className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 group flex flex-col sm:flex-row"
+              className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-100 group flex flex-col sm:flex-row transition-all relative"
             >
+              <Link to={article.route} className="absolute inset-0 z-20" aria-label={article.title} />
+              
               <div className="sm:w-2/5 h-64 sm:h-auto relative overflow-hidden shrink-0">
-                <img 
+                <OptimizedImage 
                   src={article.image} 
                   alt={article.title} 
+                  category="landscape"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = 'https://images.unsplash.com/photo-1522093007474-d86e9bf7ba6f?auto=format&fit=crop&q=80';
-                  }}
+                  containerClassName="w-full h-full"
                 />
-                <div className="absolute top-4 left-4">
+                <div className="absolute top-4 left-4 z-10">
                   <span className="bg-navy-900 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider shadow-md">
                     {article.category}
                   </span>
@@ -99,9 +109,9 @@ export const Guides = () => {
                     <span className="flex items-center gap-1"><User size={14} /> {article.author}</span>
                     <span className="flex items-center gap-1"><Compass size={14} /> {article.readTime}</span>
                   </div>
-                  <button className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-navy-900 group-hover:bg-aurora-green transition-colors">
+                  <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-navy-900 group-hover:bg-aurora-green group-hover:text-navy-900 transition-colors">
                     <ArrowRight size={14} />
-                  </button>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -111,3 +121,5 @@ export const Guides = () => {
     </div>
   );
 };
+
+export default Guides;

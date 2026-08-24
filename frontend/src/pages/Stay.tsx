@@ -8,6 +8,7 @@ import { useCurrencyStore } from '../store/useCurrencyStore';
 import { AsyncStateWrapper } from '../components/shared/AsyncStateWrapper';
 import { SEO } from '../components/shared/SEO';
 import { OptimizedImage } from '../components/shared/OptimizedImage';
+import { PageHeader } from '../components/ui/PageHeader';
 
 const AMENITIES_LIST = [
   { id: 'breakfast', label: 'Breakfast Included' },
@@ -50,9 +51,15 @@ export const Stay = () => {
         title="Stays & Accommodations | Norway SmartLife"
         description="Find the perfect place to stay in Norway, from cozy fjord cabins to luxury hotels."
       />
+
+      <PageHeader
+        title="Stays & Accommodations"
+        description="Find the perfect place to stay in Norway, from cozy fjord cabins to luxury hotels."
+        breadcrumb="Hospitality"
+      />
       
-      {/* Sticky Header / Search Bar (Simulating Phase 6 Advanced Search) */}
-      <div className="sticky top-0 z-40 bg-deep-night/95 backdrop-blur-xl border-b border-white/5 pt-24 pb-4 px-6 lg:px-12">
+      {/* Search Bar (Simulating Phase 6 Advanced Search) */}
+      <div className="z-40 bg-deep-night/95 backdrop-blur-xl border-b border-white/5 pt-8 pb-4 px-6 lg:px-12 sticky top-0">
         <div className="max-w-[1600px] mx-auto flex flex-col xl:flex-row gap-4 items-center justify-between">
           <div className="flex bg-white/5 border border-white/10 p-1 w-full xl:w-auto">
             <div className="flex items-center gap-3 px-4 py-2 border-r border-white/5 min-w-[200px]">
@@ -275,8 +282,14 @@ export const Stay = () => {
         {/* Map View */}
         {viewMode === 'split' && (
           <div className="hidden lg:block w-1/2 xl:w-3/5 bg-black/50 border-l border-white/5 relative">
-            <img src="/images/fjords_1786935800026.jpg" className="w-full h-full object-cover opacity-30 grayscale" alt="Map Background" />
-            <div className="absolute inset-0 bg-deep-night/50 mix-blend-multiply" />
+            <OptimizedImage 
+              src="/images/fjords_1786935800026.jpg" 
+              className="w-full h-full object-cover opacity-30 grayscale" 
+              alt="Map Background" 
+              category="landscape"
+              containerClassName="w-full h-full"
+            />
+            <div className="absolute inset-0 bg-deep-night/50 mix-blend-multiply pointer-events-none" />
             
             {/* Mock Map Markers */}
             <div className="absolute top-1/4 left-1/3 group cursor-pointer">

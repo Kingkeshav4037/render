@@ -2,6 +2,7 @@ import React from 'react';
 import { FavoriteItem } from '../../../types/dashboard';
 import { Heart, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { OptimizedImage } from '../../../components/shared/OptimizedImage';
 
 interface Props {
   favorites: FavoriteItem[];
@@ -30,7 +31,13 @@ export const FavoritesWidget: React.FC<Props> = ({ favorites }) => {
         <div className="space-y-4">
           {favorites.map(fav => (
             <Link key={fav.id} to={fav.url} className="flex gap-4 items-center p-2 -mx-2 rounded-xl hover:bg-gray-50 transition-colors group">
-              <img src={fav.image || '/images/placeholder.jpg'} alt={fav.name} className="w-16 h-16 rounded-lg object-cover flex-shrink-0" />
+              <OptimizedImage 
+                src={fav.image} 
+                alt={fav.name} 
+                category="landscape"
+                className="w-full h-full rounded-lg object-cover" 
+                containerClassName="w-16 h-16 rounded-lg flex-shrink-0"
+              />
               <div className="flex-grow">
                 <div className="text-xs font-bold text-aurora-green uppercase tracking-wider mb-0.5">{fav.itemType}</div>
                 <h4 className="font-bold text-navy-900 group-hover:text-blue-600 transition-colors line-clamp-1">{fav.name}</h4>

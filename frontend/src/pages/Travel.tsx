@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { Train, Ship, Car, Compass, Calendar, ArrowRight, Clock, Zap, Leaf, MapPin, Search } from 'lucide-react';
 import { transportService, RouteWithLocations, Location } from '../services/transportService';
 import { supabase } from '../lib/supabase';
-import { CinematicBackground } from '../design/backgrounds/CinematicBackground';
 import { motion } from 'framer-motion';
 import { AsyncStateWrapper } from '../components/shared/AsyncStateWrapper';
+import { PageHeader } from '../components/ui/PageHeader';
 
 const MODES = [
   { id: 'all', label: 'All Modes' },
@@ -28,13 +28,7 @@ export const Travel = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
-    supabase.from('locations').select('*').eq('status', 'PUBLISHED').order('name')
-      .then(({data}) => setLocations((data as unknown as Location[]) || []));
-    fetchRoutes();
-  }, [modeFilter]);
-
-  const fetchRoutes = async (searchOrigin?: string, searchDest?: string) => {
+  const fetchRoutes = useCallback(async (searchOrigin?: string, searchDest?: string) => {
     setLoading(true);
     setError(null);
     try {
@@ -49,7 +43,14 @@ export const Travel = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [modeFilter]);
+
+  useEffect(() => {
+    supabase.from('locations').select('*').eq('status', 'PUBLISHED').order('name')
+      .then(({data}) => setLocations((data as unknown as Location[]) || []));
+    fetchRoutes();
+  }, [fetchRoutes]);
+
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,69 +58,61 @@ export const Travel = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] font-sans pb-24 selection:bg-[#0284C7]/20">
+    <div className="min-h-screen bg-deep-night text-snow font-sans pb-24 selection:bg-arctic-gold/30">
       
-      {/* Ocean Steel Hero */}
-      <CinematicBackground 
-        imageUrl="/images/infra_windfarm_1786938637138.jpg"
-        gradient="dark"
-        overlayOpacity={0.5}
-        className="h-[60vh] flex items-center"
+      {/* Ocean Steel Hero -> Standard PageHeader */}
+      <PageHeader
+        title={<>Navigate Norway <br/>Sustainably</>}
+        description="Plan your journey through dramatic landscapes using our world-class electric ferries, scenic trains, and EV infrastructure."
+        breadcrumb={
+          <>
+            <Leaf className="w-4 h-4" /> Smart Mobility
+          </>
+        }
+        backgroundImage="/images/infra_windfarm_1786938637138.jpg"
       >
-        <div className="max-w-[1440px] mx-auto px-6 md:px-12 w-full pt-32">
-          <div className="max-w-4xl text-white">
-            <span className="text-[#38BDF8] font-sans text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2 drop-shadow-md">
-              <Leaf className="w-4 h-4" /> Smart Mobility
-            </span>
-            <h1 className="text-5xl md:text-7xl font-display font-semibold mb-6 drop-shadow-lg text-white">Navigate Norway <br/>Sustainably</h1>
-            <p className="text-lg md:text-xl font-sans text-white/90 max-w-2xl mb-12 leading-relaxed drop-shadow-md">
-              Plan your journey through dramatic landscapes using our world-class electric ferries, scenic trains, and EV infrastructure.
-            </p>
-
-            {/* Smart Routing Bar */}
-            <form onSubmit={handleSearch} className="bg-white/95 backdrop-blur-2xl border border-[#0284C7]/20 p-2 flex flex-col md:flex-row gap-2 max-w-5xl shadow-2xl rounded-sm">
-              <div className="flex-1 flex items-center gap-4 px-6 py-4 bg-[#F1F5F9] hover:bg-[#E2E8F0] transition-colors cursor-pointer group text-[#0F172A]">
-                <MapPin className="w-5 h-5 text-[#0284C7] group-hover:scale-110 transition-transform shrink-0" />
-                <div className="flex flex-col w-full">
-                  <span className="text-[10px] uppercase tracking-widest text-[#64748B] font-bold">From</span>
-                  <select value={origin} onChange={e => setOrigin(e.target.value)} className="bg-transparent text-sm outline-none placeholder:text-[#94A3B8] w-full font-medium appearance-none cursor-pointer">
-                    <option value="">Anywhere</option>
-                    {locations.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-                  </select>
-                </div>
-              </div>
-              <div className="flex items-center justify-center px-2 text-[#94A3B8]">
-                <ArrowRight size={20} />
-              </div>
-              <div className="flex-1 flex items-center gap-4 px-6 py-4 bg-[#F1F5F9] hover:bg-[#E2E8F0] transition-colors cursor-pointer group text-[#0F172A]">
-                <MapPin className="w-5 h-5 text-[#0284C7] group-hover:scale-110 transition-transform shrink-0" />
-                <div className="flex flex-col w-full">
-                  <span className="text-[10px] uppercase tracking-widest text-[#64748B] font-bold">To</span>
-                  <select value={destination} onChange={e => setDestination(e.target.value)} className="bg-transparent text-sm outline-none placeholder:text-[#94A3B8] w-full font-medium appearance-none cursor-pointer">
-                    <option value="">Anywhere</option>
-                    {locations.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-                  </select>
-                </div>
-              </div>
-              <div className="flex-1 flex items-center gap-4 px-6 py-4 bg-[#F1F5F9] hover:bg-[#E2E8F0] transition-colors cursor-pointer group text-[#0F172A]">
-                <Calendar className="w-5 h-5 text-[#0284C7] group-hover:scale-110 transition-transform shrink-0" />
-                <div className="flex flex-col w-full">
-                  <span className="text-[10px] uppercase tracking-widest text-[#64748B] font-bold">Date</span>
-                  <input type="date" value={date} onChange={e => setDate(e.target.value)} className="bg-transparent text-sm font-medium outline-none w-full cursor-pointer text-[#0F172A]" />
-                </div>
-              </div>
-              <button type="submit" className="h-auto py-4 px-10 bg-[#0284C7] text-white font-bold hover:bg-[#0369A1] transition-colors flex items-center justify-center gap-2 uppercase tracking-widest text-xs shrink-0 rounded-sm">
-                <Search className="w-4 h-4" /> Find Route
-              </button>
-            </form>
+        {/* Smart Routing Bar */}
+        <form onSubmit={handleSearch} className="bg-white/5 backdrop-blur-2xl border border-white/10 p-2 flex flex-col md:flex-row gap-2 max-w-5xl shadow-2xl rounded-sm">
+          <div className="flex-1 flex items-center gap-4 px-6 py-4 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer group text-snow">
+            <MapPin className="w-5 h-5 text-arctic-gold group-hover:scale-110 transition-transform shrink-0" />
+            <div className="flex flex-col w-full">
+              <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">From</span>
+              <select value={origin} onChange={e => setOrigin(e.target.value)} className="bg-transparent text-sm outline-none placeholder:text-slate-500 w-full font-medium appearance-none cursor-pointer">
+                <option value="" className="bg-deep-night text-snow">Anywhere</option>
+                {locations.map(l => <option key={l.id} value={l.id} className="bg-deep-night text-snow">{l.name}</option>)}
+              </select>
+            </div>
           </div>
-        </div>
-      </CinematicBackground>
+          <div className="flex items-center justify-center px-2 text-slate-500">
+            <ArrowRight size={20} />
+          </div>
+          <div className="flex-1 flex items-center gap-4 px-6 py-4 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer group text-snow">
+            <MapPin className="w-5 h-5 text-arctic-gold group-hover:scale-110 transition-transform shrink-0" />
+            <div className="flex flex-col w-full">
+              <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">To</span>
+              <select value={destination} onChange={e => setDestination(e.target.value)} className="bg-transparent text-sm outline-none placeholder:text-slate-500 w-full font-medium appearance-none cursor-pointer">
+                <option value="" className="bg-deep-night text-snow">Anywhere</option>
+                {locations.map(l => <option key={l.id} value={l.id} className="bg-deep-night text-snow">{l.name}</option>)}
+              </select>
+            </div>
+          </div>
+          <div className="flex-1 flex items-center gap-4 px-6 py-4 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer group text-snow">
+            <Calendar className="w-5 h-5 text-arctic-gold group-hover:scale-110 transition-transform shrink-0" />
+            <div className="flex flex-col w-full">
+              <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Date</span>
+              <input type="date" value={date} onChange={e => setDate(e.target.value)} className="bg-transparent text-sm font-medium outline-none w-full cursor-pointer text-snow [color-scheme:dark]" />
+            </div>
+          </div>
+          <button type="submit" className="h-auto py-4 px-10 bg-arctic-gold text-deep-night font-bold hover:bg-snow transition-colors flex items-center justify-center gap-2 uppercase tracking-widest text-xs shrink-0 rounded-sm">
+            <Search className="w-4 h-4" /> Find Route
+          </button>
+        </form>
+      </PageHeader>
 
       <div className="max-w-[1440px] mx-auto px-6 md:px-12 -mt-8 relative z-20">
         
         {/* Navigation Modes */}
-        <div className="flex flex-wrap items-center gap-4 border-b border-[#CBD5E1] mb-12 pb-6 bg-[#F8FAFC]">
+        <div className="flex flex-wrap items-center gap-4 border-b border-white/10 mb-12 pb-6 bg-deep-night">
           {MODES.map(mode => (
             <button
               key={mode.id}
@@ -130,8 +123,8 @@ export const Travel = () => {
               }}
               className={`flex items-center gap-2 px-6 py-3 font-sans text-xs font-bold uppercase tracking-widest transition-colors rounded-sm border ${
                 modeFilter === mode.id 
-                  ? 'bg-[#0284C7] border-[#0284C7] text-white shadow-md' 
-                  : 'bg-white border-[#E2E8F0] text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A]'
+                  ? 'bg-arctic-gold border-arctic-gold text-deep-night shadow-md' 
+                  : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-snow'
               }`}
             >
               {mode.icon} {mode.label}

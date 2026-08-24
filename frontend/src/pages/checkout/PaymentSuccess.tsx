@@ -3,6 +3,7 @@ import { CheckCircle, Calendar, Download, ChevronRight, Check, Loader2 } from 'l
 import { useCart } from '../../store/useCartStore';
 import { supabase } from '../../lib/supabase';
 import { invoiceService } from '../../services/invoice/invoiceService';
+import { toast } from 'sonner';
 
 export const PaymentSuccess = () => {
   const { clearCart } = useCart();
@@ -43,21 +44,48 @@ export const PaymentSuccess = () => {
     }
   }, [clearCart]);
 
-  const handleDownloadInvoice = () => {
-    const mockOrderBooking = {
-      id: orderId || 'ORD-98412',
-      total_amount: orderData?.total_amount || 3200,
-      currency: orderData?.currency || 'NOK',
-      item_type: 'Travel Checkout Order',
-      pax: 1,
-      customer_name: orderData?.customer_name || 'Traveler',
-      customer_email: orderData?.customer_email || 'traveler@smartlife.no',
-      created_at: orderData?.created_at || new Date().toISOString(),
-      payment_id: orderId,
-      status: 'CONFIRMED'
-    };
+  const handleDownloadInvoice = async () => {
+    if (!orderId) return;
 
-    invoiceService.downloadInvoiceForBooking(mockOrderBooking);
+    try {
+      const { data: invoices, error } = await (supabase as any)
+        .from('invoices')
+        .select('*')
+        .eq('order_id', orderId);
+
+      if (error || !invoices || invoices.length === 0) {
+        toast.error('Invoice is generating. Please check your email or dashboard shortly.');
+        return;
+      }
+
+      // If there are multiple bookings, we can print the first invoice
+      // or open multiple tabs. We'll print the first one for the summary.
+      const inv = invoices[0];
+      
+      const invoiceData = {
+        invoiceNumber: inv.invoice_number,
+        invoiceDate: new Date(inv.invoice_date || inv.created_at).toLocaleDateString('en-GB'),
+        dueDate: new Date(inv.due_date || inv.created_at).toLocaleDateString('en-GB'),
+        customerName: inv.customer_name || 'Customer',
+        customerEmail: inv.customer_email || '',
+        customerCountry: inv.customer_country || 'Norway',
+        currency: inv.currency || 'NOK',
+        items: inv.items || [],
+        subtotal: Number(inv.subtotal_amount || 0),
+        vatStandard: Number(inv.vat_standard_amount || 0),
+        vatReduced: Number(inv.vat_reduced_amount || 0),
+        totalAmount: Number(inv.total_amount || 0),
+        paymentMethod: inv.payment_method || 'CARD',
+        paymentGatewayRef: inv.payment_gateway_ref || orderId,
+        bookingRef: inv.booking_id ? `BKG-${inv.booking_id.substring(0,8).toUpperCase()}` : undefined,
+        status: inv.status as 'PAID' | 'REFUNDED' | 'PENDING',
+      };
+
+      invoiceService.openPrintableInvoice(invoiceData);
+    } catch (err) {
+      console.error('Error fetching invoice:', err);
+      toast.error('Failed to download invoice. Please try from your dashboard.');
+    }
   };
 
   return (

@@ -131,10 +131,12 @@ export const Register = () => {
             
             <div className="space-y-4">
               <div className="relative group">
+                <label htmlFor="register-name" className="sr-only">Full Name</label>
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <User className="h-5 w-5 text-white/50 group-focus-within:text-aurora-green transition-colors" />
                 </div>
                 <input 
+                  id="register-name"
                   name="name" 
                   type="text" 
                   autoComplete="name"
@@ -147,10 +149,12 @@ export const Register = () => {
               </div>
 
               <div className="relative group">
+                <label htmlFor="register-email" className="sr-only">Email address</label>
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Mail className="h-5 w-5 text-white/50 group-focus-within:text-aurora-green transition-colors" />
                 </div>
                 <input 
+                  id="register-email"
                   name="email" 
                   type="email" 
                   autoComplete="email"
@@ -163,10 +167,12 @@ export const Register = () => {
               </div>
 
               <div className="relative group">
+                <label htmlFor="register-password" className="sr-only">Password</label>
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5 text-white/50 group-focus-within:text-aurora-green transition-colors" />
                 </div>
                 <input 
+                  id="register-password"
                   name="password" 
                   type={showPassword ? "text" : "password"} 
                   autoComplete="new-password"

@@ -5,6 +5,7 @@ import { CinematicBackground } from '../../design/backgrounds/CinematicBackgroun
 import { Container } from '../../components/layout/Container';
 import { trailService, Trail } from '../../services/trailService';
 import { Map, Mountain, Clock, TrendingUp, Sun, CloudRain, AlertTriangle, Snowflake } from 'lucide-react';
+import { OptimizedImage } from '../../components/shared/OptimizedImage';
 
 const FILTER_DIFFICULTY = ['All', 'Easy', 'Moderate', 'Hard', 'Extreme'];
 const FILTER_DURATION = ['All', '< 2 hours', '2–4 hours', '4–8 hours', 'Full day', 'Multi-day'];
@@ -13,24 +14,27 @@ export const HikingTrails = () => {
   const [activeDiff, setActiveDiff] = useState('All');
   const [trails, setTrails] = useState<Trail[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchTrails = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await trailService.getTrails();
+      setTrails(data || []);
+    } catch (err: any) {
+      console.error('Failed to load hiking trails:', err);
+      setError(err?.message || 'Unable to load trails at this moment.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   React.useEffect(() => {
-    trailService.getTrails().then(data => {
-      setTrails(data);
-      setIsLoading(false);
-    });
-  }, []);  
-  // Fake topo map overlay
-  const TopoMapOverlay = () => (
-    <div 
-      className="absolute inset-0 opacity-10 pointer-events-none mix-blend-overlay z-[1]" 
-      style={{
-        backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 50 Q 25 25, 50 50 T 100 50\' stroke=\'white\' fill=\'none\' stroke-width=\'0.5\'/%3E%3Cpath d=\'M0 60 Q 25 35, 50 60 T 100 60\' stroke=\'white\' fill=\'none\' stroke-width=\'0.5\'/%3E%3Cpath d=\'M0 70 Q 25 45, 50 70 T 100 70\' stroke=\'white\' fill=\'none\' stroke-width=\'0.5\'/%3E%3C/svg%3E")',
-        backgroundSize: '200px 200px'
-      }}
-    />
-  );
+    fetchTrails();
+  }, []);
 
+  const filteredTrails = trails.filter(t => activeDiff === 'All' || t.difficulty === activeDiff);
   return (
     <div className="min-h-screen bg-moss text-white relative">
       <CinematicBackground 
@@ -38,7 +42,13 @@ export const HikingTrails = () => {
         overlayOpacity={0.7}
         theme="moss"
       />
-      <TopoMapOverlay />
+      <div 
+        className="absolute inset-0 opacity-10 pointer-events-none mix-blend-overlay z-[1]" 
+        style={{
+          backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 50 Q 25 25, 50 50 T 100 50\' stroke=\'white\' fill=\'none\' stroke-width=\'0.5\'/%3E%3Cpath d=\'M0 60 Q 25 35, 50 60 T 100 60\' stroke=\'white\' fill=\'none\' stroke-width=\'0.5\'/%3E%3Cpath d=\'M0 70 Q 25 45, 50 70 T 100 70\' stroke=\'white\' fill=\'none\' stroke-width=\'0.5\'/%3E%3C/svg%3E")',
+          backgroundSize: '200px 200px'
+        }}
+      />
 
       <div className="relative z-10 pt-32 pb-24">
         <Container>
@@ -131,20 +141,50 @@ export const HikingTrails = () => {
             {/* Trail Cards Grid */}
             <div className="w-full lg:w-3/4">
               <div className="flex flex-col gap-8">
-                {isLoading && (
-                  <div className="flex flex-col gap-6">
-                    {[1,2,3].map(i => <div key={i} className="glass-panel rounded-3xl h-64 animate-pulse bg-white/5" />)}
+                {isLoading ? (
+                  <div className="space-y-6">
+                    {[1, 2, 3].map(n => (
+                      <div key={n} className="glass-panel rounded-3xl overflow-hidden flex flex-col md:flex-row h-72 animate-pulse">
+                        <div className="w-full md:w-2/5 bg-white/5 h-full" />
+                        <div className="p-8 w-full md:w-3/5 space-y-4">
+                          <div className="h-6 bg-white/10 w-1/2 rounded" />
+                          <div className="h-4 bg-white/5 w-1/3 rounded" />
+                          <div className="h-12 bg-white/5 w-full rounded" />
+                          <div className="grid grid-cols-4 gap-4 pt-4">
+                            {[1, 2, 3, 4].map(c => <div key={c} className="h-8 bg-white/10 rounded" />)}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                )}
-                {!isLoading && trails.length === 0 && (
-                  <div className="glass-panel rounded-3xl p-12 text-center">
-                    <Mountain className="w-12 h-12 text-nordic-sage mx-auto mb-4 opacity-50" />
-                    <p className="text-white text-xl font-display mb-2">No trails match your filters.</p>
-                    <p className="text-gray-400 text-sm">Try selecting a different difficulty or clearing your filters.</p>
+                ) : error ? (
+                  <div className="glass-panel rounded-3xl p-12 text-center max-w-xl mx-auto border border-red-500/20 bg-red-500/10">
+                    <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+                    <h3 className="text-white text-xl font-display font-bold mb-2">Unable to Load Trails</h3>
+                    <p className="text-gray-300 text-sm mb-6 leading-relaxed">{error}</p>
+                    <button
+                      onClick={fetchTrails}
+                      className="px-6 py-2.5 bg-nordic-sage text-midnight font-bold rounded-xl text-xs uppercase tracking-wider hover:bg-white transition-all shadow-md cursor-pointer"
+                    >
+                      Try Again
+                    </button>
                   </div>
-                )}
-                
-                {trails.filter(t => activeDiff === 'All' || t.difficulty === activeDiff).map((trail, idx) => (
+                ) : filteredTrails.length === 0 ? (
+                  <div className="glass-panel rounded-3xl p-12 text-center max-w-xl mx-auto">
+                    <Mountain className="w-12 h-12 text-nordic-sage mx-auto mb-4 opacity-70" />
+                    <h3 className="text-white text-xl font-display font-bold mb-2">No trails match "{activeDiff}"</h3>
+                    <p className="text-gray-400 text-sm mb-6 leading-relaxed">
+                      We couldn't find any hiking routes with {activeDiff} difficulty level in our active catalog.
+                    </p>
+                    <button
+                      onClick={() => setActiveDiff('All')}
+                      className="px-6 py-2.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-xs uppercase tracking-wider border border-white/20 transition-all cursor-pointer"
+                    >
+                      Show All Difficulties
+                    </button>
+                  </div>
+                ) : (
+                  filteredTrails.map((trail, idx) => (
                   <motion.div 
                     key={trail.id}
                     initial={{ opacity: 0, y: 20 }}
@@ -153,13 +193,14 @@ export const HikingTrails = () => {
                     className="glass-panel rounded-3xl overflow-hidden group flex flex-col md:flex-row hover:border-nordic-sage/50 transition-all cursor-pointer"
                   >
                     <div className="w-full md:w-2/5 h-64 md:h-auto relative overflow-hidden">
-                      <img 
+                      <OptimizedImage 
                         src={trail.image} 
                         alt={trail.name}
+                        category="trail"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                        onError={(e) => { (e.target as HTMLImageElement).src = '/images/besseggen_1786936349992.jpg'; }}
+                        containerClassName="w-full h-full"
                       />
-                      <div className="absolute top-4 left-4">
+                      <div className="absolute top-4 left-4 z-10">
                         {trail.weather_status === 'Clear' && (
                           <div className="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2 border border-white/20">
                             <Sun className="w-3 h-3 text-amber-400" /> Clear conditions
@@ -230,7 +271,8 @@ export const HikingTrails = () => {
                       </div>
                     </div>
                   </motion.div>
-                ))}
+                ))
+              )}
               </div>
             </div>
           </div>

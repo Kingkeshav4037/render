@@ -1,6 +1,7 @@
 import { Users, Shield, MoreVertical, Loader } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
+import { Button } from '../../components/ui/Button';
 
 export const AdminUsers = () => {
   const [users, setUsers] = useState<any[]>([]);
@@ -29,9 +30,9 @@ export const AdminUsers = () => {
           </h1>
           <p className="text-slate-400 mt-2">Manage roles, access levels, and account status.</p>
         </div>
-        <button className="px-4 py-2 bg-aurora-green text-navy-900 font-bold rounded-lg hover:bg-green-400 transition-colors shadow-[0_0_15px_rgba(34,197,94,0.3)]">
+        <Button variant="primary" className="bg-aurora-green text-navy-900 hover:bg-green-400 shadow-[0_0_15px_rgba(34,197,94,0.3)]">
           Invite User
-        </button>
+        </Button>
       </div>
 
       <div className="bg-slate-900/50 backdrop-blur-md rounded-2xl border border-slate-800 shadow-xl overflow-hidden">

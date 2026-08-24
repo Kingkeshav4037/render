@@ -2,17 +2,20 @@ import { motion } from 'framer-motion';
 import { Leaf, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Container } from '../layout/Container';
+import { OptimizedImage } from '../shared/OptimizedImage';
 
 export const SustainableNorwaySection = () => {
   return (
     <section className="py-24 bg-emerald-900 text-white overflow-hidden relative">
       <div className="absolute inset-0 opacity-40">
-        <img 
+        <OptimizedImage 
           src="/images/infra_windfarm.jpg" 
           alt="Wind farm in Norway" 
+          category="infra"
           className="w-full h-full object-cover mix-blend-overlay"
+          containerClassName="w-full h-full"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-emerald-900 via-emerald-900/90 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-900 via-emerald-900/90 to-transparent pointer-events-none"></div>
       </div>
       
       <Container className="relative z-10">

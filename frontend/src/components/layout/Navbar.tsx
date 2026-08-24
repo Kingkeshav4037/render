@@ -57,93 +57,6 @@ export const Navbar = () => {
     navigate('/login');
   };
 
-  const NavLinks = () => (
-    <>
-      {/* 1. Discover */}
-      <div className="relative group px-3 py-2">
-        <span className="font-sans font-medium text-sm text-snow hover:text-arctic-gold cursor-pointer transition-colors flex items-center gap-1">
-          Discover ▾
-        </span>
-        <div className="absolute top-full left-0 mt-2 w-52 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2 z-50">
-          <div className="bg-snow rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.12)] border border-gray-100 overflow-hidden flex flex-col p-2 text-nordic-charcoal">
-            <Link to="/explore" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Explore Places</Link>
-            <Link to="/wildlife" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Wildlife</Link>
-            <Link to="/flora" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Flora & Forests</Link>
-            <Link to="/aurora" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Aurora Tracker</Link>
-            <Link to="/weather" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Live Weather</Link>
-            <Link to="/safety" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Safety Alerts</Link>
-            <Link to="/sustainability" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Sustainability</Link>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. Experiences */}
-      <div className="relative group px-3 py-2">
-        <span className="font-sans font-medium text-sm text-snow hover:text-arctic-gold cursor-pointer transition-colors flex items-center gap-1">
-          Experiences ▾
-        </span>
-        <div className="absolute top-full left-0 mt-2 w-52 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2 z-50">
-          <div className="bg-snow rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.12)] border border-gray-100 overflow-hidden flex flex-col p-2 text-nordic-charcoal">
-            <Link to="/activities" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Activities</Link>
-            <Link to="/trails" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Hiking Trails</Link>
-            <Link to="/winter" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Winter Sports</Link>
-            <Link to="/road-trips" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Road Trips</Link>
-            <Link to="/events" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Events</Link>
-            <Link to="/guides" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Guides</Link>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. Plan */}
-      <div className="relative group px-3 py-2">
-        <span className="font-sans font-medium text-sm text-snow hover:text-arctic-gold cursor-pointer transition-colors flex items-center gap-1">
-          Plan ▾
-        </span>
-        <div className="absolute top-full left-0 mt-2 w-52 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2 z-50">
-          <div className="bg-snow rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.12)] border border-gray-100 overflow-hidden flex flex-col p-2 text-nordic-charcoal">
-            <Link to="/stay" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Stays & Lodges</Link>
-            <Link to="/food" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Food & Dining</Link>
-            <Link to="/travel" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Transport</Link>
-            <Link to="/planner" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Trip Planner</Link>
-            <Link to="/recommendations" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Recommendations</Link>
-            <Link to="/deals" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Travel Deals</Link>
-          </div>
-        </div>
-      </div>
-
-      {/* 4. Shop / Marketplace */}
-      <Link 
-        to="/shop" 
-        className="px-3 py-2 font-sans font-medium text-sm text-snow hover:text-arctic-gold transition-colors flex items-center gap-1.5"
-        onClick={() => setShowMobileMenu(false)}
-      >
-        <ShoppingBag className="w-4 h-4 text-arctic-gold" />
-        <span>Shop</span>
-      </Link>
-
-      {/* 5. Smart City & Tech */}
-      <div className="relative group px-3 py-2">
-        <span className="font-sans font-medium text-sm text-snow hover:text-arctic-gold cursor-pointer transition-colors flex items-center gap-1">
-          Smart City ▾
-        </span>
-        <div className="absolute top-full left-0 mt-2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2 z-50">
-          <div className="bg-snow rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.12)] border border-gray-100 overflow-hidden flex flex-col p-2 text-nordic-charcoal">
-            <Link to="/smart-city" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Smart Norway Hub</Link>
-            <Link to="/map" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Interactive Map</Link>
-            <Link to="/infrastructure" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Clean Infrastructure</Link>
-            <Link to="/infrastructure/energy" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Energy Dashboard</Link>
-            <Link to="/infrastructure/iot" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>IoT Sensor Network</Link>
-            <Link to="/mobility/ev" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>EV Charging</Link>
-            <Link to="/mobility/ferry" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Smart Ferries</Link>
-            <Link to="/live" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Live Dashboard</Link>
-            <Link to="/insights" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Telemetry & Insights</Link>
-            <Link to="/impact" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Personal Impact</Link>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-
   return (
     <nav className={cn(
       "fixed top-0 inset-x-0 z-50 transition-all duration-500 border-b border-transparent",
@@ -167,7 +80,7 @@ export const Navbar = () => {
         
         {/* Desktop Navigation */}
         <div className="hidden lg:flex items-center space-x-2">
-          <NavLinks />
+          <NavLinks setShowMobileMenu={setShowMobileMenu} />
         </div>
 
         {/* Right Actions */}
@@ -210,7 +123,10 @@ export const Navbar = () => {
             </div>
           </div>
 
-          <button className="text-snow/80 hover:text-snow transition-colors">
+          <button 
+            aria-label="Search site"
+            className="text-snow/80 hover:text-snow transition-colors focus-visible:ring-2 focus-visible:ring-aurora-green focus-visible:outline-none p-1 rounded"
+          >
             <Search className="w-5 h-5" />
           </button>
           
@@ -219,7 +135,8 @@ export const Navbar = () => {
               {/* Cart Toggle */}
               <button 
                 onClick={() => setIsOpen(true)}
-                className="text-snow/80 hover:text-snow transition-colors relative"
+                aria-label={`Shopping Cart${cartItemCount > 0 ? `, ${cartItemCount} items` : ''}`}
+                className="text-snow/80 hover:text-snow transition-colors relative focus-visible:ring-2 focus-visible:ring-aurora-green focus-visible:outline-none p-1 rounded"
               >
                 <ShoppingBag className="w-5 h-5" />
                 {cartItemCount > 0 && (
@@ -233,29 +150,33 @@ export const Navbar = () => {
 
               {/* Profile Dropdown */}
               <div className="relative group">
-                <button className="flex items-center gap-2 text-snow hover:text-arctic-gold transition-colors font-sans font-medium text-sm focus:outline-none">
+                <button 
+                  aria-label="User profile menu"
+                  aria-haspopup="menu"
+                  className="flex items-center gap-2 text-snow hover:text-arctic-gold transition-colors font-sans font-medium text-sm focus-visible:ring-2 focus-visible:ring-aurora-green focus:outline-none px-2 py-1 rounded"
+                >
                   <User className="w-5 h-5" /> {firstName}
                 </button>
                 
                 <div className="absolute top-full right-0 mt-4 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right group-hover:translate-y-0 translate-y-2">
-                  <div className="bg-snow rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.12)] border border-gray-100 overflow-hidden flex flex-col p-2 text-nordic-charcoal">
-                    <Link to="/dashboard" className="px-4 py-2.5 hover:bg-arctic-mist rounded-lg font-sans font-medium text-sm transition-colors">
+                  <div className="bg-snow rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.12)] border border-gray-100 overflow-hidden flex flex-col p-2 text-nordic-charcoal" role="menu">
+                    <Link to="/dashboard" role="menuitem" className="px-4 py-2.5 hover:bg-arctic-mist rounded-lg font-sans font-medium text-sm transition-colors">
                       My Norway
                     </Link>
-                    <Link to="/user/bookings" className="px-4 py-2.5 hover:bg-arctic-mist rounded-lg font-sans font-medium text-sm transition-colors">
+                    <Link to="/user/bookings" role="menuitem" className="px-4 py-2.5 hover:bg-arctic-mist rounded-lg font-sans font-medium text-sm transition-colors">
                       My Bookings
                     </Link>
-                    <Link to="/user/invoices" className="px-4 py-2.5 hover:bg-arctic-mist rounded-lg font-sans font-medium text-sm transition-colors">
+                    <Link to="/user/invoices" role="menuitem" className="px-4 py-2.5 hover:bg-arctic-mist rounded-lg font-sans font-medium text-sm transition-colors">
                       Invoices & Receipts
                     </Link>
-                    <Link to="/profile" className="px-4 py-2.5 hover:bg-arctic-mist rounded-lg font-sans font-medium text-sm transition-colors">
+                    <Link to="/profile" role="menuitem" className="px-4 py-2.5 hover:bg-arctic-mist rounded-lg font-sans font-medium text-sm transition-colors">
                       Profile
                     </Link>
-                    <Link to="/settings/notifications" className="px-4 py-2.5 hover:bg-arctic-mist rounded-lg font-sans font-medium text-sm transition-colors flex items-center justify-between">
+                    <Link to="/settings/notifications" role="menuitem" className="px-4 py-2.5 hover:bg-arctic-mist rounded-lg font-sans font-medium text-sm transition-colors flex items-center justify-between">
                       Notifications <Bell className="w-4 h-4 text-slate" />
                     </Link>
                     <div className="h-px bg-gray-100 my-1"></div>
-                    <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2.5 hover:bg-red-50 rounded-lg text-nordic-red font-sans font-medium text-sm transition-colors text-left w-full">
+                    <button onClick={handleLogout} role="menuitem" className="flex items-center gap-2 px-4 py-2.5 hover:bg-red-50 rounded-lg text-nordic-red font-sans font-medium text-sm transition-colors text-left w-full">
                       <LogOut className="w-4 h-4" /> Sign Out
                     </button>
                   </div>
@@ -264,7 +185,7 @@ export const Navbar = () => {
             </>
           ) : (
             <>
-              <Link to="/login" className="font-sans font-medium text-sm text-snow hover:text-arctic-gold transition-colors">Log in</Link>
+              <Link to="/login" className="font-sans font-medium text-sm text-snow hover:text-arctic-gold transition-colors focus-visible:ring-2 focus-visible:ring-aurora-green focus:outline-none px-2 py-1 rounded">Log in</Link>
               <Link to="/register">
                 <Button variant="outline" className="text-snow border-snow hover:bg-snow hover:text-deep-night rounded-none">Sign Up</Button>
               </Link>
@@ -276,7 +197,8 @@ export const Navbar = () => {
         <div className="lg:hidden flex items-center gap-4">
           <button 
             onClick={() => setIsOpen(true)}
-            className="text-snow/80 hover:text-snow transition-colors relative"
+            aria-label={`Shopping Cart${cartItemCount > 0 ? `, ${cartItemCount} items` : ''}`}
+            className="text-snow/80 hover:text-snow transition-colors relative focus-visible:ring-2 focus-visible:ring-aurora-green focus-visible:outline-none p-1 rounded"
           >
             <ShoppingBag className="w-5 h-5" />
             {cartItemCount > 0 && (
@@ -285,7 +207,12 @@ export const Navbar = () => {
               </span>
             )}
           </button>
-          <button className="text-snow focus:outline-none" onClick={() => setShowMobileMenu(true)}>
+          <button 
+            className="text-snow focus-visible:ring-2 focus-visible:ring-aurora-green focus:outline-none p-1 rounded" 
+            onClick={() => setShowMobileMenu(true)}
+            aria-label="Open mobile navigation menu"
+            aria-expanded={showMobileMenu}
+          >
             <Menu className="w-6 h-6" />
           </button>
         </div>
@@ -326,18 +253,17 @@ export const Navbar = () => {
             </select>
           </div>
 
-          {/* Mobile Categorized Navigation Links */}
           <div className="space-y-4">
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 px-2">Discover</div>
+              <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 px-2">Explore</div>
               <div className="flex flex-col space-y-1">
-                <Link to="/explore" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Explore Places</Link>
+                <Link to="/explore" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Destinations</Link>
+                <Link to="/nature" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Nature & Parks</Link>
                 <Link to="/wildlife" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Wildlife</Link>
-                <Link to="/flora" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Flora & Forests</Link>
+                <Link to="/flora" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Plants & Trees</Link>
+                <Link to="/history" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>History & Heritage</Link>
+                <Link to="/infrastructure" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Infrastructure</Link>
                 <Link to="/aurora" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Aurora Tracker</Link>
-                <Link to="/weather" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Live Weather</Link>
-                <Link to="/safety" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Safety Alerts</Link>
-                <Link to="/sustainability" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Sustainability</Link>
               </div>
             </div>
 
@@ -374,14 +300,15 @@ export const Navbar = () => {
               <div className="flex flex-col space-y-1">
                 <Link to="/smart-city" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Smart Norway Hub</Link>
                 <Link to="/map" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Interactive Map</Link>
-                <Link to="/infrastructure" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Clean Infrastructure</Link>
                 <Link to="/infrastructure/energy" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Energy Dashboard</Link>
                 <Link to="/infrastructure/iot" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>IoT Sensor Network</Link>
                 <Link to="/mobility/ev" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>EV Charging</Link>
                 <Link to="/mobility/ferry" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Smart Ferries</Link>
                 <Link to="/live" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Live Dashboard</Link>
                 <Link to="/insights" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Telemetry Insights</Link>
+                <Link to="/safety" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Safety Alerts</Link>
                 <Link to="/impact" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Personal Impact</Link>
+                <Link to="/sustainability" className="px-3 py-1.5 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded-lg" onClick={() => setShowMobileMenu(false)}>Sustainability</Link>
               </div>
             </div>
           </div>
@@ -412,3 +339,94 @@ export const Navbar = () => {
     </nav>
   );
 };
+
+const NavLinks = ({ setShowMobileMenu }: { setShowMobileMenu: (show: boolean) => void }) => (
+  <>
+    {/* 1. Explore */}
+    <div className="relative group px-3 py-2">
+      <span className="font-sans font-medium text-sm text-snow hover:text-arctic-gold cursor-pointer transition-colors flex items-center gap-1">
+        Explore ▾
+      </span>
+      <div className="absolute top-full left-0 mt-2 w-52 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2 z-50">
+        <div className="bg-snow rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.12)] border border-gray-100 overflow-hidden flex flex-col p-2 text-nordic-charcoal">
+          <Link to="/explore" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Destinations</Link>
+          <Link to="/nature" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Nature & Parks</Link>
+          <Link to="/wildlife" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Wildlife</Link>
+          <Link to="/flora" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Plants & Trees</Link>
+          <Link to="/history" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>History & Heritage</Link>
+          <Link to="/infrastructure" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Infrastructure</Link>
+          <Link to="/aurora" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Aurora Tracker</Link>
+        </div>
+      </div>
+    </div>
+
+    {/* 2. Experiences */}
+    <div className="relative group px-3 py-2">
+      <span className="font-sans font-medium text-sm text-snow hover:text-arctic-gold cursor-pointer transition-colors flex items-center gap-1">
+        Experiences ▾
+      </span>
+      <div className="absolute top-full left-0 mt-2 w-52 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2 z-50">
+        <div className="bg-snow rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.12)] border border-gray-100 overflow-hidden flex flex-col p-2 text-nordic-charcoal">
+          <Link to="/activities" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Activities</Link>
+          <Link to="/trails" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Hiking Trails</Link>
+          <Link to="/winter" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Winter Sports</Link>
+          <Link to="/road-trips" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Road Trips</Link>
+          <Link to="/events" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Events</Link>
+          <Link to="/guides" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Guides</Link>
+        </div>
+      </div>
+    </div>
+
+    {/* 3. Sustainability */}
+    <div className="relative group px-3 py-2">
+      <span className="font-sans font-medium text-sm text-snow hover:text-arctic-gold cursor-pointer transition-colors flex items-center gap-1">
+        Plan & Sustainability ▾
+      </span>
+      <div className="absolute top-full left-0 mt-2 w-52 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2 z-50">
+        <div className="bg-snow rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.12)] border border-gray-100 overflow-hidden flex flex-col p-2 text-nordic-charcoal">
+          <Link to="/stay" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Stays & Lodges</Link>
+          <Link to="/food" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Food & Dining</Link>
+          <Link to="/travel" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Transport & Routes</Link>
+          <Link to="/planner" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>AI Trip Planner</Link>
+          <Link to="/recommendations" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Recommendations</Link>
+          <Link to="/deals" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Travel Deals</Link>
+          <Link to="/shop" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Sustainable Shop</Link>
+        </div>
+      </div>
+    </div>
+
+    {/* 4. Smart City & Tech */}
+    <div className="relative group px-3 py-2">
+      <span className="font-sans font-medium text-sm text-snow hover:text-arctic-gold cursor-pointer transition-colors flex items-center gap-1">
+        Smart City & Tech ▾
+      </span>
+      <div className="absolute top-full left-0 mt-2 w-52 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2 z-50">
+        <div className="bg-snow rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.12)] border border-gray-100 overflow-hidden flex flex-col p-2 text-nordic-charcoal">
+          <Link to="/smart-city" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Smart Norway Hub</Link>
+          <Link to="/map" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Interactive Map</Link>
+          <Link to="/infrastructure" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Infrastructure</Link>
+          <Link to="/infrastructure/energy" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Energy Dashboard</Link>
+          <Link to="/infrastructure/iot" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>IoT Sensor Network</Link>
+        </div>
+      </div>
+    </div>
+
+    {/* 5. Smart Mobility */}
+    <div className="relative group px-3 py-2">
+      <span className="font-sans font-medium text-sm text-snow hover:text-arctic-gold cursor-pointer transition-colors flex items-center gap-1">
+        Smart Mobility ▾
+      </span>
+      <div className="absolute top-full left-0 mt-2 w-52 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2 z-50">
+        <div className="bg-snow rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.12)] border border-gray-100 overflow-hidden flex flex-col p-2 text-nordic-charcoal">
+          <Link to="/mobility/ev" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>EV Charging</Link>
+          <Link to="/mobility/ferry" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Smart Ferries</Link>
+          <Link to="/live" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Live Dashboard</Link>
+          <Link to="/insights" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Telemetry & Insights</Link>
+          <Link to="/safety" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Safety Alerts</Link>
+          <Link to="/impact" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Personal Impact</Link>
+          <Link to="/sustainability" className="px-4 py-2 hover:bg-arctic-mist rounded-lg text-sm font-medium transition-colors" onClick={() => setShowMobileMenu(false)}>Sustainability</Link>
+        </div>
+      </div>
+    </div>
+  </>
+);

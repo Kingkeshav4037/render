@@ -217,6 +217,7 @@ export const Login = () => {
             <form className="space-y-5" onSubmit={handleEmailLogin}>
               <div className="space-y-4">
                 <div className="relative group">
+                  <label htmlFor="email" className="sr-only">Email address</label>
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <Mail className="h-5 w-5 text-white/50 group-focus-within:text-aurora-green transition-colors" />
                   </div>
@@ -234,6 +235,7 @@ export const Login = () => {
                 </div>
 
                 <div className="relative group">
+                  <label htmlFor="password" className="sr-only">Password</label>
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <Lock className="h-5 w-5 text-white/50 group-focus-within:text-aurora-green transition-colors" />
                   </div>
@@ -306,11 +308,12 @@ export const Login = () => {
             <form className="space-y-5" onSubmit={otpSent ? handleOtpSubmit : handlePhoneSubmit}>
               {!otpSent ? (
                 <div className="space-y-4">
-                  <label className="block text-xs font-bold text-white/80 uppercase tracking-wider">
+                  <label htmlFor="login-phone" className="block text-xs font-bold text-white/80 uppercase tracking-wider">
                     Enter Mobile Number
                   </label>
                   <div className="flex gap-2">
                     <select
+                      aria-label="Country calling code"
                       value={countryCode}
                       onChange={(e) => setCountryCode(e.target.value)}
                       className="w-2/5 py-3.5 px-3 border border-white/20 rounded-xl bg-white/10 text-white font-medium focus:outline-none focus:ring-2 focus:ring-aurora-green/50 transition-all text-xs"
@@ -329,6 +332,7 @@ export const Login = () => {
                       <input 
                         type="tel" 
                         name="phone"
+                        id="login-phone"
                         autoComplete="tel"
                         required 
                         value={phoneNumber}

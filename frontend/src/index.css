@@ -43,7 +43,7 @@
 }
 
 body {
-  @apply bg-snow text-nordic-charcoal font-sans antialiased;
+  @apply bg-deep-night text-snow font-sans antialiased overflow-x-hidden;
 }
 
 /* ─── WCAG Accessibility Utilities & Focus Indicators ────────────────────── */

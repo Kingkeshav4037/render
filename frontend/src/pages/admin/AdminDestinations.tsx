@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 export const AdminDestinations = () => {
   const [destinations, setDestinations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -19,22 +20,25 @@ export const AdminDestinations = () => {
     description: ''
   });
 
-  useEffect(() => {
-    fetchDestinations();
-  }, []);
-
   const fetchDestinations = async () => {
     setLoading(true);
+    setError(null);
     try {
       // In a real app, we'd fetch all locations or paginate
       const data = await mapService.fetchLocationsInBounds(57, 4, 71, 31);
-      setDestinations(data);
-    } catch (err) {
+      setDestinations(data || []);
+    } catch (err: any) {
       console.error("Failed to load destinations", err);
+      setError(err?.message || 'Unable to retrieve destination records.');
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchDestinations();
+  }, []);
+
 
   const handleOpenModal = (dest?: Location) => {
     if (dest) {
@@ -105,12 +109,42 @@ export const AdminDestinations = () => {
             </thead>
             <tbody className="divide-y divide-slate-800/50">
               {loading ? (
+                [1, 2, 3, 4, 5].map(n => (
+                  <tr key={n} className="animate-pulse">
+                    <td className="px-6 py-4"><div className="h-4 bg-slate-800 rounded w-32" /></td>
+                    <td className="px-6 py-4"><div className="h-5 bg-slate-800 rounded w-20" /></td>
+                    <td className="px-6 py-4"><div className="h-4 bg-slate-800 rounded w-28" /></td>
+                    <td className="px-6 py-4"><div className="h-4 bg-slate-800 rounded w-48" /></td>
+                    <td className="px-6 py-4 text-right"><div className="h-6 bg-slate-800 rounded w-16 ml-auto" /></td>
+                  </tr>
+                ))
+              ) : error ? (
                 <tr>
-                  <td colSpan={5} className="text-center py-12 text-slate-500 animate-pulse">Loading destinations...</td>
+                  <td colSpan={5} className="text-center py-12">
+                    <p className="text-red-400 text-sm mb-3">{error}</p>
+                    <button
+                      onClick={fetchDestinations}
+                      className="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-bold transition-colors cursor-pointer"
+                    >
+                      Try Again
+                    </button>
+                  </td>
                 </tr>
               ) : filteredDestinations.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="text-center py-12 text-slate-500">No destinations found.</td>
+                  <td colSpan={5} className="text-center py-12">
+                    <p className="text-slate-400 text-sm mb-3">
+                      {searchTerm ? `No destinations found matching "${searchTerm}".` : 'No destinations available.'}
+                    </p>
+                    {searchTerm && (
+                      <button
+                        onClick={() => setSearchTerm('')}
+                        className="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-aurora-green rounded-lg text-xs font-bold transition-colors cursor-pointer"
+                      >
+                        Clear Search
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ) : (
                 filteredDestinations.map(dest => (

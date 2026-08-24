@@ -3,6 +3,7 @@ import { Star, MessageSquare, Image as ImageIcon, Send, User } from 'lucide-reac
 import { useReviews, useAverageRating, useCreateReview } from '../../hooks/useReviews';
 import { formatDistanceToNow } from 'date-fns';
 import { useAuthStore } from '../../store/useAuthStore';
+import { OptimizedImage } from '../shared/OptimizedImage';
 
 interface Props {
   productType: string;
@@ -171,7 +172,14 @@ export const ReviewSection: React.FC<Props> = ({ productType, productId }) => {
                 {review.photos && review.photos.length > 0 && (
                   <div className="flex gap-2 mt-4 overflow-x-auto pb-2">
                     {review.photos.map((photo, idx) => (
-                      <img key={idx} src={photo} alt="Review" className="w-24 h-24 object-cover rounded-xl border border-gray-100" />
+                      <OptimizedImage 
+                        key={idx} 
+                        src={photo} 
+                        alt="Review" 
+                        category="landscape"
+                        className="w-24 h-24 object-cover rounded-xl border border-gray-100" 
+                        containerClassName="w-24 h-24 rounded-xl flex-shrink-0"
+                      />
                     ))}
                   </div>
                 )}

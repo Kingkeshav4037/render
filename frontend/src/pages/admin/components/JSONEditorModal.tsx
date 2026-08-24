@@ -18,8 +18,13 @@ export const JSONEditorModal: React.FC<Props> = ({ isOpen, title, initialData, o
     if (isOpen) {
       setJsonText(JSON.stringify(initialData, null, 2));
       setError(null);
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') onClose();
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => window.removeEventListener('keydown', handleKeyDown);
     }
-  }, [isOpen, initialData]);
+  }, [isOpen, initialData, onClose]);
 
   if (!isOpen) return null;
 
@@ -38,16 +43,25 @@ export const JSONEditorModal: React.FC<Props> = ({ isOpen, title, initialData, o
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="json-editor-modal-title"
+    >
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh]">
         
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <div>
-            <h2 className="text-xl font-bold text-navy-900">{title}</h2>
+            <h2 id="json-editor-modal-title" className="text-xl font-bold text-navy-900">{title}</h2>
             <p className="text-sm text-gray-500">Edit entity details in JSON format</p>
           </div>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100">
+          <button 
+            onClick={onClose} 
+            aria-label="Close modal"
+            className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+          >
             <X size={20} />
           </button>
         </div>
@@ -61,6 +75,7 @@ export const JSONEditorModal: React.FC<Props> = ({ isOpen, title, initialData, o
             </div>
           )}
           <textarea
+            aria-label="JSON code editor"
             value={jsonText}
             onChange={(e) => setJsonText(e.target.value)}
             className="w-full h-[400px] font-mono text-sm p-4 bg-navy-900 text-green-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"

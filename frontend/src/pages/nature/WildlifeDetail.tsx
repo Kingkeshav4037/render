@@ -5,6 +5,7 @@ import { CinematicBackground } from '../../design/backgrounds/CinematicBackgroun
 import { Container } from '../../components/layout/Container';
 import { ArrowLeft, Camera, ShieldAlert, MapPin, Calendar, Heart, Eye, Loader2, Map } from 'lucide-react';
 import { wildlifeService, WildlifeSpecies, getWildlifeImage } from '../../services/wildlifeService';
+import { OptimizedImage } from '../../components/shared/OptimizedImage';
 
 export const WildlifeDetail = () => {
   const { id } = useParams(); // Using id as slug
@@ -114,7 +115,15 @@ export const WildlifeDetail = () => {
                 </h2>
                 <div className="grid grid-cols-2 gap-4">
                   {galleryMedia.map(m => (
-                    <img key={m.id} src={m.media_url} alt={m.alt_text || species.common_name} className="w-full h-48 object-cover rounded-xl" />
+                    <div key={m.id} className="w-full h-48 rounded-xl overflow-hidden">
+                      <OptimizedImage 
+                        src={m.media_url} 
+                        alt={m.alt_text || species.common_name} 
+                        category="wildlife"
+                        className="w-full h-full object-cover" 
+                        containerClassName="w-full h-full"
+                      />
+                    </div>
                   ))}
                 </div>
               </section>

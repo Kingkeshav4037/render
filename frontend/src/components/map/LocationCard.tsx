@@ -3,6 +3,7 @@ import { MapMarker } from '../../services/map/mapService';
 import { useCart } from '../../store/useCartStore';
 import { weatherService, WeatherData } from '../../services/live/weatherService';
 import { auroraService, AuroraData } from '../../services/live/auroraService';
+import { OptimizedImage } from '../shared/OptimizedImage';
 
 interface LocationCardProps {
   marker: MapMarker;
@@ -58,13 +59,15 @@ const LocationCard: React.FC<LocationCardProps> = ({ marker, onClose, onRouteHer
         ×
       </button>
 
-      {marker.image_url ? (
-        <img src={marker.image_url} alt={marker.name} className="w-full h-40 object-cover opacity-90" />
-      ) : (
-        <div className="w-full h-40 bg-gray-800 flex items-center justify-center text-gray-500">
-          No image
-        </div>
-      )}
+      <div className="w-full h-40 relative overflow-hidden">
+        <OptimizedImage 
+          src={marker.image_url} 
+          alt={marker.name} 
+          category="landscape"
+          className="w-full h-full object-cover opacity-90" 
+          containerClassName="w-full h-full"
+        />
+      </div>
 
       <div className="p-4 flex flex-col flex-1">
         <div className="flex justify-between items-start mb-2">

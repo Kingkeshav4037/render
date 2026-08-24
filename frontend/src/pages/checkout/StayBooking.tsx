@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { staysService, AccommodationRoom } from '../../services/stay/staysService';
 import { useCartStore } from '../../store/useCartStore';
 import { Calendar as CalendarIcon, Users, ShoppingBag } from 'lucide-react';
+import { OptimizedImage } from '../../components/shared/OptimizedImage';
 
 export const StayBooking = () => {
   const { roomId } = useParams<{ roomId: string }>();
@@ -138,7 +139,13 @@ export const StayBooking = () => {
           <div className="md:col-span-1">
             <div className="bg-white rounded-3xl p-6 border border-gray-200 shadow-sm sticky top-24">
               <div className="aspect-video bg-gray-100 rounded-xl mb-6 overflow-hidden">
-                <img src={room.image_url} alt={room.name} className="w-full h-full object-cover" />
+                <OptimizedImage 
+                  src={room.image_url} 
+                  alt={room.name} 
+                  category="stay"
+                  className="w-full h-full object-cover" 
+                  containerClassName="w-full h-full"
+                />
               </div>
               <h3 className="text-xl font-bold text-navy-900 mb-2">{room.name}</h3>
               <p className="text-gray-500 text-sm mb-6 pb-6 border-b border-gray-100">{room.description}</p>

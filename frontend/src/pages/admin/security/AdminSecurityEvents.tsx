@@ -7,10 +7,6 @@ export const AdminSecurityEvents = () => {
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-
   const fetchEvents = async () => {
     setLoading(true);
     const { data, error } = await supabase
@@ -26,6 +22,11 @@ export const AdminSecurityEvents = () => {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
 
   const getEventIcon = (type: string) => {
     if (type.includes('fail') || type.includes('denied') || type.includes('lockout')) {

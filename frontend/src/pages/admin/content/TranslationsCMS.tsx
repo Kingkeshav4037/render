@@ -10,10 +10,6 @@ export const TranslationsCMS = () => {
   const [editRow, setEditRow] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    fetchItems();
-  }, []);
-
   const fetchItems = async () => {
     setLoading(true);
     const { data } = await supabase
@@ -24,6 +20,11 @@ export const TranslationsCMS = () => {
     if (data) setItems(data);
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
 
   const columns: ColumnDef[] = [
     { 

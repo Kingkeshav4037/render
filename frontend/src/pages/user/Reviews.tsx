@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Star, MessageSquare, ShieldCheck, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { OptimizedImage } from '../../components/shared/OptimizedImage';
 
 export const Reviews = () => {
   const navigate = useNavigate();
@@ -59,7 +60,13 @@ export const Reviews = () => {
           {activeTab === 'pending' && pending.map(item => (
             <div key={item.id} className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row gap-6">
               <div className="w-full md:w-48 h-32 rounded-2xl overflow-hidden shrink-0">
-                <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                <OptimizedImage 
+                  src={item.image} 
+                  alt={item.name} 
+                  category="stay"
+                  className="w-full h-full object-cover" 
+                  containerClassName="w-full h-full"
+                />
               </div>
               <div className="flex-1 flex flex-col justify-center">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">{item.type} · {item.date}</p>

@@ -71,10 +71,6 @@ export const AdminPayments = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
 
-  useEffect(() => {
-    loadInvoices();
-  }, []);
-
   const loadInvoices = async () => {
     try {
       setLoading(true);
@@ -91,6 +87,11 @@ export const AdminPayments = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadInvoices();
+  }, []);
+
 
   const filteredInvoices = invoices.filter((inv) => {
     const matchesSearch =

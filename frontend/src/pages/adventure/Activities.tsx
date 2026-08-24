@@ -5,6 +5,7 @@ import { Search, Compass, Map, Tent, Fish, CloudRain, ShieldAlert } from 'lucide
 import { CinematicBackground } from '../../design/backgrounds/CinematicBackground';
 import { Container } from '../../components/layout/Container';
 import { AdventureMap } from './components/AdventureMap';
+import { OptimizedImage } from '../../components/shared/OptimizedImage';
 
 export interface AdventureCategory {
   id: string;
@@ -16,13 +17,13 @@ export interface AdventureCategory {
 
 export const ADVENTURE_CATEGORIES: AdventureCategory[] = [
   { id: 'hiking',   name: 'Hiking',    description: 'Norwegian mountain trails.',          image: '/images/trolltunga_1786936111320.jpg',      count: 245 },
-  { id: 'skiing',   name: 'Skiing',    description: 'Alpine and cross-country experiences.',image: '/images/northern_lights_1786935879330.jpg',  count: 120 },
+  { id: 'skiing',   name: 'Skiing',    description: 'Alpine and cross-country experiences.',image: '/images/galdhopiggen.jpg',               count: 120 },
   { id: 'kayaking', name: 'Kayaking',  description: 'Fjords and coastal exploration.',       image: '/images/fjords_1786935800026.jpg',           count: 85  },
   { id: 'cycling',  name: 'Cycling',   description: 'Scenic roads and mountain routes.',     image: '/images/besseggen_1786936349992.jpg',        count: 150 },
   { id: 'fishing',  name: 'Fishing',   description: 'Freshwater and coastal fishing.',       image: '/images/lofoten_1787013505867.jpg',          count: 320 },
   { id: 'camping',  name: 'Camping',   description: 'Wilderness stays.',                     image: '/images/ryten_1786936427556.jpg',             count: 400 },
   { id: 'climbing', name: 'Climbing',  description: 'Rock and mountain climbing.',           image: '/images/kjeragbolten_1786936275605.jpg',     count: 65  },
-  { id: 'wildlife', name: 'Wildlife',  description: 'Wildlife experiences.',                 image: '/images/galdhopiggen_1786936412055.jpg',     count: 45  },
+  { id: 'wildlife', name: 'Wildlife',  description: 'Wildlife experiences.',                 image: '/images/reindeer.jpg',                       count: 45  },
 ];
 export const Activities = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -117,14 +118,16 @@ export const Activities = () => {
                     key={category.id} 
                     className={`group relative rounded-3xl overflow-hidden glass-panel block ${spanClasses}`}
                   >
-                    <img 
+                    <OptimizedImage 
                       src={category.image} 
                       alt={category.name}
-                      className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
+                      category="activity"
+                      className="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
+                      containerClassName="absolute inset-0 w-full h-full"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
                     
-                    <div className="absolute bottom-0 left-0 p-8 w-full flex justify-between items-end">
+                    <div className="absolute bottom-0 left-0 p-8 w-full flex justify-between items-end z-10">
                       <div>
                         <h3 className="text-2xl md:text-3xl font-display font-bold text-white mb-2">{category.name}</h3>
                         <p className="text-gray-300 text-sm">{category.description}</p>

@@ -4,6 +4,7 @@ import { CinematicBackground } from '../../design/backgrounds/CinematicBackgroun
 import { Container } from '../../components/layout/Container';
 import { roadTripService, RoadTrip } from '../../services/roadTripService';
 import { Map, Clock, Navigation, Calendar, Activity, ChevronRight, MapPin, Zap } from 'lucide-react';
+import { OptimizedImage } from '../../components/shared/OptimizedImage';
 
 const difficultyColor: Record<string, string> = {
   Easy: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
@@ -101,16 +102,15 @@ export const RoadTrips = () => {
                 >
                   {/* Image */}
                   <div className="w-full md:w-2/5 h-64 md:h-auto relative overflow-hidden flex-shrink-0">
-                    <img
+                    <OptimizedImage
                       src={trip.image}
                       alt={trip.name}
+                      category="landscape"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/images/fjords_1786935800026.jpg';
-                      }}
+                      containerClassName="w-full h-full"
                     />
                     {/* Difficulty badge */}
-                    <div className="absolute top-4 left-4">
+                    <div className="absolute top-4 left-4 z-10">
                       <span className={`text-xs font-bold px-3 py-1 rounded-full border ${difficultyColor[trip.difficulty] || 'bg-white/10 text-white border-white/20'}`}>
                         {trip.difficulty}
                       </span>

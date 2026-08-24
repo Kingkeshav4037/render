@@ -6,29 +6,42 @@ import { format, parseISO } from 'date-fns';
 export const AdminBookings = () => {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const fetchBookings = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await bookingService.fetchAllBookings();
+      if (!data || data.length === 0) {
+        setBookings([
+          { id: 'NSL-8201', user_id: 'usr-101', total_amount: 4500, status: 'CONFIRMED', created_at: new Date().toISOString() },
+          { id: 'NSL-8202', user_id: 'usr-205', total_amount: 1200, status: 'PENDING_PAYMENT', created_at: new Date(Date.now() - 86400000).toISOString() },
+          { id: 'NSL-8203', user_id: 'usr-412', total_amount: 8900, status: 'CANCELLED', created_at: new Date(Date.now() - 172800000).toISOString() },
+        ]);
+      } else {
+        setBookings(data);
+      }
+    } catch (err: any) {
+      console.error('Failed to load bookings', err);
+      setError(err?.message || 'Unable to retrieve booking records.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        const data = await bookingService.fetchAllBookings();
-        // Fallback to mock data if empty (since DB might be empty in this prototype)
-        if (!data || data.length === 0) {
-          setBookings([
-            { id: 'NSL-8201', user_id: 'usr-101', total_amount: 4500, status: 'CONFIRMED', created_at: new Date().toISOString() },
-            { id: 'NSL-8202', user_id: 'usr-205', total_amount: 1200, status: 'PENDING_PAYMENT', created_at: new Date(Date.now() - 86400000).toISOString() },
-            { id: 'NSL-8203', user_id: 'usr-412', total_amount: 8900, status: 'CANCELLED', created_at: new Date(Date.now() - 172800000).toISOString() },
-          ]);
-        } else {
-          setBookings(data);
-        }
-      } catch (error) {
-        console.error('Failed to load bookings', error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchBookings();
   }, []);
+
+  const filteredBookings = bookings.filter(b => {
+    const query = searchQuery.toLowerCase();
+    const idMatch = b.id?.toLowerCase().includes(query);
+    const userMatch = b.user_id?.toLowerCase().includes(query) || (b.user?.id && b.user.id.toLowerCase().includes(query));
+    const statusMatch = b.status?.toLowerCase().includes(query);
+    return idMatch || userMatch || statusMatch;
+  });
 
   const getStatusStyle = (status: string) => {
     switch (status) {
@@ -78,12 +91,19 @@ export const AdminBookings = () => {
             <input 
               type="text" 
               placeholder="Search booking ID or user..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-purple-500 shadow-sm"
             />
           </div>
-          <button className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200 bg-white shadow-sm">
-            <Filter size={16} /> Filter
-          </button>
+          {searchQuery && (
+            <button 
+              onClick={() => setSearchQuery('')}
+              className="text-xs text-purple-600 font-bold hover:underline"
+            >
+              Clear Search
+            </button>
+          )}
         </div>
 
         <div className="overflow-x-auto">
@@ -98,24 +118,59 @@ export const AdminBookings = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {loading && (
-                <tr><td colSpan={5} className="px-6 py-8 text-center text-slate-500">Loading...</td></tr>
-              )}
-              {!loading && bookings.map((booking) => (
-                <tr key={booking.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4 font-mono font-bold text-slate-900">{booking.id.substring(0, 8)}</td>
-                  <td className="px-6 py-4 font-mono text-slate-500">
-                    {booking.user?.id?.substring(0, 8) || booking.user_id?.substring(0, 8) || 'Guest'}
-                  </td>
-                  <td className="px-6 py-4 text-slate-600">{booking.created_at ? format(parseISO(booking.created_at), 'yyyy-MM-dd') : 'N/A'}</td>
-                  <td className="px-6 py-4 text-right font-mono font-semibold text-slate-700">{booking.total_amount?.toLocaleString() || 0}</td>
-                  <td className="px-6 py-4 text-center">
-                    <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${getStatusStyle(booking.status)}`}>
-                      {booking.status}
-                    </span>
+              {loading ? (
+                [1, 2, 3, 4, 5].map(n => (
+                  <tr key={n} className="animate-pulse">
+                    <td className="px-6 py-4"><div className="h-4 bg-slate-100 rounded w-24" /></td>
+                    <td className="px-6 py-4"><div className="h-4 bg-slate-100 rounded w-20" /></td>
+                    <td className="px-6 py-4"><div className="h-4 bg-slate-100 rounded w-28" /></td>
+                    <td className="px-6 py-4 text-right"><div className="h-4 bg-slate-100 rounded w-16 ml-auto" /></td>
+                    <td className="px-6 py-4 text-center"><div className="h-5 bg-slate-100 rounded w-20 mx-auto" /></td>
+                  </tr>
+                ))
+              ) : error ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-12 text-center">
+                    <p className="text-red-500 text-sm mb-3">{error}</p>
+                    <button
+                      onClick={fetchBookings}
+                      className="px-4 py-1.5 bg-slate-900 text-white rounded-lg text-xs font-bold hover:bg-slate-800 transition-colors"
+                    >
+                      Try Again
+                    </button>
                   </td>
                 </tr>
-              ))}
+              ) : filteredBookings.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
+                    <p className="text-sm mb-2">No bookings found matching your search.</p>
+                    {searchQuery && (
+                      <button
+                        onClick={() => setSearchQuery('')}
+                        className="text-xs text-purple-600 font-bold hover:underline"
+                      >
+                        Reset search filter
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ) : (
+                filteredBookings.map((booking) => (
+                  <tr key={booking.id} className="hover:bg-slate-50 transition-colors">
+                    <td className="px-6 py-4 font-mono font-bold text-slate-900">{booking.id.substring(0, 8)}</td>
+                    <td className="px-6 py-4 font-mono text-slate-500">
+                      {booking.user?.id?.substring(0, 8) || booking.user_id?.substring(0, 8) || 'Guest'}
+                    </td>
+                    <td className="px-6 py-4 text-slate-600">{booking.created_at ? format(parseISO(booking.created_at), 'yyyy-MM-dd') : 'N/A'}</td>
+                    <td className="px-6 py-4 text-right font-mono font-semibold text-slate-700">{booking.total_amount?.toLocaleString() || 0}</td>
+                    <td className="px-6 py-4 text-center">
+                      <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${getStatusStyle(booking.status)}`}>
+                        {booking.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

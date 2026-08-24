@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Clock, MapPin, Phone, Globe, Star, Users, Calendar as CalendarIcon, CheckCircle2, ChevronRight, Heart, Share2, Info } from 'lucide-react';
 import { foodService, Restaurant } from '../services/foodService';
+import { OptimizedImage } from '../components/shared/OptimizedImage';
 
 export const FoodDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -49,8 +50,14 @@ export const FoodDetails = () => {
       {/* Hero Gallery */}
       <div className="h-[50vh] min-h-[400px] w-full relative grid grid-cols-4 gap-2 bg-[#1A0F0A]">
         <div className="col-span-4 md:col-span-2 relative h-full group overflow-hidden cursor-pointer">
-          <img src={photos[0] || '/images/food_salmon_1787013684123.jpg'} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt={restaurant.name} />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#1A0F0A]/80 to-transparent"></div>
+          <OptimizedImage 
+            src={photos[0]} 
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+            alt={restaurant.name} 
+            category="food"
+            containerClassName="w-full h-full"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#1A0F0A]/80 to-transparent pointer-events-none"></div>
           
           <div className="absolute top-24 left-6 md:left-12 text-white/70 text-sm font-bold tracking-widest flex items-center gap-2 z-10">
             <Link to="/food" className="hover:text-white transition-colors">DINING</Link> 
@@ -60,11 +67,23 @@ export const FoodDetails = () => {
         </div>
         <div className="hidden md:grid col-span-2 grid-rows-2 gap-2 h-full">
            <div className="relative group overflow-hidden cursor-pointer">
-             <img src={photos[1] || '/images/hotel_juvet_1787013813000.jpg'} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="" />
+             <OptimizedImage 
+               src={photos[1]} 
+               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+               alt={`${restaurant.name} interior`} 
+               category="stay"
+               containerClassName="w-full h-full"
+             />
            </div>
            <div className="grid grid-cols-2 gap-2">
              <div className="relative group overflow-hidden cursor-pointer">
-               <img src={photos[2] || '/images/lofoten_1787013505867.jpg'} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="" />
+               <OptimizedImage 
+                 src={photos[2]} 
+                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                 alt={`${restaurant.name} dish`} 
+                 category="food"
+                 containerClassName="w-full h-full"
+               />
              </div>
              <div className="bg-[#2C1810] flex items-center justify-center text-[#FF7F50] text-sm font-bold tracking-widest hover:bg-[#1A0F0A] cursor-pointer transition-colors uppercase">
                View Gallery

@@ -1,7 +1,10 @@
 import React from 'react';
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { Navigate, Outlet, useLocation, Link } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
 import type { AppRole } from '../../store/useAuthStore';
+import { LoadingState } from '../ui/LoadingState';
+import { ShieldAlert, Home, LogIn } from 'lucide-react';
+import { Button } from '../ui/Button';
 
 interface RoleGuardProps {
   allowedRoles: AppRole[];
@@ -19,9 +22,11 @@ export const RoleGuard: React.FC<RoleGuardProps> = ({
 
   if (loading) {
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-navy-600"></div>
-      </div>
+      <LoadingState 
+        message="Verifying security credentials..." 
+        submessage="Validating access permissions for this administrative portal..."
+        fullScreen 
+      />
     );
   }
 
@@ -30,7 +35,7 @@ export const RoleGuard: React.FC<RoleGuardProps> = ({
   }
 
   if (!profile || !allowedRoles.includes(profile.role as AppRole)) {
-    return <Navigate to={redirectPath} replace />;
+    return <Navigate to={redirectPath} state={{ from: location }} replace />;
   }
 
   return children ? <>{children}</> : <Outlet />;

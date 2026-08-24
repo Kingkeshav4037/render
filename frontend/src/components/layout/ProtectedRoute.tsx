@@ -1,11 +1,12 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
+import { LoadingState } from '../ui/LoadingState';
 
 export const ProtectedRoute = () => {
   const { user, loading } = useAuthStore();
 
   if (loading) {
-    return <div className="min-h-[calc(100vh-64px)] flex items-center justify-center">Loading...</div>;
+    return <LoadingState message="Loading..." submessage="Checking your credentials with Norway SmartLife..." fullScreen />;
   }
 
   if (!user) {
@@ -14,3 +15,4 @@ export const ProtectedRoute = () => {
 
   return <Outlet />;
 };
+

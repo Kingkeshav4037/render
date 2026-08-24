@@ -7,6 +7,7 @@ import {
 import { useCurrencyStore } from '../store/useCurrencyStore';
 import { activityService, Activity } from '../services/activityService';
 import { getActivityImage } from '../services/home/homeContentService';
+import { OptimizedImage } from '../components/shared/OptimizedImage';
 
 const DATES = [
   { date: '14', day: 'Mon', available: true },
@@ -58,17 +59,14 @@ export const ActivityDetails = () => {
       
       {/* Pine Theme Hero */}
       <div className="h-[50vh] w-full relative">
-        <img 
+        <OptimizedImage 
           src={actImage} 
           alt={activityName} 
-          onError={(e) => {
-            if (activity) {
-              (e.target as HTMLImageElement).src = getActivityImage(activity.type);
-            }
-          }}
+          category="activity"
           className="w-full h-full object-cover" 
+          containerClassName="w-full h-full"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-deep-night via-deep-night/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-deep-night via-deep-night/40 to-transparent pointer-events-none" />
         
         <div className="absolute top-24 left-6 md:left-12 text-snow/70 text-sm font-bold tracking-widest flex items-center gap-2 z-10">
           <Link to="/activities" className="hover:text-snow transition-colors">ACTIVITIES</Link> 

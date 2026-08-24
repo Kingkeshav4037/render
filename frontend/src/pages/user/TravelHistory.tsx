@@ -1,6 +1,7 @@
 import React from 'react';
 import { History, Calendar, MapPin, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { OptimizedImage } from '../../components/shared/OptimizedImage';
 
 export const TravelHistory = () => {
   const navigate = useNavigate();
@@ -18,9 +19,11 @@ export const TravelHistory = () => {
   return (
     <div className="min-h-screen bg-[#FDFDFD] font-sans pb-32">
       {/* Editorial Header */}
-      <div className="pt-32 pb-12 px-6 md:px-12 max-w-[1440px] mx-auto border-b border-gray-100">
-        <h1 className="text-4xl md:text-5xl font-display font-light text-navy-900 tracking-tight flex items-center gap-4">
-          <History size={40} className="text-gray-300" />
+      <div className="max-w-[1440px] mx-auto px-6 md:px-12 pt-32">
+        <span className="text-xs font-bold uppercase tracking-widest text-aurora-green flex items-center gap-2">
+          <History size={14} /> Retrospective
+        </span>
+        <h1 className="text-5xl md:text-7xl font-display font-light text-navy-900 mt-4">
           Travel <span className="font-bold">History</span>.
         </h1>
         <p className="mt-4 text-lg text-gray-500">Relive your past adventures across Norway.</p>
@@ -39,8 +42,14 @@ export const TravelHistory = () => {
               {group.trips.map(trip => (
                 <div key={trip.id} onClick={() => navigate(`/trips/${trip.id}`)} className="group cursor-pointer">
                   <div className="rounded-[32px] overflow-hidden aspect-[4/3] mb-4 relative shadow-sm">
-                    <img src={trip.image} alt={trip.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                    <div className="absolute inset-0 bg-navy-900/10 group-hover:bg-transparent transition-colors"></div>
+                    <OptimizedImage 
+                      src={trip.image} 
+                      alt={trip.name} 
+                      category="landscape"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                      containerClassName="w-full h-full"
+                    />
+                    <div className="absolute inset-0 bg-navy-900/10 group-hover:bg-transparent transition-colors pointer-events-none"></div>
                   </div>
                   <div className="flex justify-between items-start">
                     <div>

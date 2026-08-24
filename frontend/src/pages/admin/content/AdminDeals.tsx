@@ -7,15 +7,16 @@ export const AdminDeals = () => {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchDeals();
-  }, []);
-
   const fetchDeals = async () => {
     const { data } = await supabase.from('deals').select('*').order('created_at', { ascending: false });
     setDeals((data as any) || []);
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchDeals();
+  }, []);
+
 
   const deleteDeal = async (id: string) => {
     if (!confirm('Are you sure you want to delete this deal?')) return;

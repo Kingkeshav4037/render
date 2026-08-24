@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, CloudSun, Calendar } from 'lucide-react';
+import { OptimizedImage } from '../../../components/shared/OptimizedImage';
 
 const TRIPS = [
   {
@@ -48,8 +49,14 @@ export const TripsList = () => {
             style={{ animationDelay: `${idx * 150}ms` }}
           >
             <div className="absolute inset-0">
-              <img src={trip.image} alt={trip.name} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
-              <div className="absolute inset-0 bg-gradient-to-t from-navy-900/90 via-navy-900/20 to-transparent"></div>
+              <OptimizedImage 
+                src={trip.image} 
+                alt={trip.name} 
+                category="landscape"
+                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
+                containerClassName="w-full h-full"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-navy-900/90 via-navy-900/20 to-transparent pointer-events-none"></div>
             </div>
             
             <div className="relative p-8 md:p-10 min-h-[450px] flex flex-col justify-between">

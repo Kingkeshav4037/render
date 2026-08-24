@@ -69,7 +69,7 @@ const DEFAULT_TRAILS: Trail[] = [
     id: 'tr-007', name: 'Romsdalseggen Ridge', location: 'Åndalsnes, Møre og Romsdal',
     difficulty: 'Hard', distance_km: 10, duration_hrs: '5–7', elevation_gain_m: 1000,
     rating: 4.7, best_season: 'Jun–Sep', weather_status: 'Clear',
-    image: '/images/fjords_1786935800026.jpg',
+    image: 'https://images.unsplash.com/photo-1519451241324-20b4ea2c4220?auto=format&fit=crop&q=80&w=1200',
     description: 'Voted one of the world\'s most beautiful hikes — a dramatic ridge walk above Åndalsnes with the Romsdalshorn and Trollveggen as a backdrop.',
     highlights: ['World top-10 hike', '360° panoramas', 'Mountain railway return', 'Eagle views']
   },
@@ -77,7 +77,7 @@ const DEFAULT_TRAILS: Trail[] = [
     id: 'tr-008', name: 'Glittertind via Spiterstulen', location: 'Jotunheimen, Innlandet',
     difficulty: 'Hard', distance_km: 16, duration_hrs: '6–8', elevation_gain_m: 1100,
     rating: 4.6, best_season: 'Jul–Sep', weather_status: 'Variable',
-    image: '/images/galdhopiggen_1786936412055.jpg',
+    image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=1200',
     description: 'Norway\'s second-highest peak at 2,465m, with a glacial ice cap that occasionally makes it taller than Galdhøpiggen. A less-crowded alternative.',
     highlights: ['Second highest peak', 'Glacial cap', 'Jotunheimen NP', 'Quieter crowds']
   },
@@ -123,6 +123,47 @@ export const trailService = {
       });
     } catch {
       return DEFAULT_TRAILS;
+    }
+  },
+
+  getTrailById: async (id: string): Promise<Trail | null> => {
+    try {
+      const match = DEFAULT_TRAILS.find(t => t.id === id || t.name.toLowerCase().includes(id.toLowerCase()));
+      if (match) return match;
+
+      const { data, error } = await supabase
+        .from('trails')
+        .select(`
+          id, name, difficulty, distance_km,
+          estimated_duration_minutes, elevation_gain_m,
+          location:locations ( name ),
+          content_media ( media_url, media_type )
+        `)
+        .eq('id', id)
+        .single();
+
+      if (error || !data) {
+        return DEFAULT_TRAILS[0];
+      }
+
+      const trailData = data as any;
+      const heroImage = trailData.content_media?.find?.((m: any) => m.media_type === 'HERO')?.media_url;
+      const firstImage = trailData.content_media?.[0]?.media_url;
+      return {
+        id: trailData.id,
+        name: trailData.name,
+        location: trailData.location?.name || 'Norway',
+        difficulty: trailData.difficulty || 'Moderate',
+        distance_km: trailData.distance_km || 0,
+        duration_hrs: trailData.estimated_duration_minutes ? (trailData.estimated_duration_minutes / 60).toFixed(1) : '4–5',
+        elevation_gain_m: trailData.elevation_gain_m || 0,
+        rating: 4.8,
+        best_season: 'Jun–Sep',
+        weather_status: 'Clear',
+        image: (heroImage && !heroImage.includes('placeholder')) ? heroImage : firstImage || '/images/besseggen_1786936349992.jpg'
+      };
+    } catch {
+      return DEFAULT_TRAILS.find(t => t.id === id) || DEFAULT_TRAILS[0];
     }
   }
 };

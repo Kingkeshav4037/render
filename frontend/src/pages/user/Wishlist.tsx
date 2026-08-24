@@ -1,6 +1,9 @@
 import React from 'react';
 import { Bookmark, AlertCircle, ArrowRight, TrendingDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { OptimizedImage } from '../../components/shared/OptimizedImage';
+import { EmptyState } from '../../components/ui/EmptyState';
+import { Button } from '../../components/ui/Button';
 
 export const Wishlist = () => {
   const navigate = useNavigate();
@@ -37,15 +40,30 @@ export const Wishlist = () => {
         <p className="mt-4 text-lg text-gray-500">Your saved places, organized for your next adventure.</p>
       </div>
 
-      <div className="max-w-[1440px] mx-auto px-6 md:px-12 mt-12 grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <div className="max-w-[1440px] mx-auto px-6 md:px-12 mt-12">
+        {collections.length === 0 ? (
+          <EmptyState 
+            title="No Saved Collections"
+            message="Your saved places, fjord hotels, and arctic expeditions will appear here."
+            actionLabel="Start Exploring"
+            onAction={() => navigate('/explore')}
+          />
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         
         {collections.map((collection, idx) => (
           <div key={idx} className="group relative rounded-[32px] overflow-hidden shadow-sm hover:shadow-2xl transition-shadow bg-white border border-gray-100 min-h-[400px]">
             {/* Header / Hero */}
             <div className="h-48 relative overflow-hidden">
-              <img src={collection.image} alt={collection.name} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
-              <div className="absolute inset-0 bg-gradient-to-t from-navy-900/90 to-transparent"></div>
-              <div className="absolute bottom-6 left-8">
+              <OptimizedImage 
+                src={collection.image} 
+                alt={collection.name} 
+                category="landscape"
+                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
+                containerClassName="w-full h-full"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-navy-900/90 to-transparent pointer-events-none"></div>
+              <div className="absolute bottom-6 left-8 z-10">
                 <h3 className="text-3xl font-display font-bold text-white">{collection.name}</h3>
                 <p className="text-white/80 text-sm font-bold uppercase tracking-widest">{collection.count} Saved Items</p>
               </div>
@@ -79,8 +97,10 @@ export const Wishlist = () => {
             </div>
           </div>
         ))}
-
+          </div>
+        )}
       </div>
     </div>
   );
 };
+

@@ -8,6 +8,7 @@ import { CinematicBackground } from '../design/backgrounds/CinematicBackground';
 import { AsyncStateWrapper } from '../components/shared/AsyncStateWrapper';
 import { OptimizedImage } from '../components/shared/OptimizedImage';
 import { SEO } from '../components/shared/SEO';
+import { PageHeader } from '../components/ui/PageHeader';
 
 const getPlaceholderImage = (name: string) => {
   const genericImages = [
@@ -92,34 +93,26 @@ export const Explore = () => {
     <div className="bg-deep-night min-h-screen text-snow selection:bg-fjord-teal/30">
       
       {/* Header */}
-      <CinematicBackground 
-        imageUrl="/images/ryten_1786936427556.jpg"
-        gradient="aurora"
-        overlayOpacity={0.7}
-        className="h-[60vh] flex items-end pb-24"
-        animate={false}
+      <PageHeader
+        title="Explore Norway"
+        description="Discover majestic fjords, remote islands, and bustling Nordic cities."
+        breadcrumb="The Atlas"
+        backgroundImage="/images/ryten_1786936427556.jpg"
       >
-        <div className="max-w-[1440px] mx-auto px-6 md:px-12 w-full pt-32">
-          <div className="max-w-4xl">
-            <span className="text-arctic-gold font-sans text-xs font-bold uppercase tracking-widest mb-4 block">The Atlas</span>
-            <h1 className="text-5xl md:text-7xl font-display font-semibold mb-6">Explore Norway</h1>
-            
-            {/* Search Input */}
-            <div className="relative group max-w-2xl mt-8">
-              <div className="absolute left-6 top-1/2 -translate-y-1/2 text-snow/50 group-focus-within:text-arctic-gold transition-colors">
-                <Search className="w-6 h-6" />
-              </div>
-              <input 
-                type="text"
-                placeholder="Search destinations, fjords, peaks..."
-                value={searchQuery}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                className="w-full bg-snow/5 backdrop-blur-xl border border-snow/10 text-snow rounded-none py-6 pl-16 pr-6 outline-none focus:bg-snow/10 focus:border-arctic-gold/50 transition-all placeholder:text-snow/30 font-sans text-lg"
-              />
-            </div>
+        {/* Search Input */}
+        <div className="relative group max-w-2xl mt-8">
+          <div className="absolute left-6 top-1/2 -translate-y-1/2 text-snow/50 group-focus-within:text-arctic-gold transition-colors">
+            <Search className="w-6 h-6" />
           </div>
+          <input 
+            type="text"
+            placeholder="Search destinations, fjords, peaks..."
+            value={searchQuery}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            className="w-full bg-snow/5 backdrop-blur-xl border border-snow/10 text-snow rounded-none py-6 pl-16 pr-6 outline-none focus:bg-snow/10 focus:border-arctic-gold/50 transition-all placeholder:text-snow/30 font-sans text-lg"
+          />
         </div>
-      </CinematicBackground>
+      </PageHeader>
 
       {/* Content */}
       <div className="max-w-[1440px] mx-auto px-6 md:px-12 py-16 flex flex-col lg:flex-row gap-16 relative z-10 -mt-16">

@@ -7,6 +7,7 @@ import { Search, ArrowRight, MapPin, Clock, Star, Utensils, Mountain, Leaf, Snow
 import { homeContentService, getActivityImage } from '../services/home/homeContentService';
 import { useCurrencyStore } from '../store/useCurrencyStore';
 import { SEO } from '../components/shared/SEO';
+import { OptimizedImage } from '../components/shared/OptimizedImage';
 
 const HERO_IMAGE = '/images/northern_lights_1786935879330.jpg';
 
@@ -122,30 +123,30 @@ export const Home = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-white/10">
             {[
               { value: '25,000+', label: 'km of Coastline' },
-              { value: '1,190', label: 'Fjords & Inlets' },
-              { value: '8', label: 'Michelin Stars' },
-              { value: '180+', label: 'Curated Experiences' },
-            ].map(s => (
-              <div key={s.label} className="text-center px-6 py-2">
-                <div className="text-2xl font-display font-bold text-arctic-gold">{s.value}</div>
-                <div className="text-xs text-snow/50 uppercase tracking-wider mt-1">{s.label}</div>
+              { value: '1,190+', label: 'Fjords & Inlets' },
+              { value: '48', label: 'National Parks' },
+              { value: '100%', label: 'Pure Nature' },
+            ].map((stat, i) => (
+              <div key={i} className="px-6 text-center">
+                <p className="text-2xl md:text-3xl font-display font-bold text-arctic-gold">{stat.value}</p>
+                <p className="text-xs text-snow/50 uppercase tracking-widest mt-1">{stat.label}</p>
               </div>
             ))}
           </div>
         </Container>
       </div>
 
-      <Container className="py-24 space-y-32">
+      <Container className="py-20 space-y-28">
 
-        {/* ── 3. FEATURED DESTINATIONS ─────────────────────────────── */}
+        {/* ── 3. FEATURED DESTINATIONS ────────────────────────────── */}
         {destinations.length > 0 && (
           <motion.section {...fadeUp}>
             <div className="flex items-end justify-between mb-10">
               <div>
                 <span className="text-arctic-gold text-xs font-bold uppercase tracking-[0.2em] flex items-center gap-2 mb-3">
-                  <MapPin className="w-3 h-3" /> Destinations
+                  <MapPin className="w-3 h-3" /> Iconic Norway
                 </span>
-                <h2 className="text-4xl font-display font-bold">Featured Places</h2>
+                <h2 className="text-4xl font-display font-bold">Featured Destinations</h2>
               </div>
               <Link to="/explore" className="hidden md:flex items-center gap-2 text-sm text-snow/60 hover:text-snow transition-colors">
                 View all <ArrowRight className="w-4 h-4" />
@@ -158,14 +159,15 @@ export const Home = () => {
               {destinations[0] && (
                 <Link to={`/explore/${destinations[0].slug || destinations[0].id}`}
                   className="lg:col-span-2 relative overflow-hidden rounded-2xl group block" style={{ height: 440 }}>
-                  <img 
+                  <OptimizedImage 
                     src={destinations[0].image} 
                     alt={destinations[0].name}
-                    onError={(e) => { (e.target as HTMLImageElement).src = '/images/fjords_1786935800026.jpg'; }}
+                    category="landscape"
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                    containerClassName="w-full h-full"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                  <div className="absolute bottom-0 left-0 p-8">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
+                  <div className="absolute bottom-0 left-0 p-8 z-10">
                     <span className="text-arctic-gold text-xs font-bold uppercase tracking-widest">{destinations[0].region}</span>
                     <h3 className="text-3xl font-display font-bold mt-1 mb-2">{destinations[0].name}</h3>
                     <p className="text-snow/70 text-sm max-w-sm line-clamp-2">{destinations[0].short_description}</p>
@@ -181,14 +183,15 @@ export const Home = () => {
                 {destinations.slice(1, 3).map(dest => (
                   <Link key={dest.id} to={`/explore/${dest.slug || dest.id}`}
                     className="relative overflow-hidden rounded-2xl group block flex-1" style={{ minHeight: 205 }}>
-                    <img 
+                    <OptimizedImage 
                       src={dest.image} 
                       alt={dest.name}
-                      onError={(e) => { (e.target as HTMLImageElement).src = '/images/preikestolen_1786936002797.jpg'; }}
+                      category="landscape"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                      containerClassName="w-full h-full"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
-                    <div className="absolute bottom-0 left-0 p-5">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 p-5 z-10">
                       <span className="text-arctic-gold text-[10px] font-bold uppercase tracking-widest">{dest.region}</span>
                       <h3 className="text-xl font-display font-bold mt-0.5">{dest.name}</h3>
                     </div>
@@ -203,14 +206,15 @@ export const Home = () => {
                 {destinations.slice(3).map(dest => (
                   <Link key={dest.id} to={`/explore/${dest.slug || dest.id}`}
                     className="relative overflow-hidden rounded-xl group block" style={{ height: 200 }}>
-                    <img 
+                    <OptimizedImage 
                       src={dest.image} 
                       alt={dest.name}
-                      onError={(e) => { (e.target as HTMLImageElement).src = '/images/trolltunga_1786936111320.jpg'; }}
+                      category="landscape"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                      containerClassName="w-full h-full"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 to-transparent" />
-                    <div className="absolute bottom-0 left-0 p-5">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 to-transparent pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 p-5 z-10">
                       <span className="text-arctic-gold text-[10px] font-bold uppercase tracking-widest">{dest.region}</span>
                       <h3 className="text-lg font-display font-bold mt-0.5">{dest.name}</h3>
                     </div>
@@ -221,7 +225,7 @@ export const Home = () => {
           </motion.section>
         )}
 
-        {/* ── 4. ACTIVITIES (horizontal scroll cards) ──────────────── */}
+        {/* ── 4. ACTIVITIES ────────────────────────────────────────── */}
         {activities.length > 0 && (
           <motion.section {...fadeUp}>
             <div className="flex items-end justify-between mb-10">
@@ -243,21 +247,20 @@ export const Home = () => {
                   viewport={{ once: true }} transition={{ delay: idx * 0.1 }}>
                   <Link to={`/activities/${act.id}`}
                     className="block group relative rounded-2xl overflow-hidden shadow-lg bg-white/5" style={{ height: 320 }}>
-                    <img 
+                    <OptimizedImage 
                       src={act.image || getActivityImage(act.category)} 
                       alt={act.name}
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = getActivityImage(act.category);
-                      }}
+                      category="activity"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                      containerClassName="w-full h-full"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-                    <div className="absolute top-4 left-4">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none" />
+                    <div className="absolute top-4 left-4 z-10">
                       <span className="bg-[#2F5233]/90 backdrop-blur-sm px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#A3B899] rounded-full">
                         {act.category}
                       </span>
                     </div>
-                    <div className="absolute bottom-0 left-0 right-0 p-5">
+                    <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
                       <h3 className="text-lg font-display font-bold mb-1 leading-tight">{act.name}</h3>
                       <div className="flex items-center justify-between text-xs text-snow/60">
                         <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {act.duration}</span>
@@ -271,7 +274,7 @@ export const Home = () => {
           </motion.section>
         )}
 
-        {/* ── 5. FOOD & WILDLIFE (2-column feature) ────────────────── */}
+        {/* ── 5. FOOD & WILDLIFE ───────────────────────────────────── */}
         <motion.section {...fadeUp}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
 
@@ -294,16 +297,20 @@ export const Home = () => {
                     <Link key={food.id} to="/food"
                       className="group relative rounded-xl overflow-hidden block"
                       style={{ height: idx === 0 ? 260 : 180 }}>
-                      <img src={food.image} alt={food.name}
-                        onError={(e) => { (e.target as HTMLImageElement).src = '/images/food_salmon_1787013684123.jpg'; }}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                      <div className="absolute bottom-0 left-0 p-4">
+                      <OptimizedImage 
+                        src={food.image} 
+                        alt={food.name}
+                        category="food"
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                        containerClassName="w-full h-full"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
+                      <div className="absolute bottom-0 left-0 p-4 z-10">
                         <span className="text-[#FF7F50] text-[9px] font-bold uppercase tracking-widest">{food.category}</span>
                         <h3 className="text-sm font-display font-bold mt-0.5">{food.name}</h3>
                       </div>
                       {idx === 0 && (
-                        <div className="absolute top-3 right-3">
+                        <div className="absolute top-3 right-3 z-10">
                           <span className="bg-[#FF7F50] text-white text-[9px] font-bold uppercase px-2 py-1 rounded-full">Featured</span>
                         </div>
                       )}
@@ -332,11 +339,15 @@ export const Home = () => {
                     <Link key={animal.id} to={`/wildlife/${animal.id}`}
                       className="group relative rounded-xl overflow-hidden block"
                       style={{ height: idx === 1 ? 260 : 180 }}>
-                      <img src={animal.image} alt={animal.name}
-                        onError={(e) => { (e.target as HTMLImageElement).src = '/images/wildlife_reindeer_1787013667019.jpg'; }}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                      <div className="absolute bottom-0 left-0 p-4">
+                      <OptimizedImage 
+                        src={animal.image} 
+                        alt={animal.name}
+                        category="wildlife"
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                        containerClassName="w-full h-full"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
+                      <div className="absolute bottom-0 left-0 p-4 z-10">
                         <span className="text-[#5F9EA0] text-[9px] font-bold uppercase tracking-widest italic">{animal.scientific_name}</span>
                         <h3 className="text-sm font-display font-bold mt-0.5">{animal.name}</h3>
                       </div>
@@ -368,9 +379,13 @@ export const Home = () => {
                       <Link key={hotel.id} to={`/stay/${hotel.id}`}
                         className="flex gap-4 group bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-3 transition-colors">
                         <div className="w-24 h-24 rounded-lg overflow-hidden shrink-0">
-                          <img src={hotel.image} alt={hotel.name}
-                            onError={(e) => { (e.target as HTMLImageElement).src = '/images/hotel_juvet_1787013813000.jpg'; }}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          <OptimizedImage 
+                            src={hotel.image} 
+                            alt={hotel.name}
+                            category="stay"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                            containerClassName="w-full h-full"
+                          />
                         </div>
                         <div className="flex-1 min-w-0">
                           <h4 className="font-display font-bold text-base truncate group-hover:text-arctic-gold transition-colors">{hotel.name}</h4>
@@ -400,9 +415,13 @@ export const Home = () => {
                       <Link key={rest.id} to="/food"
                         className="flex gap-4 group bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-3 transition-colors">
                         <div className="w-24 h-24 rounded-lg overflow-hidden shrink-0">
-                          <img src={rest.image_url} alt={rest.name}
-                            onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=400'; }}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          <OptimizedImage 
+                            src={rest.image_url} 
+                            alt={rest.name}
+                            category="food"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                            containerClassName="w-full h-full"
+                          />
                         </div>
                         <div className="flex-1 min-w-0">
                           <h4 className="font-display font-bold text-base truncate group-hover:text-[#FF7F50] transition-colors">{rest.name}</h4>
@@ -443,16 +462,20 @@ export const Home = () => {
               {events.slice(0, 3).map((event, idx) => (
                 <Link key={event.id} to="/events"
                   className="group relative rounded-2xl overflow-hidden block" style={{ height: idx === 0 ? 340 : 240 }}>
-                  <img src={event.image} alt={event.name}
-                    onError={(e) => { (e.target as HTMLImageElement).src = '/images/northern_lights_1786935879330.jpg'; }}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-                  <div className="absolute top-4 left-4">
+                  <OptimizedImage 
+                    src={event.image} 
+                    alt={event.name}
+                    category="aurora"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                    containerClassName="w-full h-full"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none" />
+                  <div className="absolute top-4 left-4 z-10">
                     <span className="bg-arctic-gold text-deep-night text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full">
                       {event.category}
                     </span>
                   </div>
-                  <div className="absolute bottom-0 left-0 right-0 p-5">
+                  <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
                     <p className="text-snow/60 text-xs mb-1 flex items-center gap-1">
                       <Calendar className="w-3 h-3" /> {event.date} · {event.location}
                     </p>

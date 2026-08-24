@@ -3,17 +3,18 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { CinematicBackground } from '../../design/backgrounds/CinematicBackground';
 import { Container } from '../../components/layout/Container';
-import { Snowflake, Mountain, Navigation, Compass, Wind } from 'lucide-react';
+import { Snowflake, Wind } from 'lucide-react';
+import { OptimizedImage } from '../../components/shared/OptimizedImage';
 
 const WINTER_CATEGORIES = [
-  { id: 'ski-resorts', title: 'Ski Resorts', desc: 'World-class alpine facilities', img: '/images/kjeragbolten_1786936275605.jpg' },
-  { id: 'alpine', title: 'Alpine Skiing', desc: 'Steep drops and groomed slopes', img: '/images/trolltunga_1786936111320.jpg' },
-  { id: 'cross-country', title: 'Cross-Country', desc: 'Endless miles of prepared tracks', img: '/images/fjords_1786935800026.jpg' },
-  { id: 'snowboarding', title: 'Snowboarding', desc: 'Parks and backcountry powder', img: '/images/northern_lights_1786935879330.jpg' },
-  { id: 'snowshoeing', title: 'Snowshoeing', desc: 'Quiet walks through winter forests', img: '/images/galdhopiggen_1786936412055.jpg' },
-  { id: 'dog-sledding', title: 'Dog Sledding', desc: 'Huskies across the tundra', img: '/images/besseggen_1786936349992.jpg' },
-  { id: 'snowmobiling', title: 'Snowmobiling', desc: 'High-speed Arctic exploration', img: '/images/preikestolen_1786936002797.jpg' },
-  { id: 'ice-fishing', title: 'Ice Fishing', desc: 'Patience on frozen lakes', img: '/images/lofoten_1787013505867.jpg' },
+  { id: 'ski-resorts', title: 'Ski Resorts', desc: 'World-class alpine facilities and snowparks', img: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?auto=format&fit=crop&q=80&w=800' },
+  { id: 'alpine', title: 'Alpine Skiing', desc: 'Steep drops and groomed Olympic slopes', img: 'https://images.unsplash.com/photo-1565992441121-4367c2967103?auto=format&fit=crop&q=80&w=800' },
+  { id: 'cross-country', title: 'Cross-Country', desc: 'Endless miles of prepared pine forest tracks', img: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&q=80&w=800' },
+  { id: 'snowboarding', title: 'Snowboarding', desc: 'Terrain parks and backcountry powder', img: 'https://images.unsplash.com/photo-1528722828814-77b9b83aafb2?auto=format&fit=crop&q=80&w=800' },
+  { id: 'snowshoeing', title: 'Snowshoeing', desc: 'Quiet walks through winter taiga forests', img: 'https://images.unsplash.com/photo-1516715094483-75da7dee9758?auto=format&fit=crop&q=80&w=800' },
+  { id: 'dog-sledding', title: 'Dog Sledding', desc: 'Husky teams racing across the Arctic tundra', img: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&q=80&w=800' },
+  { id: 'snowmobiling', title: 'Snowmobiling', desc: 'High-speed Arctic wilderness exploration', img: 'https://images.unsplash.com/photo-1543852786-1cf6624b9987?auto=format&fit=crop&q=80&w=800' },
+  { id: 'ice-fishing', title: 'Ice Fishing', desc: 'Patience and tranquility on frozen mountain lakes', img: 'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&q=80&w=800' },
 ];
 
 export const WinterSports = () => {
@@ -92,14 +93,16 @@ export const WinterSports = () => {
                   transition={{ delay: idx * 0.05 }}
                   className="group relative h-80 rounded-3xl overflow-hidden glass-panel block cursor-pointer"
                 >
-                  <img 
+                  <OptimizedImage 
                     src={category.img} 
                     alt={category.title}
-                    className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 mix-blend-luminosity group-hover:mix-blend-normal"
+                    category="winter"
+                    className="opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 mix-blend-luminosity group-hover:mix-blend-normal"
+                    containerClassName="absolute inset-0 w-full h-full"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none" />
                   
-                  <div className="absolute bottom-0 left-0 p-6 w-full">
+                  <div className="absolute bottom-0 left-0 p-6 w-full z-10">
                     <h3 className="text-2xl font-display font-bold text-white mb-2">{category.title}</h3>
                     <p className="text-glacier-blue text-sm opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
                       {category.desc}

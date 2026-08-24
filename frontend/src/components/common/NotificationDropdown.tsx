@@ -19,8 +19,17 @@ export const NotificationDropdown: React.FC = () => {
         setIsOpen(false);
       }
     };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   const handleNotificationClick = (id: string, link: string | null) => {
@@ -45,7 +54,10 @@ export const NotificationDropdown: React.FC = () => {
     <div className="relative" ref={dropdownRef}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 text-gray-600 hover:text-navy-900 transition-colors relative"
+        aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        className="p-2 text-gray-600 hover:text-navy-900 transition-colors relative focus-visible:ring-2 focus-visible:ring-aurora-green focus-visible:outline-none rounded"
       >
         <Bell size={24} />
         {unreadCount > 0 && (
@@ -56,7 +68,11 @@ export const NotificationDropdown: React.FC = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50">
+        <div 
+          role="menu"
+          aria-label="Notifications list"
+          className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50"
+        >
           <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
             <h3 className="font-bold text-navy-900">Notifications</h3>
             {unreadCount > 0 && (

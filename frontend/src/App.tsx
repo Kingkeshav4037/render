@@ -97,6 +97,7 @@ const Impact = lazy(() => import('./pages/user/Impact').then(m => ({ default: m.
 const Wildlife = lazy(() => import('./pages/nature/Wildlife').then(m => ({ default: m.Wildlife })));
 const WildlifeDetail = lazy(() => import('./pages/nature/WildlifeDetail').then(m => ({ default: m.WildlifeDetail })));
 const Flora = lazy(() => import('./pages/nature/Flora').then(m => ({ default: m.Flora })));
+const History = lazy(() => import('./pages/History').then(m => ({ default: m.History })));
 const Invoices = lazy(() => import('./pages/user/Invoices').then(m => ({ default: m.Invoices })));
 const LiveWeather = lazy(() => import('./pages/nature/LiveWeather').then(m => ({ default: m.LiveWeather })));
 const AuroraTracker = lazy(() => import('./pages/nature/AuroraTracker').then(m => ({ default: m.AuroraTracker })));
@@ -162,6 +163,7 @@ const ImportManager = lazy(() => import('./pages/admin/data/ImportManager').then
 const AdminPageHealth = lazy(() => import('./pages/admin/system/AdminPageHealth').then(m => ({ default: m.AdminPageHealth })));
 const AdminSecurityEvents = lazy(() => import('./pages/admin/security/AdminSecurityEvents').then(m => ({ default: m.AdminSecurityEvents })));
 const SecuritySettings = lazy(() => import('./pages/settings/SecuritySettings').then(m => ({ default: m.SecuritySettings })));
+const Sitemap = lazy(() => import('./pages/Sitemap').then(m => ({ default: m.Sitemap })));
 
 import { ToastContainer } from './components/ui/ToastContainer';
 
@@ -212,8 +214,8 @@ function App() {
               <Route path="/products" element={<Products />} />
               {/* /industry removed — duplicate of /infrastructure (ISSUE-010) */}
 
-              {/* User Settings Pages */}
-              <Route path="/settings/security" element={<SecuritySettings />} />
+              {/* Site Directory */}
+              <Route path="/sitemap" element={<Sitemap />} />
 
               {/* Redirected Destination Categories */}
               <Route path="/places" element={<Navigate to="/explore?type=LANDMARK" replace />} />
@@ -226,6 +228,7 @@ function App() {
               <Route path="/nature/flora" element={<Flora />} />
               <Route path="/nature/plants-trees" element={<Flora />} />
               <Route path="/plants-trees" element={<Navigate to="/nature/plants-trees" replace />} />
+              <Route path="/history" element={<History />} />
               <Route path="/resorts" element={<WinterSports />} />
               <Route path="/food" element={<Food />} />
               <Route path="/restaurants" element={<Navigate to="/food" replace />} />
@@ -245,6 +248,9 @@ function App() {
               <Route path="/deals" element={<Deals />} />
               <Route path="/packages" element={<Navigate to="/deals" replace />} />
               <Route path="/guides" element={<Guides />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/checkout/stay/:id" element={<StayBooking />} />
+              <Route path="/payment-success" element={<PaymentSuccess />} />
 
               {/* ── GROUP 2: Dashboard routes ───────────────────────────── */}
               <Route path="/dashboard" element={
@@ -264,7 +270,8 @@ function App() {
               <Route path="/wallet" element={<TravelWallet />} />
               <Route path="/notifications" element={<Notifications />} />
               <Route path="/reviews" element={<Reviews />} />
-              <Route path="/history" element={<TravelHistory />} />
+              <Route path="/user/history" element={<TravelHistory />} />
+              <Route path="/user/travel-history" element={<TravelHistory />} />
               <Route path="/impact" element={<Impact />} />
               <Route path="/expenses" element={<Expenses />} />
               <Route path="/settings/notifications" element={<NotificationSettings />} />
@@ -354,13 +361,14 @@ function App() {
                 <Route path="marketing" element={<ProviderMarketing />} />
                 <Route path="settings" element={<ProviderSettings />} />
               </Route>
+              </Route>
             </Route>
-              
+
             {/* Admin Auth Route */}
             <Route path="/admin/login" element={<AdminLogin />} />
 
             {/* ── Admin Routes ───────────────────────────────────────── */}
-            <Route path="/admin" element={<RoleGuard allowedRoles={['ADMIN', 'SUPER_ADMIN']} />}>
+            <Route path="/admin" element={<RoleGuard allowedRoles={['ADMIN', 'SUPER_ADMIN']} redirectPath="/admin/login" />}>
               <Route element={
                 <RouteErrorBoundary groupName="Admin">
                   <AdminLayout />
@@ -418,7 +426,6 @@ function App() {
                 } />
               </Route>
             </Route>
-          </Route>
 
           {/* Global 404 catch-all (ISSUE-009) */}
           <Route path="*" element={<NotFound />} />

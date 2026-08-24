@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Search, MapPin, Bed, Utensils, Mountain, Map, ArrowRight, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../ui/Button';
+import { OptimizedImage } from '../shared/OptimizedImage';
 
 const TABS = [
   { id: 'places', label: 'Places', icon: MapPin },
@@ -29,13 +30,15 @@ export const HomeHero = () => {
     <div className="relative min-h-[95vh] flex flex-col items-center justify-center pt-20 pb-16 overflow-hidden">
       {/* Background Image & Gradient */}
       <div className="absolute inset-0 z-0">
-        <img 
+        <OptimizedImage 
           src="/images/northern_lights.jpg" 
           alt="Norway Landscape" 
+          category="aurora"
           className="w-full h-full object-cover"
+          containerClassName="w-full h-full"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-navy-900/90 via-navy-900/60 to-navy-900/95"></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-navy-900/50 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-navy-900/90 via-navy-900/60 to-navy-900/95 pointer-events-none"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-navy-900/50 to-transparent pointer-events-none"></div>
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 w-full flex flex-col items-center mt-12">

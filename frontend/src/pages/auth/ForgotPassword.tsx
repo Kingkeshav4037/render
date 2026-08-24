@@ -80,11 +80,15 @@ export const ForgotPassword = () => {
 
               <div className="space-y-4">
                 <div className="relative group">
+                  <label htmlFor="forgot-email" className="sr-only">Email address</label>
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <Mail className="h-5 w-5 text-white/50 group-focus-within:text-aurora-green transition-colors" />
                   </div>
                   <input 
                     type="email" 
+                    name="email"
+                    id="forgot-email"
+                    autoComplete="email"
                     required 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}

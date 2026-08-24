@@ -11,9 +11,9 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
   ({ className, variant = 'solid', noPadding = false, children, ...props }, ref) => {
     
     const variants = {
-      solid: "bg-white border border-gray-200 shadow-sm",
-      glass: "bg-white/10 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.1)] text-white",
-      outline: "bg-transparent border-2 border-gray-200",
+      solid: "bg-midnight border border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.4)] text-snow",
+      glass: "bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] text-snow",
+      outline: "bg-transparent border-2 border-white/10 text-snow",
     };
 
     return (
@@ -44,7 +44,7 @@ export const CardTitle: React.FC<React.HTMLAttributes<HTMLHeadingElement>> = ({ 
 );
 
 export const CardDescription: React.FC<React.HTMLAttributes<HTMLParagraphElement>> = ({ className, ...props }) => (
-  <p className={cn("text-sm text-gray-500 dark:text-gray-400", className)} {...props} />
+  <p className={cn("text-sm text-slate-400", className)} {...props} />
 );
 
 export const CardContent: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ className, ...props }) => (
@@ -52,5 +52,5 @@ export const CardContent: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ cl
 );
 
 export const CardFooter: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ className, ...props }) => (
-  <div className={cn("flex items-center pt-4 mt-4 border-t border-gray-100 dark:border-white/10", className)} {...props} />
+  <div className={cn("flex items-center pt-4 mt-4 border-t border-white/10", className)} {...props} />
 );

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { supabase } from '../../../lib/supabase';
 import { GenericDataTable, ColumnDef } from '../components/GenericDataTable';
 import { JSONEditorModal } from '../components/JSONEditorModal';
@@ -11,11 +11,7 @@ export const FoodCMS = () => {
   const [editRow, setEditRow] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    fetchItems();
-  }, [activeTab]);
-
-  const fetchItems = async () => {
+  const fetchItems = useCallback(async () => {
     setLoading(true);
     if (activeTab === 'restaurants') {
       const { data } = await supabase
@@ -31,7 +27,12 @@ export const FoodCMS = () => {
       if (data) setItems(data);
     }
     setLoading(false);
-  };
+  }, [activeTab]);
+
+  useEffect(() => {
+    fetchItems();
+  }, [fetchItems]);
+
 
   const restaurantColumns: ColumnDef[] = [
     { key: 'name', header: 'Name', render: (val) => <div className="font-bold text-navy-900">{val}</div> },

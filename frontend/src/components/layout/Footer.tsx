@@ -37,16 +37,19 @@ export const Footer = () => {
             <h4 className="text-snow font-sans font-semibold mb-6 tracking-widest uppercase text-xs">Explore</h4>
             <ul className="space-y-4 text-sm font-sans text-snow/70">
               <li><Link to="/explore" className="hover:text-arctic-gold transition-colors">Destinations</Link></li>
-              <li><Link to="/flora" className="hover:text-arctic-gold transition-colors">Flora & Forests</Link></li>
-              <li><Link to="/trails" className="hover:text-arctic-gold transition-colors">Hiking & Nature</Link></li>
-              <li><Link to="/stay" className="hover:text-arctic-gold transition-colors">Accommodations</Link></li>
-              <li><Link to="/food" className="hover:text-arctic-gold transition-colors">Culinary Scene</Link></li>
+              <li><Link to="/planner" className="hover:text-arctic-gold transition-colors">AI Trip Planner</Link></li>
+              <li><Link to="/flora" className="hover:text-arctic-gold transition-colors">Plants & Trees</Link></li>
+              <li><Link to="/history" className="hover:text-arctic-gold transition-colors">History & Heritage</Link></li>
+              <li><Link to="/trails" className="hover:text-arctic-gold transition-colors">Hiking Trails</Link></li>
+              <li><Link to="/stay" className="hover:text-arctic-gold transition-colors">Stays & Lodges</Link></li>
+              <li><Link to="/food" className="hover:text-arctic-gold transition-colors">Food & Dining</Link></li>
             </ul>
           </div>
           
           <div>
             <h4 className="text-snow font-sans font-semibold mb-6 tracking-widest uppercase text-xs">Insights</h4>
             <ul className="space-y-4 text-sm font-sans text-snow/70">
+              <li><Link to="/smart-city" className="hover:text-arctic-gold transition-colors">Smart City Hub</Link></li>
               <li><Link to="/map" className="hover:text-arctic-gold transition-colors">Interactive Map</Link></li>
               <li><Link to="/impact" className="hover:text-arctic-gold transition-colors">Sustainability</Link></li>
               <li><Link to="/infrastructure" className="hover:text-arctic-gold transition-colors">Infrastructure</Link></li>
@@ -57,6 +60,7 @@ export const Footer = () => {
           <div>
             <h4 className="text-snow font-sans font-semibold mb-6 tracking-widest uppercase text-xs">Legal & Tax</h4>
             <ul className="space-y-4 text-sm font-sans text-snow/70">
+              <li><Link to="/sitemap" className="hover:text-arctic-gold transition-colors">Site Directory</Link></li>
               <li><Link to="/user/invoices" className="hover:text-arctic-gold transition-colors">Invoices & Receipts</Link></li>
               <li><Link to="#" className="hover:text-snow transition-colors">Privacy Policy</Link></li>
               <li><Link to="#" className="hover:text-snow transition-colors">Terms of Service</Link></li>

@@ -22,12 +22,14 @@ const getPlaceholderImage = (name: string) => {
   
   const map: Record<string, string> = {
     'Geirangerfjord': '/images/fjords.jpg',
-    'TromsÃ¸': '/images/northern_lights.jpg',
+    'Tromsø': '/images/northern_lights.jpg',
+    'Tromso': '/images/northern_lights.jpg',
     'Oslo': '/images/login_background.jpg',
     'Bergen': '/images/trolltunga.jpg',
     'Lofoten': '/images/lofoten.jpg',
     'Svalbard': '/images/besseggen.jpg',
-    'TrÃ¸ndelag': '/images/kjeragbolten.jpg',
+    'Trøndelag': '/images/kjeragbolten.jpg',
+    'Trondelag': '/images/kjeragbolten.jpg',
     'Southern Norway': '/images/preikestolen.jpg',
     'Fjord Norway': '/images/fjords.jpg',
     'Northern Norway': '/images/northern_lights.jpg',
@@ -35,7 +37,7 @@ const getPlaceholderImage = (name: string) => {
   };
   
   for (const key of Object.keys(map)) {
-    if (name.includes(key)) return map[key];
+    if (name.toLowerCase().includes(key.toLowerCase())) return map[key];
   }
   
   let hash = 0;
@@ -48,12 +50,12 @@ const getPlaceholderImage = (name: string) => {
 
 const fallbackDescriptions: Record<string, string> = {
   'Geirangerfjord': 'The Geirangerfjord is one of Norway\'s most spectacular natural wonders, famous for its deep blue waters, steep dramatic cliffs, and cascading waterfalls like the Seven Sisters. It is a UNESCO World Heritage Site and a pioneer in sustainable zero-emission ferry travel.',
-  'TromsÃ¸': 'Known as the "Capital of the Arctic," TromsÃ¸ is globally renowned as the ultimate destination for experiencing the Northern Lights. It offers a vibrant cultural scene, arctic dining, and thrilling winter expeditions like dog sledding and whale watching.',
+  'Tromsø': 'Known as the "Capital of the Arctic," Tromsø is globally renowned as the ultimate destination for experiencing the Northern Lights. It offers a vibrant cultural scene, arctic dining, and thrilling winter expeditions like dog sledding and whale watching.',
   'Oslo': 'Norway\'s capital seamlessly blends world-class modern architecture with deep historical roots. Situated between the Oslofjord and dense forests, Oslo is a global leader in green urban planning, boasting an entirely electric public transit system.',
   'Bergen': 'Surrounded by seven mountains and majestic fjords, Bergen is a picturesque coastal city. The iconic, colorful wooden houses of Bryggen wharf tell the story of its rich Hanseatic trading history.',
   'Lofoten': 'The Lofoten archipelago is famous for its dramatic scenery, featuring towering granite peaks rising directly from the ocean, sheltered bays, and traditional red fishing cabins (rorbuer).',
   'Svalbard': 'Located midway between continental Norway and the North Pole, Svalbard is an untamed Arctic wilderness. It is home to vast glaciers, polar bears, the Midnight Sun, and the Global Seed Vault.',
-  'TrÃ¸ndelag': 'The historical heart of Norway, TrÃ¸ndelag is celebrated as the European Region of Gastronomy. It features incredible local farm-to-table cuisine, ancient pilgrimage routes, and the magnificent Nidaros Cathedral.',
+  'Trøndelag': 'The historical heart of Norway, Trøndelag is celebrated as the European Region of Gastronomy. It features incredible local farm-to-table cuisine, ancient pilgrimage routes, and the magnificent Nidaros Cathedral.',
   'Southern Norway': 'Affectionately known as the "Norwegian Riviera," this region is a summer paradise featuring a stunning coastline, charming white wooden towns, and beautiful archipelagos perfect for sailing and island hopping.'
 };
 

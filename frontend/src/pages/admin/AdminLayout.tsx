@@ -13,13 +13,20 @@ import { useAuthStore } from '../../store/useAuthStore';
 const CommandPalette = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 bg-slate-900/50 backdrop-blur-sm" onClick={onClose}>
+    <div 
+      className="fixed inset-0 z-50 flex items-start justify-center pt-24 bg-slate-900/50 backdrop-blur-sm" 
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Command palette"
+    >
       <div className="w-full max-w-2xl bg-slate-900 rounded-xl shadow-2xl overflow-hidden border border-slate-700 animate-in fade-in zoom-in-95" onClick={e => e.stopPropagation()}>
         <div className="flex items-center px-4 py-4 border-b border-slate-800">
           <Search size={20} className="text-slate-400 mr-3" />
           <input 
             autoFocus
             type="text" 
+            aria-label="Search users, destinations, IoT devices"
             placeholder="Search users, destinations, IoT devices..."
             className="w-full bg-transparent border-none focus:outline-none text-white text-lg placeholder:text-slate-500"
           />
@@ -85,10 +92,13 @@ export const AdminLayout = () => {
     <div className="flex h-screen bg-slate-50 font-sans text-slate-900">
       
       {/* Sidebar Navigation */}
-      <aside className={`
-        ${sidebarOpen ? 'w-64' : 'w-20'} 
-        bg-slate-900 text-slate-300 flex flex-col transition-all duration-300 ease-in-out shrink-0 z-20 relative
-      `}>
+      <aside 
+        aria-label="Admin Sidebar"
+        className={`
+          ${sidebarOpen ? 'w-64' : 'w-20'} 
+          bg-slate-900 text-slate-300 flex flex-col transition-all duration-300 ease-in-out shrink-0 z-20 relative
+        `}
+      >
         <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800">
           {sidebarOpen ? (
             <div className="font-bold text-white tracking-tight truncate">
@@ -99,13 +109,15 @@ export const AdminLayout = () => {
           )}
           <button 
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="text-slate-500 hover:text-white transition-colors p-1"
+            aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+            aria-expanded={sidebarOpen}
+            className="text-slate-500 hover:text-white transition-colors p-1 rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
           >
             {sidebarOpen ? <X size={20} /> : <Menu size={20} className="mx-auto" />}
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto py-4 scrollbar-hide">
+        <nav aria-label="Admin Navigation" className="flex-1 overflow-y-auto py-4 scrollbar-hide">
           <ul className="space-y-1 px-2">
             {navigation.map((item) => {
               const isActive = location.pathname === item.to || 
@@ -118,7 +130,7 @@ export const AdminLayout = () => {
                     to={item.to}
                     title={!sidebarOpen ? item.name : undefined}
                     className={`
-                      flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
+                      flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:outline-none
                       ${isActive 
                         ? 'bg-blue-600 text-white shadow-sm' 
                         : 'text-slate-400 hover:bg-slate-800 hover:text-slate-100'}
@@ -157,7 +169,9 @@ export const AdminLayout = () => {
           
           <button 
             onClick={() => setCmdPaletteOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-500 text-sm hover:bg-slate-100 transition-colors md:w-96"
+            aria-label="Open command palette (Ctrl+K)"
+            aria-haspopup="dialog"
+            className="flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-500 text-sm hover:bg-slate-100 transition-colors md:w-96 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
           >
             <Search size={16} className="text-slate-400" />
             <span className="flex-1 text-left hidden sm:inline-block">Search anywhere...</span>
@@ -167,10 +181,16 @@ export const AdminLayout = () => {
           </button>
           
           <div className="flex items-center gap-4">
-            <button className="relative p-2 text-slate-400 hover:text-slate-600 transition-colors">
+            <button 
+              aria-label="System status alerts"
+              className="relative p-2 text-slate-400 hover:text-slate-600 transition-colors rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+            >
               <AlertCircle size={20} />
             </button>
-            <button className="relative p-2 text-slate-400 hover:text-slate-600 transition-colors">
+            <button 
+              aria-label="Notifications"
+              className="relative p-2 text-slate-400 hover:text-slate-600 transition-colors rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+            >
               <Bell size={20} />
               <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
             </button>

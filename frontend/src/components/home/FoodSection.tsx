@@ -6,6 +6,7 @@ import { homeContentService } from '../../services/home/homeContentService';
 import { Container } from '../layout/Container';
 import { Skeleton } from '../ui/Skeleton';
 import { SectionErrorBoundary } from '../shared/SectionErrorBoundary';
+import { OptimizedImage } from '../shared/OptimizedImage';
 
 export const FoodSection = () => {
   const { data: food, isLoading, error } = useQuery({
@@ -20,40 +21,45 @@ export const FoodSection = () => {
   return (
     <section className="py-24 bg-white dark:bg-navy-900">
       <Container>
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center justify-center p-4 bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 rounded-3xl mb-6">
-            <Utensils className="w-8 h-8" />
+          <div className="flex justify-between items-end mb-12">
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center justify-center p-3 bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 rounded-2xl mb-4">
+                <Utensils className="w-6 h-6" />
+              </div>
+              <h2 className="text-3xl md:text-4xl font-black text-navy-900 dark:text-white mb-4 tracking-tight">Taste of Norway</h2>
+              <p className="text-lg text-gray-500 dark:text-gray-400">
+                From fresh Arctic seafood to rich traditional dishes, explore Norway's culinary heritage.
+              </p>
+            </div>
+            <Link to="/food" className="hidden md:flex items-center gap-1 text-aurora-green font-bold hover:text-emerald-500 transition-colors">
+              Discover all food <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
-          <h2 className="text-4xl md:text-5xl font-black text-navy-900 dark:text-white mb-6 tracking-tight">Taste of Norway</h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400">
-            From the world's best cold-water seafood to hearty mountain traditions. Discover the culinary heritage of the North.
-          </p>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {isLoading ? (
-            Array(4).fill(0).map((_, i) => (
-              <Skeleton key={i} className="h-80 rounded-3xl" />
-            ))
-          ) : food?.map((item, index) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              whileInView={{ opacity: 1, scale: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="group cursor-pointer"
-            >
-              <div className="relative h-72 rounded-3xl overflow-hidden mb-6 shadow-sm border border-gray-100 dark:border-white/5">
-                <img 
-                  src={item.image} 
-                  alt={item.name}
-                  loading="lazy"
-                  decoding="async"
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-navy-900/90 via-navy-900/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
-                <div className="absolute bottom-4 left-4 right-4 text-white">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {isLoading ? (
+              Array(4).fill(0).map((_, i) => (
+                <Skeleton key={i} className="h-80 rounded-3xl" />
+              ))
+            ) : food?.map((item, index) => (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="group cursor-pointer"
+              >
+                <div className="relative h-72 rounded-3xl overflow-hidden mb-6 shadow-sm border border-gray-100 dark:border-white/5">
+                  <OptimizedImage 
+                    src={item.image} 
+                    alt={item.name}
+                    category="food"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    containerClassName="absolute inset-0 w-full h-full"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-navy-900/90 via-navy-900/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity pointer-events-none"></div>
+                  <div className="absolute bottom-4 left-4 right-4 text-white z-10">
                    <div className="flex items-center gap-2 mb-1">
                     <span className="text-xs font-bold text-orange-400 uppercase tracking-wider">{item.category}</span>
                     <span className="text-white/50">•</span>

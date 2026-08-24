@@ -6,6 +6,7 @@ import { homeContentService } from '../../services/home/homeContentService';
 import { Container } from '../layout/Container';
 import { Skeleton } from '../ui/Skeleton';
 import { SectionErrorBoundary } from '../shared/SectionErrorBoundary';
+import { OptimizedImage } from '../shared/OptimizedImage';
 
 export const TrendingSection = () => {
   const { data: places, isLoading, error } = useQuery({
@@ -18,18 +19,15 @@ export const TrendingSection = () => {
   }
 
   return (
-    <section className="py-20 bg-white dark:bg-navy-900">
+    <section className="py-24 bg-white dark:bg-navy-900">
       <Container>
         <div className="flex justify-between items-end mb-12">
           <div>
-            <h2 className="text-3xl md:text-4xl font-black text-navy-900 dark:text-white mb-2 tracking-tight">Trending in Norway</h2>
-            <p className="text-gray-500 dark:text-gray-400">The most popular destinations right now</p>
+            <span className="text-aurora-green text-sm font-bold tracking-wider uppercase mb-2 block">Curated Selection</span>
+            <h2 className="text-3xl md:text-4xl font-black text-navy-900 dark:text-white tracking-tight">Trending Destinations</h2>
           </div>
-          <Link 
-            to="/explore?sort=trending" 
-            className="hidden md:flex items-center gap-1 text-aurora-green font-bold hover:text-emerald-500 transition-colors"
-          >
-            View all <ArrowRight className="w-4 h-4" />
+          <Link to="/explore" className="hidden md:flex items-center gap-1 text-aurora-green font-bold hover:text-emerald-500 transition-colors">
+            Explore all places <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
@@ -47,15 +45,16 @@ export const TrendingSection = () => {
               transition={{ delay: index * 0.1 }}
               className="group relative h-96 rounded-3xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all"
             >
-              <img 
+              <OptimizedImage 
                 src={place.image} 
-                alt={place.name}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                loading="lazy"
+                alt={place.name} 
+                category="landscape"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                containerClassName="absolute inset-0 w-full h-full"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-navy-900/90 via-navy-900/20 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-navy-900/90 via-navy-900/20 to-transparent pointer-events-none"></div>
               
-              <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-md rounded-full px-3 py-1 flex items-center gap-1 border border-white/20">
+              <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-md rounded-full px-3 py-1 flex items-center gap-1 border border-white/20 z-10">
                 <Star className="w-4 h-4 text-aurora-green fill-current" />
                 <span className="text-white text-sm font-bold">{place.rating}</span>
               </div>

@@ -20,14 +20,14 @@ export const LoadingState: React.FC<{
       className
     )}>
       <div className="relative mb-5">
-        <div className="w-14 h-14 rounded-full bg-aurora-green/15 border border-aurora-green/30 flex items-center justify-center shadow-[0_0_20px_rgba(0,255,135,0.2)]">
-          <Compass className="w-7 h-7 text-aurora-green animate-spin" style={{ animationDuration: '3s' }} />
+        <div className="w-14 h-14 rounded-full bg-royal-fjord/15 border border-royal-fjord/30 flex items-center justify-center shadow-[0_0_20px_rgba(29,78,216,0.2)]">
+          <Compass className="w-7 h-7 text-glacier-blue animate-spin" style={{ animationDuration: '3s' }} />
         </div>
-        <Loader2 className="w-6 h-6 animate-spin text-aurora-green absolute -bottom-1 -right-1" />
+        <Loader2 className="w-6 h-6 animate-spin text-glacier-blue absolute -bottom-1 -right-1" />
       </div>
-      <h4 className="text-base font-bold text-navy-900 dark:text-white tracking-tight mb-1">{message}</h4>
+      <h4 className="text-base font-bold text-snow tracking-tight mb-1">{message}</h4>
       {submessage && (
-        <p className="text-xs text-gray-500 dark:text-gray-400 max-w-sm">{submessage}</p>
+        <p className="text-xs text-slate-400 max-w-sm">{submessage}</p>
       )}
     </div>
   );

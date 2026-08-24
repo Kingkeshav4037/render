@@ -10,10 +10,6 @@ export const AuroraCMS = () => {
   const [editRow, setEditRow] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    fetchItems();
-  }, []);
-
   const fetchItems = async () => {
     setLoading(true);
     // Fetch northern locations or viewpoints suited for Aurora
@@ -26,6 +22,11 @@ export const AuroraCMS = () => {
     if (data) setItems(data);
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
 
   const columns: ColumnDef[] = [
     { key: 'name', header: 'Aurora Hotspot', render: (val) => <div className="font-bold text-navy-900">{val}</div> },

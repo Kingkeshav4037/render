@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useCurrencyStore } from '../store/useCurrencyStore';
+import { OptimizedImage } from '../components/shared/OptimizedImage';
 
 const MOCK_ROOMS = [
   {
@@ -72,24 +73,43 @@ export const StayDetails = () => {
       {/* Immersive Gallery Hero */}
       <div className="h-[60vh] md:h-[70vh] w-full relative grid grid-cols-4 gap-2 pt-20 bg-black">
         <div className="col-span-4 md:col-span-2 h-full relative group cursor-pointer overflow-hidden">
-          <img 
-            src={stay.image_url || '/images/hotel_juvet_1787013813000.jpg'} 
+          <OptimizedImage 
+            src={stay.image_url} 
             alt={stay.name} 
-            onError={(e) => { (e.target as HTMLImageElement).src = '/images/hotel_juvet_1787013813000.jpg'; }}
+            category="stay"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+            containerClassName="w-full h-full"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
         </div>
         <div className="hidden md:block col-span-1 h-full relative group cursor-pointer overflow-hidden">
-          <img src="/images/northern_lights_1786935879330.jpg" alt="Gallery 1" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+          <OptimizedImage 
+            src="/images/northern_lights_1786935879330.jpg" 
+            alt="Gallery 1" 
+            category="aurora"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+            containerClassName="w-full h-full"
+          />
         </div>
         <div className="hidden md:flex col-span-1 h-full flex-col gap-2">
           <div className="h-1/2 relative group cursor-pointer overflow-hidden">
-            <img src="/images/fjords_1786935800026.jpg" alt="Gallery 2" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+            <OptimizedImage 
+              src="/images/fjords_1786935800026.jpg" 
+              alt="Gallery 2" 
+              category="landscape"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+              containerClassName="w-full h-full"
+            />
           </div>
           <div className="h-1/2 relative group cursor-pointer overflow-hidden">
-            <img src="/images/besseggen_1786936349992.jpg" alt="Gallery 3" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white font-bold tracking-widest text-sm hover:bg-black/60 transition-colors">
+            <OptimizedImage 
+              src="/images/besseggen_1786936349992.jpg" 
+              alt="Gallery 3" 
+              category="trail"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+              containerClassName="w-full h-full"
+            />
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white font-bold tracking-widest text-sm hover:bg-black/60 transition-colors pointer-events-none">
               VIEW ALL 24 PHOTOS
             </div>
           </div>
@@ -160,9 +180,15 @@ export const StayDetails = () => {
               {MOCK_ROOMS.map(room => (
                 <div key={room.id} className={`flex flex-col md:flex-row border transition-all duration-300 ${selectedRoom === room.id ? 'border-[#C17F59] shadow-lg ring-1 ring-[#C17F59]' : 'border-gray-200 hover:border-gray-300'} bg-white overflow-hidden`}>
                   <div className="w-full md:w-1/3 h-48 md:h-auto relative">
-                    <img src={room.image} alt={room.name} className="w-full h-full object-cover" />
+                    <OptimizedImage 
+                      src={room.image} 
+                      alt={room.name} 
+                      category="stay"
+                      className="w-full h-full object-cover" 
+                      containerClassName="w-full h-full"
+                    />
                     {room.remaining <= 3 && (
-                      <div className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold uppercase tracking-widest px-2 py-1">
+                      <div className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold uppercase tracking-widest px-2 py-1 z-10">
                         Only {room.remaining} left
                       </div>
                     )}
