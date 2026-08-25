@@ -1,11 +1,46 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Clock } from 'lucide-react';
+import { ArrowRight, Clock, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLocations } from '../hooks/useLocations';
 import { FavoriteButton } from '../components/common/FavoriteButton';
 import { AsyncStateWrapper } from '../components/shared/AsyncStateWrapper';
 import { OptimizedImage } from '../components/shared/OptimizedImage';
 import { PageHeader } from '../components/ui/PageHeader';
+import { SEO } from '../components/shared/SEO';
+
+const TIMELINE_ERAS = [
+  {
+    period: '8000 BCE – 500 CE',
+    title: 'Prehistoric Rock Art & Hunters',
+    description: 'Early maritime hunter-gatherers documented in UNESCO Alta Rock Carvings depicting reindeer and solar symbols.',
+    locationSlug: 'alta'
+  },
+  {
+    period: '793 – 1066 CE',
+    title: 'The Viking Age',
+    description: 'Seafaring Norsemen sailed longships across the Atlantic, establishing early trade hubs in Kaupang and Trondheim.',
+    locationSlug: 'oslo'
+  },
+  {
+    period: '1130 – 1350 CE',
+    title: 'Medieval Stave Churches & Kings',
+    description: 'Master timber architects constructed over 1,000 intricate stave churches like Urnes and Borgund, blending Christian and pagan dragon motifs.',
+    locationSlug: 'sognefjord'
+  },
+  {
+    period: '1360 – 1754 CE',
+    title: 'Hanseatic Trade Era',
+    description: 'Bergen’s iconic Bryggen wharf became the Nordic headquarters of the Hanseatic League, monopolizing dried stockfish exports.',
+    locationSlug: 'bergen'
+  },
+  {
+    period: '1888 – Present',
+    title: 'Polar Exploration & Modern Era',
+    description: 'Fridtjof Nansen and Roald Amundsen pioneered Arctic and Antarctic expeditions from Tromsø and Oslo.',
+    locationSlug: 'tromso'
+  }
+];
 
 const getPlaceholderImage = (name: string) => {
   const genericImages = [
@@ -21,6 +56,8 @@ const getPlaceholderImage = (name: string) => {
 };
 
 export const History = () => {
+  const [selectedEra, setSelectedEra] = useState<number | null>(null);
+
   // Fetch historical locations (museums and landmarks)
   const { data: fetchedDestinations, isLoading: loading, error } = useLocations({
     category: ['MUSEUM', 'LANDMARK']
@@ -30,7 +67,10 @@ export const History = () => {
 
   return (
     <div className="bg-deep-night min-h-screen text-snow selection:bg-fjord-teal/30">
-      
+      <SEO 
+        title="Norwegian History, Vikings & Heritage | Norway SmartLife"
+        description="Step back in time to the era of Vikings, explore medieval stave churches, and uncover the rich cultural tapestry of Norway."
+      />
       {/* Header */}
       <PageHeader
         title="Norwegian History & Heritage"
@@ -38,13 +78,55 @@ export const History = () => {
         breadcrumb="History"
         backgroundImage="/images/besseggen_1786936349992.jpg"
       >
-        <div className="flex items-center gap-6 mt-8">
+        <div className="flex flex-wrap items-center gap-6 mt-8">
           <div className="flex items-center gap-2 text-snow/70">
             <Clock className="w-5 h-5 text-arctic-gold" />
             <span className="font-sans text-sm font-medium">10,000 Years of Heritage</span>
           </div>
+          <div className="flex items-center gap-2 text-snow/70">
+            <Shield className="w-5 h-5 text-arctic-gold" />
+            <span className="font-sans text-sm font-medium">Viking Lore & Stave Churches</span>
+          </div>
         </div>
       </PageHeader>
+
+      {/* Structured Norway Through Time Timeline */}
+      <div className="max-w-[1440px] mx-auto px-6 md:px-12 pt-16 pb-8">
+        <div className="mb-8">
+          <span className="text-arctic-gold text-xs font-bold uppercase tracking-widest block mb-2">Chronological Heritage</span>
+          <h2 className="text-3xl md:text-4xl font-display font-semibold text-snow">Norway Through Time</h2>
+          <p className="text-snow/60 text-sm max-w-2xl mt-2">
+            Explore the formative eras that shaped Norwegian culture, naval architecture, and Arctic identity.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-16">
+          {TIMELINE_ERAS.map((era, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.08 }}
+              onClick={() => setSelectedEra(selectedEra === idx ? null : idx)}
+              className={`p-6 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
+                selectedEra === idx 
+                  ? 'bg-fjord-teal/20 border-arctic-gold shadow-lg' 
+                  : 'bg-midnight border-white/10 hover:border-white/20'
+              }`}
+            >
+              <div>
+                <span className="text-xs font-mono font-bold text-arctic-gold block mb-2">{era.period}</span>
+                <h3 className="font-display font-bold text-lg text-snow mb-2">{era.title}</h3>
+                <p className="text-xs text-snow/70 leading-relaxed">{era.description}</p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-arctic-gold">
+                <span>View Era</span>
+                <ArrowRight size={12} />
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
 
       {/* Content */}
       <div className="max-w-[1440px] mx-auto px-6 md:px-12 py-16">

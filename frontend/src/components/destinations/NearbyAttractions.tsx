@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { mapService } from '../../services/map/mapService';
-import { Home, Utensils, Activity, MapPin } from 'lucide-react';
+import { Home, Utensils, Activity, MapPin, ArrowRight } from 'lucide-react';
+import { OptimizedImage } from '../shared/OptimizedImage';
 
 interface NearbyAttractionsProps {
   locationId: string;
@@ -15,6 +17,7 @@ export const NearbyAttractions = ({ locationId, lat, lng }: NearbyAttractionsPro
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
     const fetchNearby = async () => {
       try {
         const [staysData, restaurantsData, activitiesData] = await Promise.all([
@@ -22,44 +25,89 @@ export const NearbyAttractions = ({ locationId, lat, lng }: NearbyAttractionsPro
           mapService.getNearbyRestaurants(lat, lng),
           mapService.getNearbyActivities(locationId)
         ]);
-        setStays(staysData);
-        setRestaurants(restaurantsData);
-        setActivities(activitiesData);
+        if (isMounted) {
+          setStays(staysData || []);
+          setRestaurants(restaurantsData || []);
+          setActivities(activitiesData || []);
+        }
       } catch (error) {
         console.error("Failed to fetch nearby attractions", error);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
     if (lat && lng) fetchNearby();
+    return () => { isMounted = false; };
   }, [locationId, lat, lng]);
 
   if (loading) {
-    return <div className="h-40 flex items-center justify-center"><div className="w-6 h-6 border-2 border-navy-900 border-t-transparent rounded-full animate-spin"></div></div>;
+    return (
+      <div className="py-8 flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-arctic-gold border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
   }
 
+  const hasAnyContent = stays.length > 0 || restaurants.length > 0 || activities.length > 0;
+  if (!hasAnyContent) return null;
+
   const renderCard = (item: any, type: 'stay' | 'restaurant' | 'activity') => {
-    const icon = type === 'stay' ? <Home size={18} /> : type === 'restaurant' ? <Utensils size={18} /> : <Activity size={18} />;
-    const color = type === 'stay' ? 'text-blue-500' : type === 'restaurant' ? 'text-orange-500' : 'text-green-500';
-    const bg = type === 'stay' ? 'bg-blue-50' : type === 'restaurant' ? 'bg-orange-50' : 'bg-green-50';
+    const linkUrl = type === 'stay' 
+      ? `/stay/${item.id}` 
+      : type === 'restaurant' 
+      ? `/food/${item.id}` 
+      : `/activities/${item.id}`;
+
+    const icon = type === 'stay' ? <Home size={16} /> : type === 'restaurant' ? <Utensils size={16} /> : <Activity size={16} />;
+    const badgeColor = type === 'stay' ? 'bg-fjord-teal/20 text-fjord-teal' : type === 'restaurant' ? 'bg-arctic-gold/20 text-arctic-gold' : 'bg-aurora-green/20 text-aurora-green';
+    const imageSrc = item.image_url || (item.images && item.images[0]) || '/images/hotel_juvet_1787013813000.jpg';
 
     return (
-      <div key={item.id} className="min-w-[280px] bg-white border border-gray-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
-        <div className={`w-10 h-10 ${bg} ${color} rounded-xl flex items-center justify-center mb-4`}>
-          {icon}
+      <Link 
+        key={item.id} 
+        to={linkUrl}
+        className="min-w-[280px] max-w-[320px] bg-midnight border border-white/10 hover:border-arctic-gold/50 rounded-xl overflow-hidden transition-all duration-300 group flex flex-col"
+      >
+        <div className="h-36 w-full relative overflow-hidden bg-black/40">
+          <OptimizedImage
+            src={imageSrc}
+            alt={item.name}
+            category={type === 'stay' ? 'stay' : 'activity'}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            containerClassName="w-full h-full"
+          />
+          <div className={`absolute top-3 left-3 ${badgeColor} backdrop-blur-md px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5`}>
+            {icon}
+            <span>{type}</span>
+          </div>
         </div>
-        <h4 className="font-bold text-navy-900 mb-1">{item.name}</h4>
-        <p className="text-sm text-gray-500 flex items-center gap-1"><MapPin size={14}/> Nearby</p>
-      </div>
+
+        <div className="p-4 flex flex-col flex-1">
+          <h4 className="font-bold text-snow text-base mb-1 line-clamp-1 group-hover:text-arctic-gold transition-colors">{item.name}</h4>
+          <p className="text-xs text-snow/60 flex items-center gap-1 mb-3">
+            <MapPin size={12} className="text-arctic-gold" /> 
+            {item.city || item.region || 'Nearby Destination'}
+          </p>
+          <div className="mt-auto pt-2 border-t border-white/5 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-arctic-gold">
+            <span>Explore</span>
+            <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+          </div>
+        </div>
+      </Link>
     );
   };
 
   return (
-    <div className="space-y-10 mt-12">
+    <div className="space-y-12 mt-12 pt-8 border-t border-white/10">
       {stays.length > 0 && (
         <section>
-          <h3 className="text-2xl font-bold text-navy-900 mb-6">Nearby Places to Stay</h3>
-          <div className="flex overflow-x-auto pb-4 gap-4 scrollbar-hide">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-2xl font-bold font-display text-snow">Nearby Places to Stay</h3>
+            <Link to="/stay" className="text-xs font-bold uppercase tracking-widest text-arctic-gold hover:underline">
+              View All Stays
+            </Link>
+          </div>
+          <div className="flex overflow-x-auto pb-4 gap-6 scrollbar-thin">
             {stays.map(stay => renderCard(stay, 'stay'))}
           </div>
         </section>
@@ -67,8 +115,13 @@ export const NearbyAttractions = ({ locationId, lat, lng }: NearbyAttractionsPro
 
       {restaurants.length > 0 && (
         <section>
-          <h3 className="text-2xl font-bold text-navy-900 mb-6">Local Dining</h3>
-          <div className="flex overflow-x-auto pb-4 gap-4 scrollbar-hide">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-2xl font-bold font-display text-snow">Local Dining & Cuisine</h3>
+            <Link to="/food" className="text-xs font-bold uppercase tracking-widest text-arctic-gold hover:underline">
+              View Food Hub
+            </Link>
+          </div>
+          <div className="flex overflow-x-auto pb-4 gap-6 scrollbar-thin">
             {restaurants.map(restaurant => renderCard(restaurant, 'restaurant'))}
           </div>
         </section>
@@ -76,8 +129,13 @@ export const NearbyAttractions = ({ locationId, lat, lng }: NearbyAttractionsPro
 
       {activities.length > 0 && (
         <section>
-          <h3 className="text-2xl font-bold text-navy-900 mb-6">Activities & Tours</h3>
-          <div className="flex overflow-x-auto pb-4 gap-4 scrollbar-hide">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-2xl font-bold font-display text-snow">Experiences & Activities</h3>
+            <Link to="/activities" className="text-xs font-bold uppercase tracking-widest text-arctic-gold hover:underline">
+              View All Activities
+            </Link>
+          </div>
+          <div className="flex overflow-x-auto pb-4 gap-6 scrollbar-thin">
             {activities.map(activity => renderCard(activity, 'activity'))}
           </div>
         </section>
@@ -85,3 +143,4 @@ export const NearbyAttractions = ({ locationId, lat, lng }: NearbyAttractionsPro
     </div>
   );
 };
+

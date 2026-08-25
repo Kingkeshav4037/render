@@ -33,8 +33,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   setUser: (user) => set({ user, loading: false }),
   hasPermission: (permission) => {
     const state = get();
-    // Super admins always have all permissions implicitly in frontend checks
-    if (state.profile?.role === 'SUPER_ADMIN') return true;
+    // Super admins and admins have global admin permissions in frontend checks
+    if (state.profile?.role === 'SUPER_ADMIN' || state.profile?.role === 'ADMIN') return true;
     return state.permissions.includes(permission);
   },
   signOut: async () => {

@@ -7,7 +7,6 @@
  */
 
 import { supabase } from '../lib/supabase';
-import { invokeEdgeFunction } from './api';
 
 export const bookingService = {
   /**

@@ -1,11 +1,6 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode } from 'react';
 import { motion } from 'framer-motion';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+import { cn } from '../../lib/utils';
 
 interface CinematicBackgroundProps {
   imageUrl?: string;
@@ -24,7 +19,7 @@ export const CinematicBackground = ({
   className,
   children,
   animate = true,
-  theme,
+  theme: _theme,
 }: CinematicBackgroundProps) => {
   const gradientClasses = {
     dark: 'bg-gradient-to-b from-deep-night/80 via-midnight/60 to-deep-night',

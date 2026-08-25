@@ -26,10 +26,23 @@ export const TrailDetails = () => {
     }
   }, [id]);
 
-  if (isLoading || !trail) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-nordic-sage flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent" />
+      <div className="min-h-screen bg-moss flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-nordic-sage border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (!trail) {
+    return (
+      <div className="min-h-screen bg-moss text-white flex flex-col items-center justify-center p-8 text-center">
+        <Mountain className="w-16 h-16 text-nordic-sage/60 mb-4" />
+        <h1 className="text-3xl font-bold font-display mb-4">Trail Not Found</h1>
+        <p className="text-gray-300 mb-8 max-w-md">The requested hiking route could not be located or may have been archived.</p>
+        <Link to="/trails" className="bg-nordic-sage text-pine-forest px-6 py-3 font-bold uppercase tracking-widest text-xs hover:bg-white transition-colors rounded-xl shadow-lg">
+          Browse All Trails
+        </Link>
       </div>
     );
   }
@@ -199,13 +212,19 @@ export const TrailDetails = () => {
                </Link>
                
                <div className="mt-auto p-4 relative z-10 bg-gradient-to-t from-black/90 to-transparent pt-12">
-                 <h4 className="font-bold text-lg text-white mb-2">Trail Location</h4>
-                 <ul className="text-sm text-gray-300 flex flex-col gap-2">
-                   <li className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-nordic-sage" /> Region: {trail.location}</li>
-                   <li className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-amber-400" /> Season: {trail.best_season}</li>
-                   <li className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-400" /> Weather Status: {trail.weather_status}</li>
-                 </ul>
-               </div>
+                  <h4 className="font-bold text-lg text-white mb-2">Trail Location</h4>
+                  <ul className="text-sm text-gray-300 flex flex-col gap-2 mb-4">
+                    <li className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-nordic-sage" /> Region: {trail.location}</li>
+                    <li className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-amber-400" /> Season: {trail.best_season}</li>
+                    <li className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-400" /> Weather Status: {trail.weather_status}</li>
+                  </ul>
+                  <Link 
+                    to={`/weather?city=${encodeURIComponent(trail.name)}`}
+                    className="w-full bg-white/10 hover:bg-white/20 text-white font-bold text-xs uppercase tracking-wider py-2.5 rounded-xl flex items-center justify-center gap-2 transition-colors border border-white/10"
+                  >
+                    Check Mountain Weather
+                  </Link>
+                </div>
             </div>
 
             {/* Equipment Required */}

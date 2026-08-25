@@ -1,8 +1,14 @@
-import { useState } from 'react';
-import { Bell, Smartphone, Mail, AlertTriangle, CloudRain, Sun, Calendar } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Bell, Smartphone, Mail, AlertTriangle, CloudRain, Sun, Calendar, ArrowLeft, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { toast } from '../../store/useToastStore';
+import { useAuthStore } from '../../store/useAuthStore';
+import { supabase } from '../../lib/supabase';
+import { Link } from 'react-router-dom';
 
 export const NotificationSettings = () => {
+  const { user } = useAuthStore();
+
   const [settings, setSettings] = useState({
     push: {
       auroraAlerts: true,
@@ -24,6 +30,17 @@ export const NotificationSettings = () => {
     }
   });
 
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('nsl_user_notification_prefs');
+      if (stored) {
+        setSettings(JSON.parse(stored));
+      }
+    } catch (e) {
+      console.warn('Error loading notification prefs:', e);
+    }
+  }, []);
+
   const toggleSetting = (channel: 'push' | 'email' | 'sms', key: keyof typeof settings.push) => {
     setSettings(prev => ({
       ...prev,
@@ -34,33 +51,50 @@ export const NotificationSettings = () => {
     }));
   };
 
-  const saveSettings = () => {
-    // In production, sync to Supabase user profile
-    // Save logic goes here
+  const saveSettings = async () => {
+    try {
+      localStorage.setItem('nsl_user_notification_prefs', JSON.stringify(settings));
+
+      if (user?.id) {
+        await (supabase.from('profiles') as any)
+          .update({ notification_preferences: settings, updated_at: new Date().toISOString() })
+          .eq('id', user.id);
+      }
+
+      toast.success('Notification preferences saved successfully!');
+    } catch (err: any) {
+      console.warn('Notification save note:', err);
+      toast.success('Notification preferences saved locally.');
+    }
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="mb-8">
+        <Link to="/notifications" className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-navy-900 mb-4 transition-colors">
+          <ArrowLeft size={14} /> Back to Notifications
+        </Link>
         <h1 className="text-3xl font-bold text-navy-900 mb-2 flex items-center gap-3">
           <Bell className="w-8 h-8 text-aurora-green" />
           Notification Preferences
         </h1>
-        <p className="text-gray-600 text-lg">Manage how you receive alerts for weather, bookings, and the Northern Lights.</p>
+        <p className="text-gray-600 text-base">
+          Customize delivery channels for weather advisories, booking confirmations, and Northern Lights alerts.
+        </p>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
         {/* Table Header */}
         <div className="grid grid-cols-4 bg-gray-50 border-b border-gray-200 p-4">
-          <div className="col-span-1 font-bold text-navy-900 text-sm uppercase tracking-wider">Alert Type</div>
-          <div className="col-span-1 flex flex-col items-center justify-center font-bold text-navy-900 text-sm uppercase tracking-wider">
-            <Smartphone className="w-5 h-5 mb-1 text-blue-500" /> Push
+          <div className="col-span-1 font-bold text-navy-900 text-xs uppercase tracking-wider">Alert Category</div>
+          <div className="col-span-1 flex flex-col items-center justify-center font-bold text-navy-900 text-xs uppercase tracking-wider">
+            <Smartphone className="w-4 h-4 mb-1 text-blue-500" /> Push
           </div>
-          <div className="col-span-1 flex flex-col items-center justify-center font-bold text-navy-900 text-sm uppercase tracking-wider">
-            <Mail className="w-5 h-5 mb-1 text-purple-500" /> Email
+          <div className="col-span-1 flex flex-col items-center justify-center font-bold text-navy-900 text-xs uppercase tracking-wider">
+            <Mail className="w-4 h-4 mb-1 text-purple-500" /> Email
           </div>
-          <div className="col-span-1 flex flex-col items-center justify-center font-bold text-navy-900 text-sm uppercase tracking-wider">
-            <Bell className="w-5 h-5 mb-1 text-green-500" /> SMS
+          <div className="col-span-1 flex flex-col items-center justify-center font-bold text-navy-900 text-xs uppercase tracking-wider">
+            <Bell className="w-4 h-4 mb-1 text-emerald-500" /> SMS
           </div>
         </div>
 
@@ -69,7 +103,7 @@ export const NotificationSettings = () => {
           
           <SettingRow 
             title="Aurora Alerts" 
-            description="High probability of Northern Lights in your area."
+            description="High probability of Northern Lights and geomagnetic activity."
             icon={<Sun className="w-5 h-5 text-aurora-green" />}
             settingKey="auroraAlerts"
             settings={settings}
@@ -78,7 +112,7 @@ export const NotificationSettings = () => {
           
           <SettingRow 
             title="Weather Warnings" 
-            description="Severe weather or road closures."
+            description="Severe mountain conditions, gale warnings, or road closures."
             icon={<CloudRain className="w-5 h-5 text-blue-400" />}
             settingKey="weatherWarnings"
             settings={settings}
@@ -87,7 +121,7 @@ export const NotificationSettings = () => {
 
           <SettingRow 
             title="Booking Updates" 
-            description="Confirmations, reminders, and cancellations."
+            description="Reservations, check-in reminders, receipts, and schedule changes."
             icon={<Calendar className="w-5 h-5 text-orange-400" />}
             settingKey="bookingUpdates"
             settings={settings}
@@ -95,8 +129,8 @@ export const NotificationSettings = () => {
           />
 
           <SettingRow 
-            title="Promotions" 
-            description="Special offers and new destinations."
+            title="Promotions & Deals" 
+            description="Seasonal travel offers and eco-friendly excursions."
             icon={<AlertTriangle className="w-5 h-5 text-purple-400" />}
             settingKey="promotions"
             settings={settings}
@@ -109,7 +143,7 @@ export const NotificationSettings = () => {
       <div className="mt-8 flex justify-end">
         <button 
           onClick={saveSettings}
-          className="bg-navy-900 text-white font-bold py-3 px-8 rounded-xl hover:bg-aurora-green hover:text-navy-900 transition-colors shadow-md"
+          className="bg-navy-900 text-white font-bold py-3 px-8 rounded-xl hover:bg-aurora-green hover:text-navy-900 transition-colors shadow-md text-xs uppercase tracking-wider cursor-pointer"
         >
           Save Preferences
         </button>
@@ -121,9 +155,9 @@ export const NotificationSettings = () => {
 // Helper Component
 const SettingRow = ({ title, description, icon, settingKey, settings, onToggle }: any) => {
   return (
-    <div className="grid grid-cols-4 p-4 items-center hover:bg-gray-50 transition-colors">
+    <div className="grid grid-cols-4 p-5 items-center hover:bg-gray-50/70 transition-colors">
       <div className="col-span-1 flex items-start gap-3">
-        <div className="mt-1 bg-gray-100 p-2 rounded-lg">{icon}</div>
+        <div className="mt-1 bg-gray-100 p-2 rounded-xl shrink-0">{icon}</div>
         <div>
           <h4 className="font-bold text-navy-900 text-sm">{title}</h4>
           <p className="text-xs text-gray-500 mt-0.5 pr-2 leading-tight">{description}</p>
@@ -155,8 +189,10 @@ const SettingRow = ({ title, description, icon, settingKey, settings, onToggle }
 const Toggle = ({ isActive, onClick }: { isActive: boolean, onClick: () => void }) => {
   return (
     <button 
+      type="button"
       onClick={onClick}
-      className={`relative w-12 h-6 rounded-full transition-colors duration-300 ease-in-out focus:outline-none ${isActive ? 'bg-aurora-green' : 'bg-gray-300'}`}
+      className={`relative w-12 h-6 rounded-full transition-colors duration-300 ease-in-out focus:outline-none cursor-pointer ${isActive ? 'bg-aurora-green' : 'bg-gray-200'}`}
+      aria-label="Toggle notification channel"
     >
       <motion.div 
         layout
@@ -167,3 +203,5 @@ const Toggle = ({ isActive, onClick }: { isActive: boolean, onClick: () => void 
     </button>
   );
 };
+
+export default NotificationSettings;

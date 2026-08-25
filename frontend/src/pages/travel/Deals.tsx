@@ -175,9 +175,16 @@ export const Deals = () => {
                 </div>
                 
                 <div className="p-6 flex-1 flex flex-col bg-white">
-                  <p className="text-[#92400E] text-sm mb-6 line-clamp-3 leading-relaxed flex-grow">{deal.description}</p>
+                  <p className="text-[#92400E] text-sm mb-4 line-clamp-3 leading-relaxed flex-grow">{deal.description}</p>
                   
-                  <div className="pt-6 border-t border-[#FEF3C7] flex items-end justify-between">
+                  {deal.valid_until && (
+                    <div className="flex items-center gap-1.5 text-xs text-[#B45309] font-medium mb-4">
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>Valid until {new Date(deal.valid_until).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                    </div>
+                  )}
+                  
+                  <div className="pt-4 border-t border-[#FEF3C7] flex items-end justify-between">
                     <div>
                       {deal.original_price > deal.price && (
                         <span className="text-xs text-[#B45309] line-through block font-bold mb-1">NOK {deal.original_price.toLocaleString()}</span>

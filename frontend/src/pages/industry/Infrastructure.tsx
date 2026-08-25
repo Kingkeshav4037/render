@@ -207,6 +207,65 @@ export const Infrastructure = () => {
           )}
         </AnimatePresence>
 
+        {/* Getting Around Norway: Smart Travel & Clean Mobility */}
+        <div className="mt-16 pt-16 border-t border-white/10">
+          <div className="mb-8">
+            <span className="text-polar-indigo text-xs font-bold uppercase tracking-widest block mb-1">Smart Mobility Systems</span>
+            <h2 className="text-3xl font-display font-bold">Getting Around Norway — Clean Transit & Networks</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                title: "EV Fast-Charging Network",
+                description: "Over 24,000 public EV fast-chargers covering Arctic corridors and mountain passes.",
+                link: "/mobility/ev",
+                badge: "Mobility"
+              },
+              {
+                title: "Smart Ferry Navigation",
+                description: "Live schedule telemetry, capacity tracking, and zero-emission battery ferry routes.",
+                link: "/mobility/ferry",
+                badge: "Maritime"
+              },
+              {
+                title: "Scenic Rail & Transit",
+                description: "The Flåm, Bergen, and Dovre scenic railway lines connected with nationwide bus systems.",
+                link: "/travel",
+                badge: "Transit"
+              },
+              {
+                title: "Smart City IoT Networks",
+                description: "Real-time municipal traffic flow, urban air quality, and autonomous micro-mobility.",
+                link: "/smart-norway",
+                badge: "IoT Tech"
+              }
+            ].map(item => (
+              <Link
+                key={item.title}
+                to={item.link}
+                className="bg-white/5 border border-white/10 hover:border-polar-indigo/50 rounded-2xl p-6 flex flex-col justify-between transition-all group backdrop-blur-xl"
+              >
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-polar-indigo bg-polar-indigo/10 border border-polar-indigo/20 px-2 py-0.5 rounded w-fit block mb-3">
+                    {item.badge}
+                  </span>
+                  <h3 className="font-bold text-lg text-white mb-2 group-hover:text-polar-indigo transition-colors">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs text-gray-400 leading-relaxed mb-4">
+                    {item.description}
+                  </p>
+                </div>
+                <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-polar-indigo pt-3 border-t border-white/5">
+                  <span>Explore Network</span>
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
       </Container>
     </div>
   );

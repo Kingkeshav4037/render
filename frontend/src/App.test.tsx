@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom/vitest';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import App from './App';
@@ -52,7 +53,8 @@ describe('App Component Smoke Test', () => {
     
     // Look for a common element that should be on the landing page or navbar
     // e.g. the site title or logo text "SmartLife" (awaited because of Suspense)
-    const titleElement = await screen.findByText(/SmartLife/i);
-    expect(titleElement).toBeInTheDocument();
+    const titleElements = await screen.findAllByText(/SmartLife/i);
+    expect(titleElements.length).toBeGreaterThan(0);
+    expect(titleElements[0]).toBeInTheDocument();
   });
 });

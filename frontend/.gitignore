@@ -24,6 +24,18 @@ dist-ssr
 *.sln
 *.sw?
 
+# Test & Audit Artifacts
+playwright-report/
+test-results/
+coverage/
+*.report.*
+audit_results.json
+audit-report.txt
+linter_report.txt
+audit_patterns.json
+audit_layout.mjs
+routes.json
+
 # Environment Variables & Secrets
 .env
 .env.*

@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 import { vi } from 'vitest';
 
 // Mock matchMedia
@@ -48,6 +48,5 @@ class MockIntersectionObserver {
   unobserve = vi.fn();
 }
 window.IntersectionObserver = MockIntersectionObserver as any;
-global.IntersectionObserver = MockIntersectionObserver as any;
 globalThis.IntersectionObserver = MockIntersectionObserver as any;
 

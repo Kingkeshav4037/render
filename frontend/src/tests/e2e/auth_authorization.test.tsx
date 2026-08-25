@@ -13,8 +13,8 @@ vi.mock('../../lib/supabase', () => ({
       signOut: vi.fn().mockResolvedValue({ error: null }),
       getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
       onAuthStateChange: vi.fn().mockReturnValue({ data: { subscription: { unsubscribe: vi.fn() } } }),
-      resetPasswordForEmail: vi.fn(),
-      updateUser: vi.fn(),
+      resetPasswordForEmail: vi.fn().mockResolvedValue({ data: {}, error: null }),
+      updateUser: vi.fn().mockResolvedValue({ data: { user: { id: 'test-user' } }, error: null }),
       mfa: { getAuthenticatorAssuranceLevel: vi.fn().mockResolvedValue({ data: { currentLevel: 'aal1' } }) },
     },
     from: vi.fn().mockReturnValue({
@@ -154,7 +154,8 @@ describe('Authentication & Authorization', () => {
       );
 
       fireEvent.change(screen.getByPlaceholderText(/Email address/i), { target: { value: 'test@example.com' } });
-      fireEvent.change(screen.getByPlaceholderText(/Password/i), { target: { value: 'SecurePass123!' } });
+      fireEvent.change(screen.getByPlaceholderText(/^Password$/i), { target: { value: 'SecurePass123!' } });
+      fireEvent.change(screen.getByPlaceholderText(/Confirm Password/i), { target: { value: 'SecurePass123!' } });
       fireEvent.change(screen.getByPlaceholderText(/Full Name/i), { target: { value: 'Test User' } });
       fireEvent.click(screen.getByRole('button', { name: /Create Account/i }));
 
@@ -180,7 +181,8 @@ describe('Authentication & Authorization', () => {
       );
 
       fireEvent.change(screen.getByPlaceholderText(/Email address/i), { target: { value: 'taken@example.com' } });
-      fireEvent.change(screen.getByPlaceholderText(/Password/i), { target: { value: 'SecurePass123!' } });
+      fireEvent.change(screen.getByPlaceholderText(/^Password$/i), { target: { value: 'SecurePass123!' } });
+      fireEvent.change(screen.getByPlaceholderText(/Confirm Password/i), { target: { value: 'SecurePass123!' } });
       fireEvent.change(screen.getByPlaceholderText(/Full Name/i), { target: { value: 'Someone' } });
       fireEvent.click(screen.getByRole('button', { name: /Create Account/i }));
 
@@ -274,35 +276,21 @@ describe('Authentication & Authorization', () => {
   // ─── 4. Forgot Password ───────────────────────────────────────────
   describe('Forgot Password', () => {
     it('sends a password reset email and shows success message', async () => {
-      (supabase.auth.resetPasswordForEmail as any).mockResolvedValue({ data: {}, error: null });
-
-      // Must mock authService since ForgotPassword uses it, not supabase directly
-      vi.mock('../../services/auth/authService', async () => {
-        const actual = await vi.importActual('../../services/auth/authService');
-        return {
-          ...actual,
-          authService: {
-            ...(actual as any).authService,
-            resetPasswordForEmail: vi.fn().mockResolvedValue({}),
-            updatePassword: vi.fn().mockResolvedValue({}),
-          },
-        };
-      });
-
       render(
         <MemoryRouter>
           <ForgotPassword />
         </MemoryRouter>
       );
 
-      expect(screen.getByText(/Reset Password/i)).toBeTruthy();
-      expect(screen.getByPlaceholderText(/Email address/i)).toBeTruthy();
+      expect(screen.getByText('Reset Password')).toBeTruthy();
+      const emailInput = screen.getByPlaceholderText('Email address');
+      expect(emailInput).toBeTruthy();
 
-      fireEvent.change(screen.getByPlaceholderText(/Email address/i), { target: { value: 'forgot@example.com' } });
+      fireEvent.change(emailInput, { target: { value: 'forgot@example.com' } });
       fireEvent.click(screen.getByRole('button', { name: /Send Reset Link/i }));
 
       await waitFor(() => {
-        expect(screen.getByText(/Check your email/i)).toBeTruthy();
+        expect(screen.getByText(/Recovery Instructions Sent/i)).toBeTruthy();
       });
     });
   });
@@ -310,21 +298,31 @@ describe('Authentication & Authorization', () => {
   // ─── 5. Reset Password ────────────────────────────────────────────
   describe('Reset Password', () => {
     it('renders new password form and submits update', async () => {
+      (supabase.auth.getSession as any).mockResolvedValue({
+        data: { session: { user: { id: 'test-user', email: 'test@example.com' } } },
+        error: null,
+      });
+
       render(
         <MemoryRouter>
           <ResetPassword />
         </MemoryRouter>
       );
 
-      expect(screen.getByText(/Set New Password/i)).toBeTruthy();
-      expect(screen.getByPlaceholderText(/New Password/i)).toBeTruthy();
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /Set New Password/i })).toBeTruthy();
+      });
 
-      fireEvent.change(screen.getByPlaceholderText(/New Password/i), { target: { value: 'NewSecurePass456!' } });
-      fireEvent.click(screen.getByRole('button', { name: /Update Password/i }));
+      fireEvent.change(screen.getByPlaceholderText('New Password'), { target: { value: 'NewSecurePass456!' } });
+      fireEvent.change(screen.getByPlaceholderText('Confirm New Password'), { target: { value: 'NewSecurePass456!' } });
+      fireEvent.click(screen.getByRole('button', { name: /Set New Password/i }));
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/home');
+        expect(screen.getByText(/Password Updated!/i)).toBeTruthy();
       });
+
+      fireEvent.click(screen.getByRole('button', { name: /Continue to Norway SmartLife/i }));
+      expect(mockNavigate).toHaveBeenCalledWith('/home');
     });
   });
 

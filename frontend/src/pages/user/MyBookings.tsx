@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Calendar, MapPin, CheckCircle2, XCircle, Clock, Wallet, Ticket, Navigation, Coffee, Home, Bed, User, FileText, ChevronRight, Download } from 'lucide-react';
+import { Calendar, MapPin, CheckCircle2, XCircle, Clock, Wallet, Ticket, Navigation, Coffee, Home, Bed, User, FileText, ChevronRight, Download, ShoppingBag } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCurrencyStore } from '../../store/useCurrencyStore';
 import { CinematicBackground } from '../../design/backgrounds/CinematicBackground';
@@ -72,9 +72,11 @@ export const MyBookings = () => {
       case 'TRANSPORT': return <Navigation size={20} className="text-[#0284C7]" />;
       case 'ACTIVITY': return <Ticket size={20} className="text-[#059669]" />;
       case 'RESTAURANT': return <Coffee size={20} className="text-[#D97706]" />;
+      case 'PRODUCT': return <ShoppingBag size={20} className="text-[#059669]" />;
       default: return <Wallet size={20} className="text-navy-900" />;
     }
   };
+
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-navy-900 font-sans pb-24">

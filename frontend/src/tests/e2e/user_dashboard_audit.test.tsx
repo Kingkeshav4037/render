@@ -465,14 +465,14 @@ describe('User Dashboard Complete Audit', () => {
         </MemoryRouter>
       );
 
-      expect(screen.getByText('Preferences')).toBeInTheDocument();
-      expect(screen.getByText('Severe Weather Warning')).toBeInTheDocument();
+      expect(screen.getByText('Notification Center')).toBeInTheDocument();
+      expect(screen.getByText('Severe Mountain Weather Advisory')).toBeInTheDocument();
       expect(screen.getByText('All Notifications')).toBeInTheDocument();
-      expect(screen.getByText('Critical & Important')).toBeInTheDocument();
+      expect(screen.getByText('Safety & Advisories')).toBeInTheDocument();
 
-      // Switch to Critical filter
-      fireEvent.click(screen.getByText('Critical & Important'));
-      expect(screen.getByText('Severe Weather Warning')).toBeInTheDocument();
+      // Switch to Safety & Advisories filter
+      fireEvent.click(screen.getByText('Safety & Advisories'));
+      expect(screen.getByText('Severe Mountain Weather Advisory')).toBeInTheDocument();
     });
   });
 

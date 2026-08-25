@@ -1,28 +1,49 @@
 import React, { useState } from 'react';
-import { useLocation, useParams, Link } from 'react-router-dom';
+import { useLocation, useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Container } from '../../components/layout/Container';
 import { TripPlanResponse } from '../../types/planner';
-import { Map, Share2, Download, Calendar, Sun, CloudRain, Clock, Plane, Coffee, Home, Activity, Wind, Navigation } from 'lucide-react';
+import { 
+  Map, 
+  Share2, 
+  Download, 
+  Calendar, 
+  Sun, 
+  Clock, 
+  Plane, 
+  Coffee, 
+  Home, 
+  Activity, 
+  Wind, 
+  Navigation,
+  BookmarkPlus,
+  ArrowLeft,
+  CheckCircle2
+} from 'lucide-react';
+import { toast } from 'sonner';
+import { SEO } from '../../components/shared/SEO';
 
 export const ItineraryView = () => {
   const { id } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const plan = location.state?.plan as TripPlanResponse;
   const [activeDay, setActiveDay] = useState(1);
+  const [isSaved, setIsSaved] = useState(false);
 
   if (!plan) {
     return (
-      <div className="min-h-screen bg-deep-night text-white flex items-center justify-center pt-24">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Trip Plan Not Found</h2>
-          <Link to="/planner" className="text-lavender-ice hover:underline">Return to Planner</Link>
-        </div>
+      <div className="min-h-screen bg-deep-night text-white flex flex-col items-center justify-center pt-24 text-center px-4 font-sans">
+        <h2 className="text-3xl font-display font-bold mb-4">Trip Itinerary Not Found</h2>
+        <p className="text-gray-400 mb-8 max-w-md">The requested trip plan could not be retrieved or has expired from active memory.</p>
+        <Link to="/planner" className="bg-glacier-mint text-deep-night px-6 py-3 font-bold uppercase tracking-wider text-xs rounded-xl hover:bg-white transition-colors">
+          Build a New Itinerary
+        </Link>
       </div>
     );
   }
 
-  const selectedDay = plan.days.find(d => d.day === activeDay);
+  const selectedDay = plan.days.find(d => d.day === activeDay) || plan.days[0];
 
   const getActivityIcon = (type: string) => {
     switch (type) {
@@ -34,21 +55,63 @@ export const ItineraryView = () => {
     }
   };
 
+  const handleSaveTrip = () => {
+    try {
+      const existingStr = localStorage.getItem('nsl_user_saved_trips');
+      const existing = existingStr ? JSON.parse(existingStr) : [];
+      
+      const newTrip = {
+        id: plan.id,
+        name: plan.title.includes(' in ') ? plan.title.split(' in ')[1] : plan.title,
+        title: plan.title,
+        dates: `${plan.days[0]?.date} — ${plan.days[plan.days.length - 1]?.date}`,
+        nights: plan.days.length,
+        activities: plan.days.reduce((acc, d) => acc + d.activities.length, 0),
+        status: 'Upcoming',
+        image: '/images/besseggen_1786936236965.jpg',
+        weather: '14°C',
+        days: plan.days,
+        summary: plan.summary
+      };
+
+      const updated = [newTrip, ...existing.filter((t: any) => t.id !== plan.id)];
+      localStorage.setItem('nsl_user_saved_trips', JSON.stringify(updated));
+      setIsSaved(true);
+      toast.success('Trip saved to your Digital Travel Journal!');
+      
+      setTimeout(() => {
+        navigate('/trips');
+      }, 600);
+    } catch (err) {
+      toast.error('Unable to save trip. Please try again.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-deep-night text-white pb-24 pt-32 font-sans relative overflow-hidden">
-      {/* Premium Digital Travel Journal Background */}
+      <SEO 
+        title={`${plan.title} | Trip Itinerary`}
+        description={plan.summary}
+      />
+
+      {/* Background */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1542314831-c6a4d14d8c85?q=80&w=1600')] bg-cover bg-center opacity-10 mix-blend-luminosity grayscale" />
         <div className="absolute inset-0 bg-gradient-to-b from-deep-night via-deep-night/90 to-deep-night" />
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-ice-silver/5 blur-[120px] rounded-full" />
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-glacier-mint/5 blur-[120px] rounded-full" />
       </div>
 
       <Container className="relative z-10">
         
+        {/* Top Back link */}
+        <Link to="/planner" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-400 hover:text-white mb-6 transition-colors">
+          <ArrowLeft size={14} /> Back to Planner
+        </Link>
+
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-16 border-b border-white/10 pb-8">
           <div>
-            <div className="flex items-center gap-3 text-ice-silver mb-4">
+            <div className="flex items-center gap-3 text-glacier-mint mb-4">
               <Calendar className="w-5 h-5" />
               <span className="font-bold tracking-widest uppercase text-sm">{plan.days.length} Day Itinerary</span>
             </div>
@@ -69,16 +132,34 @@ export const ItineraryView = () => {
             </motion.p>
           </div>
           
-          <div className="flex gap-4">
-            <button className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 transition-colors">
-              <Map className="w-5 h-5 text-ice-silver" />
+          <div className="flex flex-wrap items-center gap-4">
+            <button 
+              onClick={handleSaveTrip}
+              className={`px-6 py-3.5 rounded-xl font-bold uppercase tracking-widest text-xs flex items-center gap-2 transition-all cursor-pointer shadow-lg ${
+                isSaved 
+                  ? 'bg-green-500 text-white' 
+                  : 'bg-glacier-mint text-deep-night hover:bg-white'
+              }`}
+            >
+              {isSaved ? <CheckCircle2 size={16} /> : <BookmarkPlus size={16} />}
+              {isSaved ? 'Saved to Trips' : 'Save to My Trips'}
             </button>
-            <button className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 transition-colors">
-              <Share2 className="w-5 h-5 text-ice-silver" />
-            </button>
-            <button className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 transition-colors">
-              <Download className="w-5 h-5 text-ice-silver" />
-            </button>
+
+            <Link
+              to="/map"
+              className="w-12 h-12 rounded-xl border border-white/20 flex items-center justify-center hover:bg-white/10 transition-colors"
+              title="View on Map"
+            >
+              <Map className="w-5 h-5 text-gray-300" />
+            </Link>
+
+            <Link
+              to={`/weather?city=${encodeURIComponent(selectedDay?.activities[0]?.location || 'Tromsø')}`}
+              className="w-12 h-12 rounded-xl border border-white/20 flex items-center justify-center hover:bg-white/10 transition-colors"
+              title="Check Destination Weather"
+            >
+              <Sun className="w-5 h-5 text-amber-400" />
+            </Link>
           </div>
         </div>
 
@@ -86,20 +167,20 @@ export const ItineraryView = () => {
           
           {/* Day Navigation Sidebar */}
           <div className="w-full lg:w-1/4">
-            <div className="sticky top-32 flex flex-row lg:flex-col gap-2 overflow-x-auto hide-scrollbar pb-4 lg:pb-0">
+            <div className="sticky top-32 flex flex-row lg:flex-col gap-2 overflow-x-auto scrollbar-none pb-4 lg:pb-0">
               {plan.days.map((day) => (
                 <button
                   key={day.day}
                   onClick={() => setActiveDay(day.day)}
-                  className={`flex flex-col items-start p-4 rounded-xl border transition-all whitespace-nowrap min-w-[120px] ${
+                  className={`flex flex-col items-start p-4 rounded-xl border transition-all whitespace-nowrap min-w-[140px] text-left cursor-pointer ${
                     activeDay === day.day
-                      ? 'bg-ice-silver/10 border-ice-silver text-white'
-                      : 'bg-transparent border-transparent text-gray-500 hover:text-white hover:bg-white/5'
+                      ? 'bg-white/10 border-glacier-mint text-white shadow-lg'
+                      : 'bg-transparent border-white/5 text-gray-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  <span className="text-xs font-bold uppercase tracking-wider mb-1">Day {day.day}</span>
-                  <span className="font-bold">{day.title}</span>
-                  <span className="text-xs text-gray-400 mt-2">{day.date}</span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-glacier-mint mb-1">Day {day.day}</span>
+                  <span className="font-bold text-sm truncate w-full">{day.title}</span>
+                  <span className="text-[11px] text-gray-500 mt-2">{day.date}</span>
                 </button>
               ))}
             </div>
@@ -124,19 +205,19 @@ export const ItineraryView = () => {
                     <div className="w-16 md:w-48 text-right hidden md:block">
                       <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">{selectedDay.date}</span>
                     </div>
-                    <div className="w-16 h-16 rounded-full bg-ice-silver/10 border border-ice-silver flex flex-col items-center justify-center shrink-0 shadow-[0_0_15px_rgba(203,213,225,0.1)]">
-                      <span className="text-xs uppercase font-bold text-ice-silver">Day</span>
-                      <span className="text-xl font-bold text-white">{selectedDay.day}</span>
+                    <div className="w-16 h-16 rounded-full bg-glacier-mint/10 border border-glacier-mint flex flex-col items-center justify-center shrink-0 shadow-[0_0_15px_rgba(203,213,225,0.1)]">
+                      <span className="text-[10px] uppercase font-bold text-glacier-mint">Day</span>
+                      <span className="text-xl font-bold text-white leading-none">{selectedDay.day}</span>
                     </div>
                     <div>
-                      <h2 className="text-3xl font-display font-bold">{selectedDay.title}</h2>
+                      <h2 className="text-2xl md:text-3xl font-display font-bold">{selectedDay.title}</h2>
                     </div>
                   </div>
 
                   {/* Activities */}
                   <div className="space-y-12">
-                    {selectedDay.activities.map((activity, idx) => (
-                      <div key={activity.id} className="relative z-10 flex items-start gap-6 group cursor-grab active:cursor-grabbing">
+                    {selectedDay.activities.map((activity) => (
+                      <div key={activity.id} className="relative z-10 flex items-start gap-6 group">
                         {/* Time Column */}
                         <div className="w-16 md:w-48 text-right pt-4 shrink-0">
                           <span className="text-xl font-bold text-white block">{activity.time}</span>
@@ -145,11 +226,11 @@ export const ItineraryView = () => {
                         
                         {/* Timeline Node */}
                         <div className="relative pt-5">
-                          <div className="w-4 h-4 rounded-full bg-deep-night border-2 border-white/30 group-hover:border-ice-silver group-hover:scale-125 transition-all z-10 relative" />
+                          <div className="w-4 h-4 rounded-full bg-deep-night border-2 border-white/30 group-hover:border-glacier-mint group-hover:scale-125 transition-all z-10 relative" />
                         </div>
 
                         {/* Activity Card */}
-                        <div className="flex-1 bg-white/5 backdrop-blur-md border border-white/10 p-6 md:p-8 rounded-3xl hover:bg-white/10 hover:border-white/20 transition-all group-hover:-translate-y-1">
+                        <div className="flex-1 bg-white/5 backdrop-blur-md border border-white/10 p-6 md:p-8 rounded-3xl hover:bg-white/10 hover:border-white/20 transition-all">
                           <div className="flex justify-between items-start mb-4">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-full bg-black/40 flex items-center justify-center border border-white/5">
@@ -157,24 +238,27 @@ export const ItineraryView = () => {
                               </div>
                               <h3 className="text-xl font-bold text-white">{activity.title}</h3>
                             </div>
-                            {activity.cost && (
+                            {activity.cost ? (
                               <div className="text-right">
-                                <span className="font-bold text-ice-silver">{activity.cost} {activity.currency}</span>
+                                <span className="font-bold text-glacier-mint">{activity.cost} {activity.currency}</span>
                               </div>
-                            )}
+                            ) : null}
                           </div>
                           
-                          <p className="text-gray-400 leading-relaxed mb-6">
+                          <p className="text-gray-400 leading-relaxed mb-6 text-sm">
                             {activity.description}
                           </p>
                           
-                          <div className="flex flex-wrap gap-4 text-sm font-bold text-gray-500">
+                          <div className="flex flex-wrap gap-4 text-xs font-bold text-gray-400">
                             <div className="flex items-center gap-2 bg-black/30 px-3 py-1.5 rounded-lg border border-white/5">
-                              <Navigation className="w-4 h-4 text-ice-silver" /> {activity.location}
+                              <Navigation className="w-3.5 h-3.5 text-glacier-mint" /> {activity.location}
                             </div>
-                            <div className="flex items-center gap-2 bg-black/30 px-3 py-1.5 rounded-lg border border-white/5">
-                              <Sun className="w-4 h-4 text-amber-400" /> 12°C, Clear
-                            </div>
+                            <Link 
+                              to={`/weather?city=${encodeURIComponent(activity.location)}`}
+                              className="flex items-center gap-2 bg-black/30 hover:bg-black/50 px-3 py-1.5 rounded-lg border border-white/5 text-amber-400 transition-colors"
+                            >
+                              <Sun className="w-3.5 h-3.5" /> Check Weather
+                            </Link>
                           </div>
                         </div>
                       </div>
@@ -184,7 +268,7 @@ export const ItineraryView = () => {
                   {/* End of Day Cap */}
                   <div className="relative z-10 flex items-center gap-6 mt-12">
                     <div className="w-16 md:w-48 shrink-0" />
-                    <div className="w-4 h-4 rounded-full bg-ice-silver/30 border-2 border-ice-silver shrink-0 ml-[1.1rem] md:ml-[1.1rem]" />
+                    <div className="w-4 h-4 rounded-full bg-glacier-mint/30 border-2 border-glacier-mint shrink-0 ml-[1.1rem] md:ml-[1.1rem]" />
                     <div className="h-px bg-white/10 flex-1" />
                   </div>
 
@@ -198,3 +282,5 @@ export const ItineraryView = () => {
     </div>
   );
 };
+
+export default ItineraryView;

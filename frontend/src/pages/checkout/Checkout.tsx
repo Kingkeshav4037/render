@@ -1,20 +1,38 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useCart } from '../../store/useCartStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useCurrencyStore } from '../../store/useCurrencyStore';
-import { Check, CreditCard, User, Tag, Lock, ExternalLink, ShieldCheck, Leaf, ArrowRight, Info, ShoppingBag } from 'lucide-react';
+import { Check, CreditCard, User, Tag, Lock, ShieldCheck, Leaf, ArrowRight, Info, ShoppingBag, AlertCircle } from 'lucide-react';
 import { checkoutService } from '../../services/checkoutService';
 import { toast } from 'sonner';
 
 export const Checkout = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { items, getCartTotal, clearCart } = useCart();
   const { user, profile } = useAuthStore();
   const { formatPrice } = useCurrencyStore();
   
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [processing, setProcessing] = useState(false);
+  const isSubmittingRef = useRef(false);
+  const [pendingOrderId, setPendingOrderId] = useState<string | null>(searchParams.get('order_id') || null);
+
+
+  // Contact State
+  const [firstName, setFirstName] = useState(profile?.fullName?.split(' ')[0] || '');
+  const [lastName, setLastName] = useState(profile?.fullName?.split(' ').slice(1).join(' ') || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [phone, setPhone] = useState((profile as any)?.phone || '');
+
+  // Fulfilment State (for Food & Shop Items)
+  const hasPhysicalOrFoodItems = items.some(i => i.item_type === 'PRODUCT' || i.item_type === 'RESTAURANT');
+  const [fulfillmentType, setFulfillmentType] = useState<'delivery' | 'pickup' | 'dinein'>('delivery');
+  const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [deliveryCity, setDeliveryCity] = useState('');
+  const [deliveryPostal, setDeliveryPostal] = useState('');
+  const [deliveryNotes, setDeliveryNotes] = useState('');
 
   // Add-ons State
   const [addInsurance, setAddInsurance] = useState(true);
@@ -23,6 +41,40 @@ export const Checkout = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  useEffect(() => {
+    if (profile?.fullName) {
+      const parts = profile.fullName.split(' ');
+      if (!firstName) setFirstName(parts[0] || '');
+      if (!lastName) setLastName(parts.slice(1).join(' ') || '');
+    }
+    if (user?.email && !email) {
+      setEmail(user.email);
+    }
+  }, [profile, user]);
+
+  const handleStep1Next = () => {
+    if (!firstName.trim()) {
+      toast.error('Please enter your first name.');
+      return;
+    }
+    if (!email.trim() || !email.includes('@')) {
+      toast.error('Please enter a valid email address.');
+      return;
+    }
+    setStep(2);
+  };
+
+  const handleStep2Next = () => {
+    if (hasPhysicalOrFoodItems && fulfillmentType === 'delivery') {
+      if (!deliveryAddress.trim() || !deliveryCity.trim()) {
+        toast.error('Please provide a delivery street address and city.');
+        return;
+      }
+    }
+    setStep(3);
+  };
+
 
   if (items.length === 0) {
     return (
@@ -84,18 +136,31 @@ export const Checkout = () => {
       return;
     }
 
+    // Idempotency check: Guard against multiple clicks
+    if (isSubmittingRef.current || processing) {
+      return;
+    }
+    isSubmittingRef.current = true;
+    setProcessing(true);
+
     // ISSUE-020: Load Razorpay SDK *before* creating the order
     // — prevents phantom orders if the SDK fails to load
     const sdkLoaded = await loadRazorpayScript();
     if (!sdkLoaded) {
+      isSubmittingRef.current = false;
+      setProcessing(false);
       toast.error('Payment gateway SDK failed to load. Please check your internet connection.');
       return;
     }
 
-    setProcessing(true);
+    let orderId = pendingOrderId || '';
+
     try {
-      // 1. Create Pending Order (only after SDK is confirmed available)
-      const orderId = await checkoutService.processCheckout(user.id, items, 'NOK');
+      // 1. Create or Reuse Pending Order
+      if (!orderId) {
+        orderId = await checkoutService.processCheckout(user.id, items, 'NOK');
+        setPendingOrderId(orderId);
+      }
       
       // 2. Create Payment Intent via Supabase Edge Function
       let gatewayOrderId = '';
@@ -115,11 +180,50 @@ export const Checkout = () => {
         amount: Math.round(total * 100),
         currency: 'NOK',
         name: 'Norway SmartLife',
-        description: 'Payment for your booking',
-        handler: function (_response: any) {
-          clearCart();
-          navigate(`/payment-success?order_id=${orderId}`);
+        description: `Order #${orderId.substring(0, 8).toUpperCase()}`,
+        modal: {
+          ondismiss: function () {
+            isSubmittingRef.current = false;
+            setProcessing(false);
+            toast.info(
+              `Payment was cancelled or closed. Your cart and order (#ORD-${orderId.substring(0, 8).toUpperCase()}) have been preserved so you can retry whenever you are ready.`
+            );
+          }
         },
+        handler: async function (response: any) {
+          try {
+            setProcessing(true);
+            toast.loading('Verifying payment signature with secure server...', { id: 'payment-verifying' });
+            
+            // Step 6: Server-side verification of payment signature
+            if (response.razorpay_signature && response.razorpay_payment_id) {
+              const verifyRes = await checkoutService.verifyPayment({
+                orderId: orderId,
+                razorpay_order_id: response.razorpay_order_id || gatewayOrderId,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              });
+
+              if (verifyRes && verifyRes.success === false) {
+                throw new Error(verifyRes.message || 'Payment signature verification mismatch');
+              }
+            }
+
+            toast.success('Payment completed and verified successfully!', { id: 'payment-verifying' });
+            // Step 8: Only clear cart on verified success
+            clearCart();
+            isSubmittingRef.current = false;
+            setProcessing(false);
+            navigate(`/payment-success?order_id=${orderId}`);
+          } catch (err: any) {
+            console.error('Payment processing error:', err);
+            isSubmittingRef.current = false;
+            setProcessing(false);
+            toast.error(err?.message || 'Payment verification failed.', { id: 'payment-verifying' });
+            navigate(`/payment-failure?order_id=${orderId}&reason=VERIFICATION_FAILED&description=${encodeURIComponent(err?.message || 'Signature mismatch')}`);
+          }
+        },
+
         prefill: {
           name: profile?.fullName || '',
           email: user?.email || '',
@@ -135,17 +239,25 @@ export const Checkout = () => {
 
       const paymentObject = new (window as any).Razorpay(options);
       paymentObject.on('payment.failed', function (response: any) {
-        toast.error(response?.error?.description || 'Payment was cancelled or failed.');
+        isSubmittingRef.current = false;
+        setProcessing(false);
+        const errMsg = response?.error?.description || response?.error?.reason || 'Payment was declined by your bank or provider.';
+        toast.error(errMsg);
+        navigate(`/payment-failure?order_id=${orderId}&reason=DECLINED&description=${encodeURIComponent(errMsg)}`);
       });
       paymentObject.open();
 
     } catch (error: any) {
       console.error('Checkout error:', error);
-      toast.error(error.message || 'Checkout could not be completed.');
-    } finally {
+      isSubmittingRef.current = false;
       setProcessing(false);
+      toast.error(error.message || 'Checkout could not be completed.');
+      if (orderId) {
+        navigate(`/payment-failure?order_id=${orderId}&reason=PROVIDER_ERROR&description=${encodeURIComponent(error.message || 'Order initialization failed')}`);
+      }
     }
   };
+
 
   if (items.length === 0) {
     return (
@@ -203,23 +315,55 @@ export const Checkout = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label htmlFor="checkout-first-name" className="block text-[10px] font-bold text-snow/50 uppercase tracking-widest mb-2">First Name</label>
-                      <input id="checkout-first-name" type="text" defaultValue={profile?.fullName?.split(' ')[0]} className="w-full p-4 border border-white/10 bg-white/5 focus:bg-white/10 focus:border-arctic-gold outline-none transition-colors font-medium text-snow" />
+                      <label htmlFor="checkout-first-name" className="block text-[10px] font-bold text-snow/50 uppercase tracking-widest mb-2">First Name *</label>
+                      <input 
+                        id="checkout-first-name" 
+                        type="text" 
+                        value={firstName} 
+                        onChange={(e) => setFirstName(e.target.value)} 
+                        placeholder="First name"
+                        className="w-full p-4 border border-white/10 bg-white/5 focus:bg-white/10 focus:border-arctic-gold outline-none transition-colors font-medium text-snow placeholder:text-snow/30" 
+                      />
                     </div>
                     <div>
                       <label htmlFor="checkout-last-name" className="block text-[10px] font-bold text-snow/50 uppercase tracking-widest mb-2">Last Name</label>
-                      <input id="checkout-last-name" type="text" defaultValue={profile?.fullName?.split(' ')[1]} className="w-full p-4 border border-white/10 bg-white/5 focus:bg-white/10 focus:border-arctic-gold outline-none transition-colors font-medium text-snow" />
+                      <input 
+                        id="checkout-last-name" 
+                        type="text" 
+                        value={lastName} 
+                        onChange={(e) => setLastName(e.target.value)} 
+                        placeholder="Last name"
+                        className="w-full p-4 border border-white/10 bg-white/5 focus:bg-white/10 focus:border-arctic-gold outline-none transition-colors font-medium text-snow placeholder:text-snow/30" 
+                      />
                     </div>
-                    <div className="md:col-span-2">
-                      <label htmlFor="checkout-email" className="block text-[10px] font-bold text-snow/50 uppercase tracking-widest mb-2">Email Address (For booking confirmation)</label>
-                      <input id="checkout-email" type="email" defaultValue={user?.email} className="w-full p-4 border border-white/10 bg-white/5 focus:bg-white/10 focus:border-arctic-gold outline-none transition-colors font-medium text-snow" />
+                    <div>
+                      <label htmlFor="checkout-email" className="block text-[10px] font-bold text-snow/50 uppercase tracking-widest mb-2">Email Address *</label>
+                      <input 
+                        id="checkout-email" 
+                        type="email" 
+                        value={email} 
+                        onChange={(e) => setEmail(e.target.value)} 
+                        placeholder="name@example.com"
+                        className="w-full p-4 border border-white/10 bg-white/5 focus:bg-white/10 focus:border-arctic-gold outline-none transition-colors font-medium text-snow placeholder:text-snow/30" 
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="checkout-phone" className="block text-[10px] font-bold text-snow/50 uppercase tracking-widest mb-2">Phone Number</label>
+                      <input 
+                        id="checkout-phone" 
+                        type="tel" 
+                        value={phone} 
+                        onChange={(e) => setPhone(e.target.value)} 
+                        placeholder="+47 000 00 000"
+                        className="w-full p-4 border border-white/10 bg-white/5 focus:bg-white/10 focus:border-arctic-gold outline-none transition-colors font-medium text-snow placeholder:text-snow/30" 
+                      />
                     </div>
                   </div>
 
                   <div className="mt-8 pt-6 border-t border-white/5 flex justify-end">
                     <button 
-                      onClick={() => setStep(2)}
-                      className="px-8 py-4 bg-arctic-gold text-deep-night font-bold uppercase tracking-widest text-xs hover:bg-snow transition-colors flex items-center gap-2"
+                      onClick={handleStep1Next}
+                      className="px-8 py-4 bg-arctic-gold text-deep-night font-bold uppercase tracking-widest text-xs hover:bg-snow transition-colors flex items-center gap-2 cursor-pointer"
                     >
                       Next Step <ArrowRight size={16} />
                     </button>
@@ -228,37 +372,138 @@ export const Checkout = () => {
               )}
             </div>
 
-            {/* Step 2: Guest & Itinerary Details */}
+            {/* Step 2: Guest & Fulfilment Details */}
             <div className={`bg-midnight shadow-sm border transition-all duration-300 ${step === 2 ? 'border-arctic-gold ring-1 ring-arctic-gold/50 scale-[1.01] shadow-2xl' : 'border-white/10'} opacity-${step >= 2 ? '100' : '60'}`}>
               <div className={`p-6 border-b border-white/5 flex items-center gap-4 ${step === 2 ? 'bg-white/5' : 'bg-transparent'}`}>
                 <div className={`w-10 h-10 flex items-center justify-center font-bold text-lg ${step >= 2 ? 'bg-arctic-gold text-deep-night' : 'bg-white/10 text-snow/50'}`}>2</div>
-                <h2 className={`text-2xl font-display font-bold ${step >= 2 ? 'text-snow' : 'text-snow/50'}`}>Guest & Itinerary Details</h2>
+                <h2 className={`text-2xl font-display font-bold ${step >= 2 ? 'text-snow' : 'text-snow/50'}`}>
+                  {hasPhysicalOrFoodItems ? 'Fulfilment & Delivery Details' : 'Guest & Itinerary Details'}
+                </h2>
                 {step > 2 && <Check className="ml-auto text-arctic-gold" size={24} />}
               </div>
               
               {step === 2 && (
-                <div className="p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  <p className="text-snow/60 mb-8">Please provide names exactly as they appear on official IDs for tickets and reservations.</p>
+                <div className="p-8 animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
                   
-                  <div className="space-y-6">
-                    {items.map((item, idx) => (
-                      <div key={item.id} className="p-6 border border-white/10 bg-white/5">
-                        <div className="flex justify-between items-start mb-6">
-                          <div>
-                            <span className="text-[10px] font-bold text-arctic-gold uppercase tracking-widest block mb-1">Item {idx + 1} • {item.item_type}</span>
-                            <h4 className="font-bold text-snow text-lg leading-tight">{item.name}</h4>
-                            {item.start_time && <p className="text-sm font-bold text-snow/50 mt-2">{new Date(item.start_time).toLocaleDateString()}</p>}
+                  {/* Fulfilment Mode Selector (for Food & Shop items) */}
+                  {hasPhysicalOrFoodItems && (
+                    <div className="space-y-4">
+                      <label className="block text-xs font-bold text-arctic-gold uppercase tracking-widest">
+                        Select Fulfilment Method
+                      </label>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {[
+                          { type: 'delivery', title: '🌱 Eco-Delivery', desc: 'Zero-emission EV to your address' },
+                          { type: 'pickup', title: '🛍️ Express Pickup', desc: 'Ready in 30-45 mins at store/kitchen' },
+                          { type: 'dinein', title: '🍽️ Dine-in / Venue', desc: 'Prepared for your reserved table' },
+                        ].map((m) => (
+                          <button
+                            key={m.type}
+                            type="button"
+                            onClick={() => setFulfillmentType(m.type as any)}
+                            className={`p-4 text-left border rounded-xl transition-all cursor-pointer ${
+                              fulfillmentType === m.type
+                                ? 'border-arctic-gold bg-arctic-gold/15 text-snow ring-1 ring-arctic-gold'
+                                : 'border-white/10 bg-white/5 text-snow/70 hover:border-white/30'
+                            }`}
+                          >
+                            <div className="font-bold text-sm text-snow">{m.title}</div>
+                            <div className="text-[11px] text-snow/60 mt-1">{m.desc}</div>
+                          </button>
+                        ))}
+                      </div>
+
+                      {fulfillmentType === 'delivery' && (
+                        <div className="mt-4 p-6 bg-white/5 border border-white/10 rounded-2xl space-y-4">
+                          <h4 className="font-bold text-sm text-snow uppercase tracking-wider">Norwegian Delivery Address</h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="md:col-span-2">
+                              <label htmlFor="del-addr" className="block text-[10px] font-bold text-snow/50 uppercase tracking-widest mb-1">Street Address & Hotel / Unit Number *</label>
+                              <input
+                                id="del-addr"
+                                type="text"
+                                value={deliveryAddress}
+                                onChange={(e) => setDeliveryAddress(e.target.value)}
+                                placeholder="e.g. Karl Johans gate 22, Apt 4B"
+                                className="w-full p-3 bg-deep-night border border-white/10 text-sm text-snow rounded-lg focus:border-arctic-gold outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label htmlFor="del-city" className="block text-[10px] font-bold text-snow/50 uppercase tracking-widest mb-1">City / Municipality *</label>
+                              <input
+                                id="del-city"
+                                type="text"
+                                value={deliveryCity}
+                                onChange={(e) => setDeliveryCity(e.target.value)}
+                                placeholder="e.g. Oslo / Tromsø / Bergen"
+                                className="w-full p-3 bg-deep-night border border-white/10 text-sm text-snow rounded-lg focus:border-arctic-gold outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label htmlFor="del-post" className="block text-[10px] font-bold text-snow/50 uppercase tracking-widest mb-1">Postal Code</label>
+                              <input
+                                id="del-post"
+                                type="text"
+                                value={deliveryPostal}
+                                onChange={(e) => setDeliveryPostal(e.target.value)}
+                                placeholder="e.g. 0159"
+                                className="w-full p-3 bg-deep-night border border-white/10 text-sm text-snow rounded-lg focus:border-arctic-gold outline-none"
+                              />
+                            </div>
+                            <div className="md:col-span-2">
+                              <label htmlFor="del-notes" className="block text-[10px] font-bold text-snow/50 uppercase tracking-widest mb-1">Special Delivery / Dietary Instructions (Optional)</label>
+                              <input
+                                id="del-notes"
+                                type="text"
+                                value={deliveryNotes}
+                                onChange={(e) => setDeliveryNotes(e.target.value)}
+                                placeholder="e.g. Ring doorbell #4, leave at door, gluten allergy"
+                                className="w-full p-3 bg-deep-night border border-white/10 text-sm text-snow rounded-lg focus:border-arctic-gold outline-none"
+                              />
+                            </div>
                           </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <p className="text-snow/60 text-xs">Review individual item details and dietary or guest requests below.</p>
+                  
+                  <div className="space-y-4">
+                    {items.map((item, idx) => (
+                      <div key={item.id} className="p-5 border border-white/10 bg-white/5 rounded-2xl">
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <span className="text-[10px] font-bold text-arctic-gold uppercase tracking-widest block mb-1">
+                              Item {idx + 1} • {item.item_type}
+                            </span>
+                            <h4 className="font-bold text-snow text-base leading-tight">{item.name}</h4>
+                            <p className="text-xs text-snow/50 mt-1">Quantity: {item.quantity} × {formatPrice(item.unit_price)}</p>
+                          </div>
+                          <span className="font-display font-bold text-snow text-sm">
+                            {formatPrice(item.unit_price * item.quantity)}
+                          </span>
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label htmlFor={`lead-guest-${item.id}`} className="block text-[10px] font-bold text-snow/50 uppercase tracking-widest mb-2">Lead Guest Name</label>
-                            <input id={`lead-guest-${item.id}`} type="text" placeholder="Same as contact" defaultValue={profile?.fullName || ''} className="w-full p-3 border border-white/10 bg-deep-night focus:border-arctic-gold outline-none text-sm font-medium text-snow placeholder:text-snow/30" />
+                            <label htmlFor={`lead-guest-${item.id}`} className="block text-[10px] font-bold text-snow/50 uppercase tracking-widest mb-1">Recipient / Guest</label>
+                            <input 
+                              id={`lead-guest-${item.id}`} 
+                              type="text" 
+                              placeholder="Same as contact name" 
+                              defaultValue={firstName ? `${firstName} ${lastName}`.trim() : profile?.fullName || ''} 
+                              className="w-full p-2.5 border border-white/10 bg-deep-night focus:border-arctic-gold outline-none text-xs font-medium text-snow placeholder:text-snow/30 rounded-lg" 
+                            />
                           </div>
                           <div>
-                            <label htmlFor={`special-requests-${item.id}`} className="block text-[10px] font-bold text-snow/50 uppercase tracking-widest mb-2">Special Requests</label>
-                            <input id={`special-requests-${item.id}`} type="text" placeholder="Dietary, accessibility, etc." className="w-full p-3 border border-white/10 bg-deep-night focus:border-arctic-gold outline-none text-sm font-medium text-snow placeholder:text-snow/30" />
+                            <label htmlFor={`special-requests-${item.id}`} className="block text-[10px] font-bold text-snow/50 uppercase tracking-widest mb-1">Item Notes / Preferences</label>
+                            <input 
+                              id={`special-requests-${item.id}`} 
+                              type="text" 
+                              placeholder="Dietary, gift wrap, extra napkins, etc." 
+                              className="w-full p-2.5 border border-white/10 bg-deep-night focus:border-arctic-gold outline-none text-xs font-medium text-snow placeholder:text-snow/30 rounded-lg" 
+                            />
                           </div>
                         </div>
                       </div>
@@ -266,16 +511,23 @@ export const Checkout = () => {
                   </div>
 
                   <div className="mt-8 pt-6 border-t border-white/5 flex justify-between">
-                    <button onClick={() => setStep(1)} className="px-6 py-4 text-snow/50 font-bold uppercase tracking-widest text-xs hover:text-snow transition-colors">
+                    <button 
+                      onClick={() => setStep(1)} 
+                      className="px-6 py-4 text-snow/50 font-bold uppercase tracking-widest text-xs hover:text-snow transition-colors cursor-pointer"
+                    >
                       Back
                     </button>
-                    <button onClick={() => setStep(3)} className="px-8 py-4 bg-arctic-gold text-deep-night font-bold uppercase tracking-widest text-xs hover:bg-snow transition-colors flex items-center gap-2">
+                    <button 
+                      onClick={handleStep2Next} 
+                      className="px-8 py-4 bg-arctic-gold text-deep-night font-bold uppercase tracking-widest text-xs hover:bg-snow transition-colors flex items-center gap-2 cursor-pointer rounded-xl"
+                    >
                       Next Step <ArrowRight size={16} />
                     </button>
                   </div>
                 </div>
               )}
             </div>
+
 
             {/* Step 3: Add-ons & Upgrades */}
             <div className={`bg-midnight shadow-sm border transition-all duration-300 ${step === 3 ? 'border-arctic-gold ring-1 ring-arctic-gold/50 scale-[1.01] shadow-2xl' : 'border-white/10'} opacity-${step >= 3 ? '100' : '60'}`}>

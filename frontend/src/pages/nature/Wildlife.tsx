@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { CinematicBackground } from '../../design/backgrounds/CinematicBackground';
 import { Container } from '../../components/layout/Container';
-import { Eye, Map, Shield, Calendar, Leaf, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Eye, Map, Shield, Calendar, Leaf, ChevronLeft, ChevronRight, Search, Compass, AlertTriangle, Binoculars } from 'lucide-react';
 import { useWildlife } from '../../hooks/useWildlife';
 import { AsyncStateWrapper } from '../../components/shared/AsyncStateWrapper';
 import { SEO } from '../../components/shared/SEO';
@@ -15,6 +15,7 @@ export const Wildlife = () => {
   const limit = 12;
 
   // Filter states
+  const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedRegion, setSelectedRegion] = useState<string>('All');
   const [selectedSeason, setSelectedSeason] = useState<string>('All');
@@ -25,12 +26,17 @@ export const Wildlife = () => {
     season: selectedSeason !== 'All' ? selectedSeason : undefined,
   }, page, limit);
 
-  const species = data?.data || [];
+  const rawSpecies = data?.data || [];
+  const species = searchTerm.trim() 
+    ? rawSpecies.filter(s => 
+        s.common_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        s.scientific_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (s.norwegian_name && s.norwegian_name.toLowerCase().includes(searchTerm.toLowerCase()))
+      )
+    : rawSpecies;
+
   const totalPages = data ? Math.ceil(data.count / limit) : 1;
 
-  // Compute available filter options based on actual data
-  // Note: in a fully server-side filtered app, these might come from an aggregations endpoint.
-  // For now we'll hardcode some logical options for Norway wildlife.
   const categories = ['All', 'Mammals', 'Birds', 'Marine', 'Other'];
   const regions = ['All', 'Svalbard', 'Northern Norway', 'Fjord Norway', 'Eastern Norway', 'Trøndelag'];
   const seasons = ['All', 'Summer', 'Winter', 'Spring', 'Autumn', 'Year-round'];
@@ -38,11 +44,11 @@ export const Wildlife = () => {
   return (
     <div className="min-h-screen bg-nordic-sage/10 text-nordic-charcoal font-sans pb-24">
       <SEO 
-        title="Wildlife of Norway | SmartLife"
-        description="Discover the magnificent wildlife of Norway from Polar Bears to Atlantic Puffins."
+        title="Wildlife of Norway | SmartLife Nature Guide"
+        description="Discover the magnificent wildlife of Norway from Polar Bears and Arctic Foxes to Atlantic Puffins and Orcas."
       />
       {/* Documentary-style Hero */}
-      <div className="relative h-[70vh]">
+      <div className="relative h-[70vh] min-h-[500px]">
         <CinematicBackground 
           imageUrl="/images/wildlife_reindeer_1787013667019.jpg"
           overlayOpacity={0.6}
@@ -63,7 +69,18 @@ export const Wildlife = () => {
               <p className="text-lg md:text-2xl text-gray-200 font-light max-w-2xl font-serif italic mb-8">
                 Meet the animals of Norway — from Arctic foxes and wild reindeer to whales, puffins and majestic birds of prey.
               </p>
-              <div className="w-16 h-1 bg-nordic-sage mt-4" />
+
+              {/* Search Bar */}
+              <div className="w-full max-w-md relative shadow-2xl">
+                <Search className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search species (e.g. Polar Bear, Puffin, Orca)..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-white/95 backdrop-blur-md text-nordic-charcoal placeholder-gray-400 font-medium text-sm border-0 focus:ring-4 focus:ring-nordic-sage/50 outline-none transition-all"
+                />
+              </div>
             </motion.div>
           </Container>
         </div>
@@ -103,6 +120,14 @@ export const Wildlife = () => {
                 {seasons.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
+            {(selectedCategory !== 'All' || selectedRegion !== 'All' || selectedSeason !== 'All' || searchTerm) && (
+              <button 
+                onClick={() => { setSelectedCategory('All'); setSelectedRegion('All'); setSelectedSeason('All'); setSearchTerm(''); }}
+                className="text-xs font-bold uppercase tracking-widest text-red-600 hover:text-red-800 transition-colors cursor-pointer"
+              >
+                Clear Filters
+              </button>
+            )}
           </div>
         </Container>
       </div>
@@ -215,6 +240,53 @@ export const Wildlife = () => {
             </>
           )}
         </AsyncStateWrapper>
+
+        {/* Responsible Wildlife Observation Code */}
+        <div className="mt-20 pt-16 border-t border-nordic-sage/20">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-nordic-sage/20 text-nordic-sage font-bold text-xs uppercase tracking-widest mb-4">
+              <Shield className="w-4 h-4" /> Ethical Observation Code
+            </div>
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-nordic-charcoal mb-4">
+              Responsible Wildlife Watching
+            </h2>
+            <p className="text-nordic-charcoal/70 text-sm leading-relaxed">
+              Norway's fauna thrives in fragile Arctic and alpine ecosystems. Adhere to these principles to preserve their natural behaviors.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white p-8 rounded-3xl border border-nordic-sage/20 shadow-sm">
+              <div className="w-12 h-12 rounded-2xl bg-nordic-sage/10 text-nordic-sage flex items-center justify-center mb-6">
+                <Binoculars className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-nordic-charcoal mb-3">Maintain Safe Distances</h3>
+              <p className="text-sm text-nordic-charcoal/70 leading-relaxed">
+                Always use binoculars or telephoto lenses. For Muskox, maintain a strict 200m safety perimeter; never approach Polar Bears or seal haul-outs.
+              </p>
+            </div>
+
+            <div className="bg-white p-8 rounded-3xl border border-nordic-sage/20 shadow-sm">
+              <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center mb-6">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-nordic-charcoal mb-3">Never Feed or Lure</h3>
+              <p className="text-sm text-nordic-charcoal/70 leading-relaxed">
+                Feeding wildlife alters natural foraging behaviors and creates dangerous habituation. Keep all camp food and organic waste securely sealed.
+              </p>
+            </div>
+
+            <div className="bg-white p-8 rounded-3xl border border-nordic-sage/20 shadow-sm">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-6">
+                <Compass className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-nordic-charcoal mb-3">Leash Laws & Nesting Sanctuary</h3>
+              <p className="text-sm text-nordic-charcoal/70 leading-relaxed">
+                Under Norway's <em>Hundeloven</em>, dogs must be kept on a leash from April 1 to August 20 to protect ground-nesting seabirds and reindeer calves.
+              </p>
+            </div>
+          </div>
+        </div>
       </Container>
     </div>
   );

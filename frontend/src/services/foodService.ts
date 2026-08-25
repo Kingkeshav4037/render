@@ -6,7 +6,6 @@ export type RestaurantRow = Database['public']['Tables']['restaurants']['Row'];
 
 export interface Restaurant extends RestaurantRow {
   location?: Location;
-  is_demo?: boolean;
 }
 
 export type FoodRow = Database['public']['Tables']['foods']['Row'];
@@ -96,9 +95,8 @@ const FOOD_PRICES: Record<string, number> = {
 };
 
 export function getFoodImage(name: string, imageUrl?: string | null): string {
-  // Trust DB url only if it's genuinely unique (not the repeated salmon image from a bad migration)
   if (imageUrl && !imageUrl.includes('placeholder') && !imageUrl.includes('food_salmon')) {
-    // Extra check – if slug-key image exists, prefer it anyway
+    return imageUrl;
   }
 
   const key = name.toLowerCase().trim();
@@ -121,41 +119,8 @@ export function getFoodPrice(name: string, dbPrice?: number | null): number {
   for (const [slug, price] of Object.entries(FOOD_PRICES)) {
     if (key === slug || key.includes(slug)) return price;
   }
-  // Generic fallback
   return 149;
 }
-
-// Fallback dataset for when DB is empty
-const FOOD_DEFAULTS = {
-  canonical_url: null, external_id: null, og_image: null, published_at: null,
-  seo_description: null, seo_title: null, source_name: null, source_type: null,
-  verified_at: null, verified_by: null,
-  image_alt: null, image_category: null, image_credit: null, image_source: null,
-  image_verified: null, image_verified_at: null, image_verified_by: null,
-  search_vector: null
-};
-const DEFAULT_FOODS: Food[] = [
-  { ...FOOD_DEFAULTS, id: 'f-001', slug: 'farikal', name: 'Fårikål', description: "Norway's national dish: slow-cooked lamb and cabbage with whole black peppercorns, traditionally served in autumn.", status: 'PUBLISHED', featured: true, image_url: FOOD_IMAGES['farikal'], price: 198, currency: 'NOK', category: 'Traditional', prep_time: '2.5 hrs', created_at: '', updated_at: '' },
-  { ...FOOD_DEFAULTS, id: 'f-002', slug: 'brunost', name: 'Brunost', description: "A sweet, caramelized brown cheese made by boiling whey, milk, and cream — iconic on Norwegian waffles.", status: 'PUBLISHED', featured: true, image_url: FOOD_IMAGES['brunost'], price: 89, currency: 'NOK', category: 'Traditional', prep_time: '5 min', created_at: '', updated_at: '' },
-  { ...FOOD_DEFAULTS, id: 'f-003', slug: 'kjottkaker', name: 'Kjøttkaker', description: 'Traditional Norwegian meatballs in a rich brown gravy, served with mashed potatoes and lingonberry jam.', status: 'PUBLISHED', featured: true, image_url: FOOD_IMAGES['kjottkaker'], price: 175, currency: 'NOK', category: 'Traditional', prep_time: '45 min', created_at: '', updated_at: '' },
-  { ...FOOD_DEFAULTS, id: 'f-004', slug: 'pinnekjott', name: 'Pinnekjøtt', description: 'Salted and dried lamb ribs steamed over birch sticks — the classic Norwegian Christmas main course.', status: 'PUBLISHED', featured: true, image_url: FOOD_IMAGES['pinnekjott'], price: 285, currency: 'NOK', category: 'Traditional', prep_time: '3 hrs', created_at: '', updated_at: '' },
-  { ...FOOD_DEFAULTS, id: 'f-005', slug: 'ribbe', name: 'Ribbe', description: "Crispy pork belly, Norway's most popular Christmas Eve main dish, seasoned with salt and pepper.", status: 'PUBLISHED', featured: true, image_url: FOOD_IMAGES['ribbe'], price: 245, currency: 'NOK', category: 'Traditional', prep_time: '3 hrs', created_at: '', updated_at: '' },
-  { ...FOOD_DEFAULTS, id: 'f-006', slug: 'lutefisk', name: 'Lutefisk', description: 'Dried stockfish treated with lye then rehydrated — a polarizing but traditional Norwegian Christmas dish.', status: 'PUBLISHED', featured: false, image_url: FOOD_IMAGES['lutefisk'], price: 220, currency: 'NOK', category: 'Seafood', prep_time: '20 min', created_at: '', updated_at: '' },
-  { ...FOOD_DEFAULTS, id: 'f-007', slug: 'raspeballer', name: 'Raspeballer', description: 'Hearty potato dumplings boiled with salted meat and bacon — a beloved comfort food from Western Norway.', status: 'PUBLISHED', featured: false, image_url: FOOD_IMAGES['raspeballer'], price: 165, currency: 'NOK', category: 'Traditional', prep_time: '1 hr', created_at: '', updated_at: '' },
-  { ...FOOD_DEFAULTS, id: 'f-008', slug: 'lapskaus', name: 'Lapskaus', description: 'A thick Norwegian stew of meat, potatoes, and root vegetables — hearty winter comfort food.', status: 'PUBLISHED', featured: false, image_url: FOOD_IMAGES['lapskaus'], price: 155, currency: 'NOK', category: 'Traditional', prep_time: '1.5 hrs', created_at: '', updated_at: '' },
-];
-
-
-const DEFAULT_RESTAURANTS: any[] = [
-  { id: 'r-001', name: 'Maaemo', type: 'FINE_DINING', description: 'Three-Michelin-star pioneer of New Nordic cuisine in Oslo.', image_url: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=1200', rating: 5.0, price_range: '$$$$', location: { name: 'Oslo', region: 'Eastern Norway' } },
-  { id: 'r-002', name: 'Cornelius Seafood Restaurant', type: 'SEAFOOD', description: 'Norway\'s freshest seafood served on a rocky island accessible only by boat in the Bergen Fjord.', image_url: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1200', rating: 4.8, price_range: '$$$', location: { name: 'Bergen', region: 'Fjord Norway' } },
-  { id: 'r-003', name: 'Lysverket', type: 'NEW_NORDIC', description: 'Creative New Nordic tasting menus inside Bergen\'s famous KODE art museum.', image_url: 'https://images.unsplash.com/photo-1550966871-3ed3cbe818b5?q=80&w=1200', rating: 4.7, price_range: '$$$', location: { name: 'Bergen', region: 'Fjord Norway' } },
-  { id: 'r-004', name: 'Sabi Omakase', type: 'FINE_DINING', description: 'Intimate 8-seat omakase bar in Stavanger combining Japanese precision with Norwegian seafood.', image_url: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=1200', rating: 4.9, price_range: '$$$$', location: { name: 'Stavanger', region: 'Fjord Norway' } },
-  { id: 'r-005', name: 'Re-naa', type: 'FINE_DINING', description: 'One-Michelin-star restaurant highlighting local Rogaland produce with modern technique.', image_url: 'https://images.unsplash.com/photo-1571997478779-2adcbbe9ab2f?q=80&w=1200', rating: 4.8, price_range: '$$$', location: { name: 'Stavanger', region: 'Fjord Norway' } },
-  { id: 'r-006', name: 'Bagatelle', type: 'NEW_NORDIC', description: 'Oslo\'s legendary fine-dining institution with a deep focus on seasonal Norwegian ingredients.', image_url: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=1200', rating: 4.7, price_range: '$$$', location: { name: 'Oslo', region: 'Eastern Norway' } },
-  { id: 'r-007', name: 'Sjømagasinet', type: 'SEAFOOD', description: 'Award-winning Bergen waterfront seafood restaurant in a beautifully restored 19th-century warehouse.', image_url: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1200', rating: 4.6, price_range: '$$$', location: { name: 'Bergen', region: 'Fjord Norway' } },
-  { id: 'r-008', name: 'Arakataka', type: 'CASUAL', description: 'Celebrated Oslo bistro for organic, locally-sourced small plates with natural wines.', image_url: 'https://images.unsplash.com/photo-1550966871-3ed3cbe818b5?q=80&w=1200', rating: 4.5, price_range: '$$', location: { name: 'Oslo', region: 'Eastern Norway' } },
-];
 
 export const foodService = {
   async getRestaurants(
@@ -183,37 +148,33 @@ export const foodService = {
 
       const { data, count, error } = await query.range(from, to);
 
-      if (error || !data || data.length === 0) {
-        const filtered = filters?.cuisine
-          ? DEFAULT_RESTAURANTS
-          : DEFAULT_RESTAURANTS;
-        return {
-          data: filtered.slice((page - 1) * limit, page * limit) as Restaurant[],
-          count: filtered.length,
-        };
+      if (error) {
+        console.error('Error fetching restaurants:', error);
+        return { data: [], count: 0 };
       }
 
-      return { data: data as Restaurant[], count: count || 0 };
-    } catch {
-      return { data: DEFAULT_RESTAURANTS as Restaurant[], count: DEFAULT_RESTAURANTS.length };
+      return { data: (data as Restaurant[]) || [], count: count || 0 };
+    } catch (err) {
+      console.error('Error in getRestaurants:', err);
+      return { data: [], count: 0 };
     }
   },
 
   async getRestaurantById(id: string): Promise<Restaurant | null> {
     try {
-      // Check if it's a fallback ID
-      const fallback = DEFAULT_RESTAURANTS.find(r => r.id === id);
-      if (fallback) return fallback as Restaurant;
-
       const { data, error } = await supabase
         .from('restaurants')
         .select('*, location:locations(*)')
         .eq('id', id)
         .single();
 
-      if (error || !data) return null;
+      if (error || !data) {
+        if (error) console.error('Error fetching restaurant by id:', error);
+        return null;
+      }
       return data as Restaurant;
-    } catch {
+    } catch (err) {
+      console.error('Error in getRestaurantById:', err);
       return null;
     }
   },
@@ -237,17 +198,13 @@ export const foodService = {
 
       const { data, count, error } = await query.range(from, to);
 
-      if (error || !data || data.length === 0) {
-        let fallback = DEFAULT_FOODS;
-        if (filters?.featured) fallback = DEFAULT_FOODS.filter(f => f.featured);
-        return {
-          data: fallback.slice((page - 1) * limit, page * limit),
-          count: fallback.length,
-        };
+      if (error) {
+        console.error('Error fetching foods:', error);
+        return { data: [], count: 0 };
       }
 
       // Enrich each food with correct image and price
-      const enriched: Food[] = (data as Food[]).map(food => ({
+      const enriched: Food[] = ((data as Food[]) || []).map(food => ({
         ...food,
         image_url: getFoodImage(food.name, food.image_url),
         price: getFoodPrice(food.name, undefined),
@@ -255,8 +212,38 @@ export const foodService = {
       }));
 
       return { data: enriched, count: count || enriched.length };
-    } catch {
-      return { data: DEFAULT_FOODS, count: DEFAULT_FOODS.length };
+    } catch (err) {
+      console.error('Error in getFoods:', err);
+      return { data: [], count: 0 };
+    }
+  },
+
+  async getFoodById(id: string): Promise<Food | null> {
+    try {
+      const { data, error } = await supabase
+        .from('foods')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error || !data) {
+        // Fallback: try searching across foods list
+        const { data: allFoods } = await this.getFoods({}, 1, 50);
+        const match = allFoods.find(f => f.id === id || f.name.toLowerCase().replace(/\s+/g, '-') === id.toLowerCase());
+        return match || null;
+      }
+
+      const food = data as Food;
+      return {
+        ...food,
+        image_url: getFoodImage(food.name, food.image_url),
+        price: getFoodPrice(food.name, undefined),
+        currency: 'NOK',
+      };
+    } catch (err) {
+      console.error('Error in getFoodById:', err);
+      return null;
     }
   },
 };
+

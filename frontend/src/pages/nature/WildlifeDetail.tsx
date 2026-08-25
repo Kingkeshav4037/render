@@ -6,6 +6,7 @@ import { Container } from '../../components/layout/Container';
 import { ArrowLeft, Camera, ShieldAlert, MapPin, Calendar, Heart, Eye, Loader2, Map } from 'lucide-react';
 import { wildlifeService, WildlifeSpecies, getWildlifeImage } from '../../services/wildlifeService';
 import { OptimizedImage } from '../../components/shared/OptimizedImage';
+import { SEO } from '../../components/shared/SEO';
 
 export const WildlifeDetail = () => {
   const { id } = useParams(); // Using id as slug
@@ -49,6 +50,10 @@ export const WildlifeDetail = () => {
 
   return (
     <div className="min-h-screen bg-snow text-nordic-charcoal pb-24">
+      <SEO 
+        title={`${species.common_name} (${species.scientific_name}) | Norway Wildlife Guide`}
+        description={species.description}
+      />
       {/* Hero */}
       <div className="relative h-[80vh]">
         <CinematicBackground 

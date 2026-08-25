@@ -1,4 +1,4 @@
-﻿// @ts-nocheck
+// @ts-nocheck
 import { useQuery } from '@tanstack/react-query';
 import { mapService, Location } from '../services/map/mapService';
 import { supabase } from '../lib/supabase';
@@ -49,11 +49,41 @@ export const useLocations = (filters?: LocationFilters) => {
           query = query.eq('type', filters.category);
         }
       }
-      query = query.limit(100); // safety limit
-      
-      const { data, error } = await query;
-      if (error) throw error;
-      return (data || []) as unknown as Location[];
+      try {
+        const { data, error } = await query;
+        if (!error && data && data.length > 0) {
+          return data as unknown as Location[];
+        }
+      } catch {
+        // Fall through to fallback
+      }
+
+      const { FALLBACK_DESTINATIONS } = await import('../services/destinationService');
+      let res = FALLBACK_DESTINATIONS.map(d => ({
+        id: d.id,
+        location_id: d.id,
+        name: d.name,
+        slug: d.slug,
+        type: d.type,
+        region: d.region,
+        description: d.description || '',
+        lat: d.lat,
+        lng: d.lng,
+        hero_image_url: d.hero_image_url,
+        featured: true
+      }));
+
+      if (filters?.search) {
+        const s = filters.search.toLowerCase();
+        res = res.filter(d => d.name.toLowerCase().includes(s) || (d.region && d.region.toLowerCase().includes(s)) || (d.description && d.description.toLowerCase().includes(s)));
+      }
+      if (filters?.category) {
+        const cats = Array.isArray(filters.category) ? filters.category : [filters.category];
+        if (cats.length > 0) {
+          res = res.filter(d => cats.includes(d.type));
+        }
+      }
+      return res as unknown as Location[];
     },
   });
 };

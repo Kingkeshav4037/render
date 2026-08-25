@@ -12,6 +12,9 @@ vi.mock('../../lib/supabase', () => ({
       signUp: vi.fn(),
       signInWithPassword: vi.fn(),
     },
+    from: vi.fn().mockReturnValue({
+      upsert: vi.fn().mockResolvedValue({ error: null }),
+    }),
   },
 }));
 
@@ -32,7 +35,7 @@ describe('E2E Journey 1: Authentication', () => {
 
   it('allows a user to register and redirects to login', async () => {
     (supabase.auth.signUp as any).mockResolvedValue({
-      data: { user: { id: 'test-user-id' } },
+      data: { user: { id: 'test-user-id' }, session: { user: { id: 'test-user-id' } } },
       error: null,
     });
 
@@ -46,7 +49,10 @@ describe('E2E Journey 1: Authentication', () => {
     fireEvent.change(screen.getByPlaceholderText(/Email address/i), {
       target: { value: 'test@example.com' },
     });
-    fireEvent.change(screen.getByPlaceholderText(/Password/i), {
+    fireEvent.change(screen.getByPlaceholderText(/^Password$/i), {
+      target: { value: 'SecurePass123!' },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Confirm Password/i), {
       target: { value: 'SecurePass123!' },
     });
     fireEvent.change(screen.getByPlaceholderText(/Full Name/i), {
@@ -72,7 +78,7 @@ describe('E2E Journey 1: Authentication', () => {
 
     // Should redirect to home
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/home');
+      expect(mockNavigate).toHaveBeenCalledWith('/home', { replace: true });
     });
   });
 
@@ -92,7 +98,7 @@ describe('E2E Journey 1: Authentication', () => {
     fireEvent.change(screen.getByPlaceholderText(/Email address/i), {
       target: { value: 'test@example.com' },
     });
-    fireEvent.change(screen.getByPlaceholderText(/Password/i), {
+    fireEvent.change(screen.getByPlaceholderText(/^Password$/i), {
       target: { value: 'SecurePass123!' },
     });
 
@@ -106,9 +112,9 @@ describe('E2E Journey 1: Authentication', () => {
       });
     });
 
-    // Wait for navigation
+    // Wait for navigation with timeout for the 500ms delay
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/home');
-    });
+      expect(mockNavigate).toHaveBeenCalledWith('/home', { replace: true });
+    }, { timeout: 2000 });
   });
 });

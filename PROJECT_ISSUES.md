@@ -1,26 +1,36 @@
 # Project Issues & Risks
 
-## 1. TypeScript & Architecture Errors
-The repository fails to build (`npm run build`) and typecheck (`npx tsc -b`) due to massive type inconsistencies between the generated Supabase types (`src/lib/database.types.ts`) and the frontend's service layer.
-- **Missing Tables**: The local Supabase schema is completely missing critical tables like `trips`, `trip_segments`, `reviews`, and `travel_preferences`. A repository-wide scan (`grep_search`) confirmed that `CREATE TABLE trips` does not exist in *any* of the 29 migration files. This means the frontend code in `src/services/tripService.ts` is attempting to query a database model that was never committed or was removed. This results in TS errors like `Argument of type '"trips"' is not assignable to parameter of type 'never'`. *Attempted fix via `npm run db:types` confirmed the schema mismatch is structural.*
-- **Property Mismatches**: Several component interfaces do not match the expected types (e.g., `preferred_trip_style` vs `preferredTripStyle` in `TravelPreferencesForm.tsx`, `total_users` in `AdminDashboard.tsx`, and `full_name` vs `fullName` in `Profile.tsx`).
-- **Missing Imports**: Files in `src/pages/admin/` have broken imports referring to missing modules (e.g., `Cannot find module '../../../../lib/supabase'`).
+## 1. Hard-coded Mock Data (Resolved)
 
-## 2. Hard-coded Mock Data
-- The newly built `Stay`, `Travel`, and `Food` pages (Phase 0) use temporary mock data files (`stays.ts`, `transport.ts`, `food.ts`) structured to mimic the eventual Supabase queries. These files use the `is_demo: true` flag. These must be replaced with real Supabase queries once the database is populated.
+- All services (`staysService.ts`, `transportService.ts`, `foodService.ts`) are fully wired to live Supabase database tables with schema validation, with all temporary mock files (`src/data/demo/`) and `is_demo` flags removed. Database errors and empty responses are cleanly handled via UI empty-state components (`AsyncStateWrapper`).
 
-## 3. Duplicate Routes and Components
-- **Explore vs Destinations**: Both `/explore` and `/destinations` map to the same `Explore.tsx` component.
-- **Trip Planner**: `/planner`, `/ai-planner`, and `/plan-trip` all map to `TripPlanner.tsx`.
-- **Map**: `/map` and `/smart-map` both map to `SmartMap.tsx`.
-- **Infrastructure vs Industry**: The `/industry` route loads the actual `<Infrastructure />` component, while the `/infrastructure` route is assigned a placeholder `<ComingSoon />`.
+## 2. Duplicate Routes and Components (Resolved)
 
-## 4. Placeholders & Incomplete Features
-A significant portion of the platform is still mapped to the `ComingSoon` component, representing unbuilt features:
-- `/places`, `/nature`, `/fjords`, `/mountains`, `/wildlife`
-- `/activities`, `/events`
-- `/weather`, `/aurora`, `/safety`
-- `/deals`, `/packages`, `/guides`
+- **Explore vs Destinations**: Resolved via redirects (e.g., `/destinations` redirects to `/explore`).
+- **Trip Planner**: Resolved via redirects.
+- **Map**: Resolved via redirects.
+- **Infrastructure vs Industry**: The `/industry` route has been removed and `/infrastructure` now correctly loads the `Infrastructure` component.
 
-## 5. Potential RLS / Security Issues
+## 3. Placeholders & Incomplete Features (Resolved)
+
+The features previously mapped to placeholders or `ComingSoon` have been implemented or correctly redirected to the main Explore system:
+
+- `/places`, `/nature`, `/fjords`, `/mountains` (Redirecting to Explore/Trails)
+- `/wildlife`, `/activities`, `/events`, `/weather`, `/aurora`, `/safety`, `/deals`, `/packages`, `/guides` (Implemented components or properly redirected)
+
+## 4. Potential RLS / Security Issues
+
 - The database migrations include a file named `20260818000001_fix_rls_recursion.sql`, implying that previous Row Level Security (RLS) policies might have caused infinite recursion or lockups. This needs to be carefully monitored when the application is connected to the real database.
+
+## 5. Build Environment & Clean Release Packaging
+
+- **Release Archive Cleanup**: To ensure the release archive is lightweight and portable (~10-20 MB instead of ~585 MB), exclude all generated development and environment artifacts before compressing:
+  - `node_modules/` (prevents cross-platform native binding errors such as `@rolldown/binding-linux-x64-gnu`)
+  - `.venv/` and Python virtual environment caches (`__pycache__/`)
+  - `dist/`, `dist-ssr/` (build outputs)
+  - `playwright-report/`, `test-results/`, `coverage/`
+  - Generated audit & linter logs (`audit_results.json`, `audit-report.txt`, `linter_report.txt`)
+  - `.git/` (if producing a standalone distribution zip)
+- Target deployment machines should run a clean `npm install` and `npm run build` directly.
+
+*(Note: The previous TypeScript and architecture errors relating to Supabase schema mismatches and missing tables have been resolved with `npx tsc -b` passing 0 errors, and primary linter warnings including `AuroraCMS` initialization and unused imports have been cleaned up.)*

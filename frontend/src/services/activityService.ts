@@ -253,8 +253,8 @@ export const activityService = {
 
       if (error || !data) {
         const found = DEFAULT_ACTIVITIES.find(a => a.id === id) ||
-          DEFAULT_ACTIVITIES.find(a => a.id.toLowerCase().includes(id.toLowerCase())) ||
-          DEFAULT_ACTIVITIES[0];
+          DEFAULT_ACTIVITIES.find(a => a.id.toLowerCase().includes(id.toLowerCase()));
+        if (!found) return null;
         return {
           ...found,
           image_url: getActivityImage(found.type, found.image_url)
@@ -266,7 +266,8 @@ export const activityService = {
         image_url: getActivityImage(data.type, data.image_url)
       };
     } catch {
-      const found = DEFAULT_ACTIVITIES.find(a => a.id === id) || DEFAULT_ACTIVITIES[0];
+      const found = DEFAULT_ACTIVITIES.find(a => a.id === id);
+      if (!found) return null;
       return {
         ...found,
         image_url: getActivityImage(found.type, found.image_url)

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../../../lib/supabase';
 import { useAdmin } from '../../../hooks/useAdmin';
-import { Loader2, Plus, Edit, Trash2, CheckCircle, XCircle, Search } from 'lucide-react';
+import { Loader2, Plus, Edit, Trash2, CheckCircle, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const ContentManager = () => {

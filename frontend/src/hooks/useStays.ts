@@ -1,7 +1,19 @@
 import { useQuery } from '@tanstack/react-query';
 import { staysService } from '../services/stay/staysService';
 
-export const useStays = (filters?: { type?: string; minPrice?: number; maxPrice?: number; rating?: number; eco_certified?: boolean }, page: number = 1, limit: number = 12) => {
+export const useStays = (
+  filters?: { 
+    type?: string; 
+    searchQuery?: string;
+    minPrice?: number; 
+    maxPrice?: number; 
+    rating?: number; 
+    eco_certified?: boolean;
+    amenities?: string[];
+  }, 
+  page: number = 1, 
+  limit: number = 12
+) => {
   return useQuery({
     queryKey: ['stays', filters, page, limit],
     queryFn: async () => {

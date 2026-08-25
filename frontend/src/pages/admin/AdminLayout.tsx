@@ -3,7 +3,7 @@ import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Search, Bell, UserCircle, Menu, X, Command, 
   LayoutDashboard, Users, Building2, Map, FileText, 
-  ShoppingCart, Calendar, CreditCard, Star, Activity, 
+  ShoppingCart, ShoppingBag, Calendar, CreditCard, Star, Activity, 
   BarChart3, Megaphone, Image as ImageIcon, Shield, 
   Settings, Zap, AlertCircle
 } from 'lucide-react';
@@ -73,6 +73,8 @@ export const AdminLayout = () => {
   const navigation = [
     { name: 'Dashboard', to: '/admin', icon: LayoutDashboard },
     { name: 'Live Operations', to: '/admin/operations', icon: Activity },
+    { name: 'Orders & Fulfillment', to: '/admin/orders', icon: ShoppingCart },
+    { name: 'Marketplace Stock', to: '/admin/products', icon: ShoppingBag },
     { name: 'Users', to: '/admin/users', icon: Users },
     { name: 'Providers', to: '/admin/providers', icon: Building2 },
     { name: 'Page Registry', to: '/admin/pages', icon: FileText },
@@ -87,6 +89,7 @@ export const AdminLayout = () => {
     { name: 'Media Library', to: '/admin/media', icon: ImageIcon },
     { name: 'System Settings', to: '/admin/settings', icon: Settings },
   ];
+
 
   return (
     <div className="flex h-screen bg-slate-50 font-sans text-slate-900">

@@ -47,46 +47,100 @@ serve(async (req) => {
       await verifyRazorpaySignature(rawBody, razorpaySig, endpointSecret)
 
       const event = JSON.parse(rawBody)
-      if (event.event !== 'payment.captured') {
-        edgeLogger.info(`Ignoring non-capture event: ${event.event}`);
-        return new Response(JSON.stringify({ received: true }), { status: 200 })
-      }
-      gatewayOrderId = event.payload.payment.entity.order_id
+      const eventType = event.event;
       
-      edgeLogger.operationalEvent('WEBHOOK_PAYMENT_CAPTURED', {
-        gateway: 'Razorpay',
-        gatewayOrderId
-      });
+      if (eventType === 'payment.captured' || eventType === 'order.paid') {
+        const paymentEntity = event.payload?.payment?.entity || {};
+        gatewayOrderId = paymentEntity.order_id || event.payload?.order?.entity?.id || '';
+        const paymentId = paymentEntity.id || '';
+
+        if (!gatewayOrderId) {
+          edgeLogger.warn('Webhook received capture event without gateway order id', event);
+          return new Response(JSON.stringify({ received: true, error: 'Missing order_id in payload' }), { status: 200 });
+        }
+        
+        edgeLogger.operationalEvent('WEBHOOK_PAYMENT_CAPTURED', {
+          gateway: 'Razorpay',
+          gatewayOrderId,
+          paymentId,
+          eventType
+        });
+
+        const supabaseAdmin = createClient(
+          Deno.env.get('SUPABASE_URL') ?? '',
+          Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+        )
+
+        // 2. Call RPC to handle the entire transaction atomically
+        const { data: success, error: rpcError } = await supabaseAdmin
+          .rpc('process_payment_webhook', {
+            p_gateway_order_id: gatewayOrderId
+          });
+          
+        if (rpcError) {
+          edgeLogger.error('Webhook RPC database execution failed', rpcError, { gatewayOrderId });
+          throw new Error(`Webhook RPC failed: ${rpcError.message}`);
+        }
+
+        if (paymentId) {
+          await supabaseAdmin
+            .from('payment_transactions')
+            .update({
+              gateway_payment_id: paymentId,
+              status: 'SUCCESS',
+              updated_at: new Date().toISOString()
+            })
+            .eq('gateway_order_id', gatewayOrderId);
+        }
+
+        edgeLogger.operationalEvent('WEBHOOK_PROCESSING_SUCCEEDED', {
+          gatewayOrderId,
+          success
+        });
+
+        return new Response(JSON.stringify({ success: true, received: true }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+      } else if (eventType === 'payment.failed') {
+        const paymentEntity = event.payload?.payment?.entity || {};
+        gatewayOrderId = paymentEntity.order_id || '';
+        const paymentId = paymentEntity.id || '';
+        const failReason = paymentEntity.error_description || paymentEntity.error_reason || 'Payment failed';
+
+        edgeLogger.warn('Webhook received payment.failed event', { gatewayOrderId, failReason });
+
+        if (gatewayOrderId) {
+          const supabaseAdmin = createClient(
+            Deno.env.get('SUPABASE_URL') ?? '',
+            Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+          );
+
+          await supabaseAdmin
+            .from('payment_transactions')
+            .update({
+              status: 'FAILED',
+              gateway_payment_id: paymentId,
+              updated_at: new Date().toISOString()
+            })
+            .eq('gateway_order_id', gatewayOrderId);
+        }
+
+        return new Response(JSON.stringify({ received: true, status: 'failed_recorded' }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+      } else {
+        edgeLogger.info(`Ignoring non-payment event: ${eventType}`);
+        return new Response(JSON.stringify({ received: true, ignored: true }), { status: 200 });
+      }
     } else {
       edgeLogger.error('Rejected webhook: missing x-razorpay-signature header');
-      throw new Error('No supported webhook signature found')
+      throw new Error('No supported webhook signature found');
     }
 
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
-
-    // 2. Call RPC to handle the entire transaction atomically
-    const { data: success, error: rpcError } = await supabaseAdmin
-      .rpc('process_payment_webhook', {
-        p_gateway_order_id: gatewayOrderId
-      });
-      
-    if (rpcError) {
-      edgeLogger.error('Webhook RPC database execution failed', rpcError, { gatewayOrderId });
-      throw new Error(`Webhook RPC failed: ${rpcError.message}`);
-    }
-
-    edgeLogger.operationalEvent('WEBHOOK_PROCESSING_SUCCEEDED', {
-      gatewayOrderId,
-      success
-    });
-
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    })
   } catch (error: any) {
     edgeLogger.error('Webhook handling terminated with error', error);
     return new Response(JSON.stringify({ error: error?.message || 'Webhook processing failed' }), {

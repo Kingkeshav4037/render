@@ -25,12 +25,25 @@ export const Activities = () => {
   const typeFilter = searchParams.get('type') || 'all';
   const { formatPrice } = useCurrencyStore();
   const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [difficultyFilter, setDifficultyFilter] = useState('ALL');
   const limit = 12;
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['activities', typeFilter, page, limit],
     queryFn: () => activityService.getActivities({ category: typeFilter }, page, limit),
     staleTime: 5 * 60 * 1000,
+  });
+
+  const rawActivities = data?.data || [];
+  const filteredActivities = rawActivities.filter(a => {
+    const matchesSearch = !searchQuery.trim() || 
+      a.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      a.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (a.tags && a.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase())));
+    const matchesDifficulty = difficultyFilter === 'ALL' || 
+      (a.difficulty_level || a.difficulty || '').toUpperCase() === difficultyFilter;
+    return matchesSearch && matchesDifficulty;
   });
 
   const totalPages = data ? Math.ceil(data.count / limit) : 1;
@@ -62,21 +75,45 @@ export const Activities = () => {
             <div className="bg-[#1A2E1F]/90 backdrop-blur-2xl border border-[#2F5233]/40 p-2 flex flex-col md:flex-row gap-2 max-w-4xl shadow-2xl">
               <div className="flex-1 flex items-center gap-4 px-6 py-4 bg-black/20 hover:bg-black/40 transition-colors cursor-pointer group">
                 <MapPin className="w-5 h-5 text-[#A3B899] group-hover:scale-110 transition-transform shrink-0" />
-                <div className="flex flex-col">
-                  <span className="text-[10px] uppercase tracking-widest text-snow/60 font-bold">Location</span>
-                  <input type="text" placeholder="Where to?" className="bg-transparent text-sm outline-none placeholder:text-snow/30 w-full" />
+                <div className="flex flex-col w-full">
+                  <span className="text-[10px] uppercase tracking-widest text-snow/60 font-bold">Location or Experience</span>
+                  <input 
+                    type="text" 
+                    placeholder="Search fjords, hikes, wildlife..." 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="bg-transparent text-sm outline-none placeholder:text-snow/30 w-full text-snow" 
+                  />
                 </div>
               </div>
-              <div className="flex-1 flex items-center gap-4 px-6 py-4 bg-black/20 hover:bg-black/40 transition-colors cursor-pointer group">
-                <Calendar className="w-5 h-5 text-[#A3B899] group-hover:scale-110 transition-transform shrink-0" />
+              <div className="flex items-center gap-4 px-6 py-4 bg-black/20 hover:bg-black/40 transition-colors cursor-pointer group shrink-0">
+                <Filter className="w-5 h-5 text-[#A3B899] group-hover:scale-110 transition-transform shrink-0" />
                 <div className="flex flex-col">
-                  <span className="text-[10px] uppercase tracking-widest text-snow/60 font-bold">When</span>
-                  <span className="text-sm font-medium">Select Dates</span>
+                  <span className="text-[10px] uppercase tracking-widest text-snow/60 font-bold">Difficulty</span>
+                  <select
+                    value={difficultyFilter}
+                    onChange={(e) => setDifficultyFilter(e.target.value)}
+                    className="bg-transparent text-sm font-medium outline-none text-snow cursor-pointer border-none"
+                  >
+                    <option value="ALL" className="bg-deep-night text-snow">All Levels</option>
+                    <option value="EASY" className="bg-deep-night text-snow">Easy</option>
+                    <option value="MODERATE" className="bg-deep-night text-snow">Moderate</option>
+                    <option value="HARD" className="bg-deep-night text-snow">Hard / Demanding</option>
+                  </select>
                 </div>
               </div>
-              <button className="h-auto py-4 px-10 bg-[#2F5233] text-snow font-bold hover:bg-[#A3B899] hover:text-deep-night transition-colors flex items-center justify-center gap-2 uppercase tracking-widest text-xs shrink-0">
-                <Search className="w-4 h-4" /> Find
-              </button>
+              {(searchQuery || typeFilter !== 'all' || difficultyFilter !== 'ALL') && (
+                <button 
+                  onClick={() => {
+                    setSearchQuery('');
+                    setDifficultyFilter('ALL');
+                    setSearchParams({ type: 'all' });
+                  }}
+                  className="py-4 px-6 bg-white/10 hover:bg-white/20 text-snow font-bold transition-colors uppercase tracking-widest text-xs shrink-0"
+                >
+                  Clear
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -102,18 +139,13 @@ export const Activities = () => {
               {cat.icon} {cat.label}
             </button>
           ))}
-          <div className="ml-auto">
-            <button className="flex items-center gap-2 font-sans text-xs font-bold uppercase tracking-widest text-snow/70 hover:text-snow transition-colors px-6 py-3 border border-white/10 rounded-full">
-              <Filter size={14} /> More Filters
-            </button>
-          </div>
         </div>
 
         {/* Results Grid */}
         <AsyncStateWrapper
           isLoading={isLoading}
           error={error as Error}
-          data={data?.data}
+          data={filteredActivities}
           emptyMessage="No activities found matching your criteria."
           errorMessage="Unable to load activities."
           skeleton={

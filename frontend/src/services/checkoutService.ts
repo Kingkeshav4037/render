@@ -1,6 +1,5 @@
 import { supabase } from '../lib/supabase';
 import { CartItem } from '../store/useCartStore';
-import { notificationService } from './notificationService';
 
 export const checkoutService = {
   async processCheckout(userId: string, items: CartItem[], currency: string = 'NOK') {
@@ -41,5 +40,24 @@ export const checkoutService = {
     }
     
     return data;
+  },
+
+  async verifyPayment(params: {
+    orderId: string;
+    razorpay_order_id: string;
+    razorpay_payment_id: string;
+    razorpay_signature: string;
+  }) {
+    const { data, error } = await supabase.functions.invoke('verify-payment', {
+      body: params
+    });
+
+    if (error) {
+      console.error('Failed to verify payment with server:', error);
+      throw error;
+    }
+
+    return data;
   }
 };
+

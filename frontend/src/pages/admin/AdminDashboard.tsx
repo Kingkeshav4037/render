@@ -2,27 +2,17 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Users, Building2, Calendar, DollarSign, Activity, 
-  RefreshCw, Clock, ArrowUpRight, ShieldCheck, Layers, 
+  RefreshCw, ArrowUpRight, ShieldCheck, Layers, 
   Radio, MapPin, Trees, Snowflake, ChevronRight, 
-  CheckCircle2, AlertCircle, ExternalLink, CreditCard,
-  Sparkles, Compass, LucideIcon
+  CheckCircle2, CreditCard,
+  Sparkles, Compass, LucideIcon, ShoppingCart
 } from 'lucide-react';
 import { 
   ResponsiveContainer, PieChart, Pie, Cell, 
-  Tooltip as RechartsTooltip, BarChart, Bar, XAxis, YAxis 
+  Tooltip as RechartsTooltip
 } from 'recharts';
 import { useAuthStore } from '../../store/useAuthStore';
 import { supabase } from '../../lib/supabase';
-
-// Theme Colors
-const STATUS_COLORS: Record<string, string> = {
-  CONFIRMED: '#10B981', // emerald-500
-  PAID: '#10B981',
-  PENDING_PAYMENT: '#F59E0B', // amber-500
-  PENDING: '#F59E0B',
-  CANCELLED: '#EF4444', // red-500
-  REFUNDED: '#8B5CF6', // purple-500
-};
 
 interface MetricCardProps {
   label: string;
@@ -70,17 +60,22 @@ export const AdminDashboard = () => {
   const { profile } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [timeRange, setTimeRange] = useState<'TODAY' | '7D' | '30D' | 'ALL'>('ALL');
   
   // Real Statistics State
   const [stats, setStats] = useState({
     totalUsers: 0,
+    newUsers: 0,
     totalProviders: 0,
     totalBookings: 0,
     confirmedBookings: 0,
     pendingBookings: 0,
     totalRevenueNOK: 0,
     totalDestinations: 0,
+    totalProducts: 0,
+    foodOrders: 0,
+    shopOrders: 0,
+    pendingOrders: 0,
     totalFlora: 0,
     totalWildlife: 0,
     totalResorts: 0,
@@ -91,7 +86,6 @@ export const AdminDashboard = () => {
   const [recentBookings, setRecentBookings] = useState<any[]>([]);
   const [recentUsers, setRecentUsers] = useState<any[]>([]);
   const [bookingStatusData, setBookingStatusData] = useState<{ name: string; value: number; color: string }[]>([]);
-  const [revenueCategoryData, setRevenueCategoryData] = useState<{ category: string; amount: number }[]>([]);
   const [systemHealth, setSystemHealth] = useState({
     dbConnected: true,
     edgeFunctionsHealthy: true,
@@ -103,7 +97,18 @@ export const AdminDashboard = () => {
     try {
       const startTime = performance.now();
 
-      // 1. Initialize Promises
+      // Determine date cutoff based on timeRange
+      const now = new Date();
+      let cutoffDate: Date | null = null;
+      if (timeRange === 'TODAY') {
+        cutoffDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      } else if (timeRange === '7D') {
+        cutoffDate = new Date(now.getTime() - 7 * 86400000);
+      } else if (timeRange === '30D') {
+        cutoffDate = new Date(now.getTime() - 30 * 86400000);
+      }
+
+      // 1. Initialize Supabase Queries
       const profilesPromise = (supabase as any)
         .from('profiles')
         .select('id, role, full_name, email, created_at')
@@ -121,42 +126,75 @@ export const AdminDashboard = () => {
 
       const ordersPromise = (supabase as any)
         .from('orders')
-        .select('total_amount, currency, status, created_at')
-        .eq('status', 'PAID');
+        .select('id, total_amount, currency, status, created_at')
+        .order('created_at', { ascending: false });
 
-      const destPromise = (supabase as any).from('destinations').select('id', { count: 'exact', head: true });
+      // Authoritative locations table query for destinations
+      const locationsPromise = (supabase as any).from('locations').select('id, status', { count: 'exact' });
+      const productsPromise = (supabase as any).from('products').select('id, status', { count: 'exact' });
       const floraPromise = (supabase as any).from('flora_species').select('id', { count: 'exact', head: true });
       const wildPromise = (supabase as any).from('wildlife_sightings').select('id', { count: 'exact', head: true });
       const resortPromise = (supabase as any).from('winter_resorts').select('id', { count: 'exact', head: true });
       const iotPromise = (supabase as any).from('iot_devices').select('id, status', { count: 'exact' });
 
-      // 2. Execute Concurrently (Eliminate Waterfall)
+      // 2. Execute Concurrently
       const [
         { data: profilesData, error: profilesError },
         { data: bookingsData, error: bookingsError },
         { data: invoicesData },
         { data: ordersData },
-        destRes, floraRes, wildRes, resortRes, iotRes
+        locRes, prodRes, floraRes, wildRes, resortRes, iotRes
       ] = await Promise.all([
         profilesPromise, bookingsPromise, invoicesPromise, ordersPromise,
-        destPromise, floraPromise, wildPromise, resortPromise, iotPromise
+        locationsPromise, productsPromise, floraPromise, wildPromise, resortPromise, iotPromise
       ]);
 
       if (profilesError) console.warn('Profiles fetch notice:', profilesError);
       if (bookingsError) console.warn('Bookings fetch notice:', bookingsError);
 
-      // 3. Process Data
+      // 3. Process Profiles
       const allProfiles = profilesData || [];
       const totalUsers = allProfiles.length;
       const totalProviders = allProfiles.filter((p: any) => p.role === 'PROVIDER').length;
+      const newUsers = cutoffDate 
+        ? allProfiles.filter((p: any) => p.created_at && new Date(p.created_at) >= cutoffDate).length
+        : totalUsers;
       const recentUsersList = allProfiles.slice(0, 5);
 
-      const allBookings = bookingsData || [];
+      // 4. Process Bookings with Date Range
+      let allBookings = bookingsData || [];
+      if (cutoffDate) {
+        allBookings = allBookings.filter((b: any) => b.created_at && new Date(b.created_at) >= cutoffDate);
+      }
       const totalBookings = allBookings.length;
-      const confirmedBookings = allBookings.filter((b: any) => b.status === 'CONFIRMED').length;
+      const confirmedBookings = allBookings.filter((b: any) => b.status === 'CONFIRMED' || b.status === 'COMPLETED').length;
       const pendingBookings = allBookings.filter((b: any) => b.status === 'PENDING_PAYMENT' || b.status === 'PENDING').length;
       const cancelledBookings = allBookings.filter((b: any) => b.status === 'CANCELLED').length;
-      const recentBookingsList = allBookings.slice(0, 5);
+      const recentBookingsList = (bookingsData || []).slice(0, 5);
+
+      // 5. Process Orders & Commerce
+      const allOrders = ordersData || [];
+      const relevantOrders = cutoffDate 
+        ? allOrders.filter((o: any) => o.created_at && new Date(o.created_at) >= cutoffDate)
+        : allOrders;
+      const pendingOrdersCount = relevantOrders.filter((o: any) => o.status === 'PENDING' || o.status === 'PENDING_PAYMENT').length;
+      
+      // Calculate Revenue ONLY from authoritative PAID / SETTLED records
+      let revenueNOK = 0;
+      if (invoicesData && invoicesData.length > 0) {
+        const filteredInvoices = cutoffDate
+          ? invoicesData.filter((inv: any) => inv.created_at && new Date(inv.created_at) >= cutoffDate)
+          : invoicesData;
+        revenueNOK = filteredInvoices.reduce((acc: number, inv: any) => acc + (Number(inv.total_amount) || 0), 0);
+      } else if (relevantOrders.length > 0) {
+        revenueNOK = relevantOrders
+          .filter((ord: any) => ord.status === 'PAID' || ord.status === 'CONFIRMED' || ord.status === 'COMPLETED')
+          .reduce((acc: number, ord: any) => acc + (Number(ord.total_amount) || 0), 0);
+      } else if (allBookings.length > 0) {
+        revenueNOK = allBookings
+          .filter((b: any) => b.status === 'CONFIRMED' || b.status === 'COMPLETED')
+          .reduce((acc: number, b: any) => acc + (Number(b.total_amount) || 0), 0);
+      }
 
       // Status Chart Data
       const statusChart = [
@@ -165,61 +203,41 @@ export const AdminDashboard = () => {
         { name: 'Cancelled', value: cancelledBookings, color: '#EF4444' },
       ].filter(item => item.value > 0);
 
-      let revenueNOK = 0;
-      if (invoicesData && invoicesData.length > 0) {
-        revenueNOK = invoicesData.reduce((acc: number, inv: any) => acc + (Number(inv.total_amount) || 0), 0);
-      } else if (ordersData && ordersData.length > 0) {
-        revenueNOK = ordersData.reduce((acc: number, ord: any) => acc + (Number(ord.total_amount) || 0), 0);
-      } else if (allBookings.length > 0) {
-        revenueNOK = allBookings
-          .filter((b: any) => b.status === 'CONFIRMED')
-          .reduce((acc: number, b: any) => acc + (Number(b.total_amount) || 0), 0);
-      }
-
-      // Revenue Category Breakdown
-      const categoryMap: Record<string, number> = {};
-      allBookings.forEach((b: any) => {
-        const cat = b.item_type || 'EXPERIENCE';
-        categoryMap[cat] = (categoryMap[cat] || 0) + (Number(b.total_amount) || 0);
-      });
-      const categoryChart = Object.entries(categoryMap).map(([category, amount]) => ({
-        category: category.charAt(0).toUpperCase() + category.slice(1).toLowerCase(),
-        amount: Math.round(amount),
-      }));
-
-      const iotDevices = iotRes.data || [];
+      const iotDevices = iotRes?.data || [];
       const onlineIoTCount = iotDevices.filter((d: any) => d.status === 'ONLINE' || d.status === 'ACTIVE').length;
-
       const latency = Math.round(performance.now() - startTime);
 
       setStats({
         totalUsers,
+        newUsers,
         totalProviders,
         totalBookings,
         confirmedBookings,
         pendingBookings,
         totalRevenueNOK: revenueNOK,
-        totalDestinations: destRes.count || 0,
-        totalFlora: floraRes.count || 0,
-        totalWildlife: wildRes.count || 0,
-        totalResorts: resortRes.count || 0,
-        totalIoT: iotRes.count || iotDevices.length || 0,
+        totalDestinations: locRes?.count || locRes?.data?.length || 0,
+        totalProducts: prodRes?.count || prodRes?.data?.length || 0,
+        foodOrders: relevantOrders.filter((o: any) => o.item_type === 'FOOD' || o.item_type === 'RESTAURANT').length,
+        shopOrders: relevantOrders.filter((o: any) => o.item_type === 'PRODUCT' || o.item_type === 'SHOP').length,
+        pendingOrders: pendingOrdersCount,
+        totalFlora: floraRes?.count || 0,
+        totalWildlife: wildRes?.count || 0,
+        totalResorts: resortRes?.count || 0,
+        totalIoT: iotRes?.count || iotDevices.length || 0,
         onlineIoT: onlineIoTCount,
       });
 
       setRecentBookings(recentBookingsList);
       setRecentUsers(recentUsersList);
       setBookingStatusData(statusChart);
-      setRevenueCategoryData(categoryChart);
       setSystemHealth(prev => ({ ...prev, latencyMs: latency }));
-      setLastUpdated(new Date());
     } catch (err) {
       console.error('Failed to load admin dashboard telemetry:', err);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, []);
+  }, [timeRange]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -258,7 +276,24 @@ export const AdminDashboard = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Date Range Selector */}
+          <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold">
+            {(['TODAY', '7D', '30D', 'ALL'] as const).map((r) => (
+              <button
+                key={r}
+                onClick={() => setTimeRange(r)}
+                className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                  timeRange === r 
+                    ? 'bg-white text-slate-900 shadow-sm font-black' 
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                {r === 'TODAY' ? 'Today' : r === '7D' ? '7 Days' : r === '30D' ? '30 Days' : 'All Time'}
+              </button>
+            ))}
+          </div>
+
           <button
             onClick={handleRefresh}
             disabled={refreshing}
@@ -268,13 +303,65 @@ export const AdminDashboard = () => {
             <RefreshCw size={14} className={refreshing ? 'animate-spin text-blue-600' : 'text-slate-500'} />
             <span>{refreshing ? 'Syncing...' : 'Refresh Data'}</span>
           </button>
-          
+        </div>
+      </div>
+
+      {/* ── Quick Actions Hub ─────────────────────────────────────────────────── */}
+      <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl p-5 shadow-sm text-white">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+            <Sparkles size={14} className="text-amber-400" /> Operational Quick Actions
+          </span>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5">
           <Link
             to="/admin/destinations"
-            className="flex items-center gap-1.5 px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-colors shadow-sm cursor-pointer"
+            className="px-3.5 py-2.5 bg-slate-800/80 hover:bg-blue-600 rounded-xl text-xs font-bold transition-all text-center flex flex-col items-center gap-1 border border-slate-700 hover:border-blue-500 shadow-sm"
           >
-            <Sparkles size={14} className="text-amber-400" />
-            <span>+ New Destination</span>
+            <MapPin size={16} className="text-blue-400" />
+            <span>Add Destination</span>
+          </Link>
+          <Link
+            to="/admin/content"
+            className="px-3.5 py-2.5 bg-slate-800/80 hover:bg-emerald-600 rounded-xl text-xs font-bold transition-all text-center flex flex-col items-center gap-1 border border-slate-700 hover:border-emerald-500 shadow-sm"
+          >
+            <Layers size={16} className="text-emerald-400" />
+            <span>Add Food Item</span>
+          </Link>
+          <Link
+            to="/admin/products"
+            className="px-3.5 py-2.5 bg-slate-800/80 hover:bg-purple-600 rounded-xl text-xs font-bold transition-all text-center flex flex-col items-center gap-1 border border-slate-700 hover:border-purple-500 shadow-sm"
+          >
+            <ShoppingCart size={16} className="text-purple-400" />
+            <span>Add Product</span>
+          </Link>
+          <Link
+            to="/admin/orders"
+            className="px-3.5 py-2.5 bg-slate-800/80 hover:bg-amber-600 rounded-xl text-xs font-bold transition-all text-center flex flex-col items-center gap-1 border border-slate-700 hover:border-amber-500 shadow-sm"
+          >
+            <CreditCard size={16} className="text-amber-400" />
+            <span>Manage Orders</span>
+          </Link>
+          <Link
+            to="/admin/content"
+            className="px-3.5 py-2.5 bg-slate-800/80 hover:bg-cyan-600 rounded-xl text-xs font-bold transition-all text-center flex flex-col items-center gap-1 border border-slate-700 hover:border-cyan-500 shadow-sm"
+          >
+            <Compass size={16} className="text-cyan-400" />
+            <span>Create Content</span>
+          </Link>
+          <Link
+            to="/admin/providers"
+            className="px-3.5 py-2.5 bg-slate-800/80 hover:bg-emerald-600 rounded-xl text-xs font-bold transition-all text-center flex flex-col items-center gap-1 border border-slate-700 hover:border-emerald-500 shadow-sm"
+          >
+            <ShieldCheck size={16} className="text-emerald-400" />
+            <span>Providers</span>
+          </Link>
+          <Link
+            to="/admin/users"
+            className="px-3.5 py-2.5 bg-slate-800/80 hover:bg-indigo-600 rounded-xl text-xs font-bold transition-all text-center flex flex-col items-center gap-1 border border-slate-700 hover:border-indigo-500 shadow-sm"
+          >
+            <Users size={16} className="text-indigo-400" />
+            <span>View Users</span>
           </Link>
         </div>
       </div>
@@ -284,7 +371,7 @@ export const AdminDashboard = () => {
         <MetricCard
           label="Users"
           value={stats.totalUsers.toLocaleString()}
-          subtext="Active accounts"
+          subtext={`${stats.newUsers} in selected range`}
           icon={Users}
           color="text-blue-600"
           bg="bg-blue-50"
@@ -292,14 +379,14 @@ export const AdminDashboard = () => {
           linkTo="/admin/users"
         />
         <MetricCard
-          label="Providers"
-          value={stats.totalProviders.toLocaleString()}
-          subtext="Verified businesses"
-          icon={Building2}
+          label="Market Products"
+          value={stats.totalProducts.toLocaleString()}
+          subtext="Active SKUs"
+          icon={ShoppingCart}
           color="text-emerald-600"
           bg="bg-emerald-50"
           loading={loading}
-          linkTo="/admin/providers"
+          linkTo="/admin/products"
         />
         <MetricCard
           label="Bookings"
@@ -312,9 +399,9 @@ export const AdminDashboard = () => {
           linkTo="/admin/bookings"
         />
         <MetricCard
-          label="Gross Revenue"
+          label="Settled Revenue"
           value={`NOK ${stats.totalRevenueNOK.toLocaleString()}`}
-          subtext="Paid transactions"
+          subtext="Authoritative paid records"
           icon={DollarSign}
           color="text-amber-600"
           bg="bg-amber-50"
@@ -322,24 +409,24 @@ export const AdminDashboard = () => {
           linkTo="/admin/payments"
         />
         <MetricCard
-          label="Catalog Content"
-          value={totalCatalogItems.toLocaleString()}
-          subtext="Destinations & nature"
-          icon={Layers}
+          label="Destinations"
+          value={stats.totalDestinations.toLocaleString()}
+          subtext="Authoritative locations"
+          icon={MapPin}
           color="text-cyan-600"
           bg="bg-cyan-50"
           loading={loading}
-          linkTo="/admin/content"
+          linkTo="/admin/destinations"
         />
         <MetricCard
-          label="IoT Network"
-          value={`${stats.onlineIoT} / ${stats.totalIoT}`}
-          subtext="Live active nodes"
-          icon={Radio}
+          label="Pending Orders"
+          value={stats.pendingOrders.toLocaleString()}
+          subtext="Awaiting settlement"
+          icon={Activity}
           color="text-indigo-600"
           bg="bg-indigo-50"
           loading={loading}
-          linkTo="/admin/iot"
+          linkTo="/admin/orders"
         />
       </div>
 
@@ -503,13 +590,22 @@ export const AdminDashboard = () => {
             </div>
           </div>
 
-          <Link
-            to="/admin/payments"
-            className="mt-4 w-full py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-colors text-center flex items-center justify-center gap-1.5 shadow-sm"
-          >
-            <DollarSign size={14} className="text-amber-400" />
-            <span>Open Payment Ledger</span>
-          </Link>
+          <div className="grid grid-cols-2 gap-2 mt-4">
+            <Link
+              to="/admin/orders"
+              className="py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition-colors text-center flex items-center justify-center gap-1.5 shadow-sm"
+            >
+              <ShoppingCart size={14} />
+              <span>Orders & Flow</span>
+            </Link>
+            <Link
+              to="/admin/payments"
+              className="py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-colors text-center flex items-center justify-center gap-1.5 shadow-sm"
+            >
+              <DollarSign size={14} className="text-amber-400" />
+              <span>Payment Ledger</span>
+            </Link>
+          </div>
         </div>
 
       </div>

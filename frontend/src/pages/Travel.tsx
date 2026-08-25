@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { Train, Ship, Car, Compass, Calendar, ArrowRight, Clock, Zap, Leaf, MapPin, Search } from 'lucide-react';
+import { Train, Ship, Car, Compass, Calendar, ArrowRight, Clock, Zap, Leaf, MapPin, Search, RotateCcw, ShieldCheck, Sparkles, Navigation } from 'lucide-react';
 import { transportService, RouteWithLocations, Location } from '../services/transportService';
 import { supabase } from '../lib/supabase';
 import { motion } from 'framer-motion';
 import { AsyncStateWrapper } from '../components/shared/AsyncStateWrapper';
 import { PageHeader } from '../components/ui/PageHeader';
+import { toast } from 'sonner';
+import { SEO } from '../components/shared/SEO';
 
 const MODES = [
   { id: 'all', label: 'All Modes' },
@@ -51,14 +53,28 @@ export const Travel = () => {
     fetchRoutes();
   }, [fetchRoutes]);
 
-
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    if (origin && destination && origin === destination) {
+      toast.error('Origin and destination cannot be the same. Please choose different points.');
+      return;
+    }
     fetchRoutes(origin, destination);
+  };
+
+  const handleResetSearch = () => {
+    setOrigin('');
+    setDestination('');
+    setDate('');
+    fetchRoutes();
   };
 
   return (
     <div className="min-h-screen bg-deep-night text-snow font-sans pb-24 selection:bg-arctic-gold/30">
+      <SEO 
+        title="Smart Travel & Sustainable Transport | Norway SmartLife"
+        description="Discover Norway's zero-emission scenic trains, electric fjord catamarans, and EV travel corridors."
+      />
       
       {/* Ocean Steel Hero -> Standard PageHeader */}
       <PageHeader
@@ -103,7 +119,7 @@ export const Travel = () => {
               <input type="date" value={date} onChange={e => setDate(e.target.value)} className="bg-transparent text-sm font-medium outline-none w-full cursor-pointer text-snow [color-scheme:dark]" />
             </div>
           </div>
-          <button type="submit" className="h-auto py-4 px-10 bg-arctic-gold text-deep-night font-bold hover:bg-snow transition-colors flex items-center justify-center gap-2 uppercase tracking-widest text-xs shrink-0 rounded-sm">
+          <button type="submit" className="h-auto py-4 px-10 bg-arctic-gold text-deep-night font-bold hover:bg-snow transition-colors flex items-center justify-center gap-2 uppercase tracking-widest text-xs shrink-0 rounded-sm cursor-pointer">
             <Search className="w-4 h-4" /> Find Route
           </button>
         </form>
@@ -121,7 +137,7 @@ export const Travel = () => {
                 else searchParams.set('mode', mode.id);
                 setSearchParams(searchParams);
               }}
-              className={`flex items-center gap-2 px-6 py-3 font-sans text-xs font-bold uppercase tracking-widest transition-colors rounded-sm border ${
+              className={`flex items-center gap-2 px-6 py-3 font-sans text-xs font-bold uppercase tracking-widest transition-colors rounded-sm border cursor-pointer ${
                 modeFilter === mode.id 
                   ? 'bg-arctic-gold border-arctic-gold text-deep-night shadow-md' 
                   : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-snow'
@@ -130,19 +146,36 @@ export const Travel = () => {
               {mode.icon} {mode.label}
             </button>
           ))}
+
+          {(origin || destination || date) && (
+            <button
+              onClick={handleResetSearch}
+              className="ml-auto text-xs font-bold uppercase tracking-wider text-arctic-gold hover:text-snow flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <RotateCcw size={12} /> Reset Route Search
+            </button>
+          )}
         </div>
 
         {/* Results Grid */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-display font-semibold mb-2 text-[#0F172A]">Available Routes</h2>
-          <p className="font-sans text-[#64748B]">Zero-emission transport options for your journey.</p>
+        <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+          <div>
+            <h2 className="text-3xl font-display font-semibold mb-2 text-white">Available Scenic Corridors</h2>
+            <p className="font-sans text-slate-400">Zero-emission railways, electric catamarans, and coastal transit.</p>
+          </div>
+          <Link
+            to="/mobility/ev"
+            className="text-xs font-bold uppercase tracking-wider text-glacier-mint hover:text-white flex items-center gap-1.5 border border-white/10 bg-white/5 px-4 py-2 rounded-lg transition-colors"
+          >
+            <Zap size={14} /> EV Fast Charging Hubs
+          </Link>
         </div>
 
         <AsyncStateWrapper
           isLoading={loading}
           error={error}
           data={routes}
-          emptyMessage="No routes found. Try adjusting your origin/destination or switching transport modes."
+          emptyMessage="No direct scenic routes found for this specific origin and destination. Try searching 'Anywhere' to browse all iconic Norwegian routes."
           errorMessage="Unable to load routes."
           skeleton={
             <div className="flex justify-center py-24"><div className="w-10 h-10 border-4 border-[#E2E8F0] border-t-[#0284C7] rounded-full animate-spin"></div></div>
@@ -172,13 +205,21 @@ export const Travel = () => {
 
                     {/* Route Details */}
                     <div className="flex-1 w-full text-center md:text-left">
-                      <div className="flex items-center justify-center md:justify-start gap-3 mb-3">
-                        <span className="text-xs font-sans font-bold text-[#64748B] uppercase tracking-widest">{route.operator}</span>
+                      <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-2">
+                        <span className="text-base font-bold text-[#0F172A]">{route.name || route.operator}</span>
+                        {route.operator && route.name && (
+                          <span className="text-xs font-sans font-bold text-[#64748B] uppercase tracking-widest">({route.operator})</span>
+                        )}
                         <span className="flex items-center gap-1 text-[10px] font-sans font-bold text-[#059669] bg-[#059669]/10 px-2 py-1 uppercase tracking-widest rounded-sm">
                           <Zap size={10} /> Zero Emission
                         </span>
+                        {route.co2_saved_kg && (
+                          <span className="text-[10px] font-sans font-bold text-[#0284C7] bg-[#0284C7]/10 px-2 py-1 uppercase tracking-widest rounded-sm">
+                            {route.co2_saved_kg} kg CO2 Saved
+                          </span>
+                        )}
                       </div>
-                      <div className="flex items-center justify-center md:justify-start gap-4 font-display font-semibold text-2xl text-[#0F172A]">
+                      <div className="flex items-center justify-center md:justify-start gap-4 font-display font-semibold text-xl text-[#0F172A]">
                         <span>{route.origin?.name}</span>
                         <ArrowRight size={20} className="text-[#CBD5E1]" />
                         <span>{route.destination?.name}</span>
@@ -192,7 +233,7 @@ export const Travel = () => {
                         {hours > 0 && `${hours}h `}{mins > 0 && `${mins}m`}
                       </div>
                       <div className="text-2xl font-display font-semibold text-[#0F172A] mt-1 group-hover:text-[#0284C7] transition-colors">
-                        {route.price_estimate} {route.currency}
+                        {route.price_estimate} {route.currency || 'NOK'}
                       </div>
                     </div>
                   </motion.div>
@@ -201,6 +242,40 @@ export const Travel = () => {
             </div>
           )}
         </AsyncStateWrapper>
+
+        {/* Clean Transport Options Overview */}
+        <div className="border-t border-white/10 pt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-md">
+            <div className="w-12 h-12 rounded-xl bg-arctic-gold/10 text-arctic-gold flex items-center justify-center mb-4">
+              <Train size={24} />
+            </div>
+            <h3 className="text-xl font-display font-bold text-white mb-2">Electrified Railways</h3>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              Norway's mainline rail network runs on 100% renewable hydroelectric power, offering zero-emission travel through mountains and fjords.
+            </p>
+          </div>
+
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-md">
+            <div className="w-12 h-12 rounded-xl bg-glacier-mint/10 text-glacier-mint flex items-center justify-center mb-4">
+              <Ship size={24} />
+            </div>
+            <h3 className="text-xl font-display font-bold text-white mb-2">Electric Fjord Ferries</h3>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              Silent battery-powered catamarans protect UNESCO fjord waters from emissions while providing undisturbed panoramic views.
+            </p>
+          </div>
+
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-md">
+            <div className="w-12 h-12 rounded-xl bg-polar-indigo/20 text-polar-indigo flex items-center justify-center mb-4">
+              <Car size={24} />
+            </div>
+            <h3 className="text-xl font-display font-bold text-white mb-2">High-Power EV Corridors</h3>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              World's dense ultra-fast charging network (150kW-350kW) across national tourist routes and mountain passes.
+            </p>
+          </div>
+        </div>
+
       </div>
     </div>
   );

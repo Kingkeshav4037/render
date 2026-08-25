@@ -11,6 +11,7 @@ import { NearbyAttractions } from '../components/destinations/NearbyAttractions'
 import { FavoriteButton } from '../components/common/FavoriteButton';
 import { ReviewSection } from '../components/common/ReviewSection';
 import { openStreetMap } from '../lib/openStreetMap';
+import { SEO } from '../components/shared/SEO';
 
 // Map database slugs/names to local images
 const getPlaceholderImage = (name: string) => {
@@ -103,6 +104,10 @@ export const DestinationDetails = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
+      <SEO 
+        title={`${location.name} | Norway SmartLife`}
+        description={location.description || fallbackDescriptions[location.name] || `Explore ${location.name}, Norway.`}
+      />
       {/* Hero Section */}
       <div className="relative h-[60vh] w-full">
         <div 

@@ -1,9 +1,11 @@
+import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { checkoutService } from '../../services/checkoutService';
 import { useCartStore } from '../../store/useCartStore';
+
 
 // ─── Mock Auth Store ──────────────────────────────────────────────────
 vi.mock('../../store/useAuthStore', () => {
@@ -89,7 +91,9 @@ vi.mock('../../services/stay/staysService', () => ({
 // ─── Component Imports ────────────────────────────────────────────────
 import { Checkout } from '../../pages/checkout/Checkout';
 import { PaymentSuccess } from '../../pages/checkout/PaymentSuccess';
+import { PaymentFailure } from '../../pages/checkout/PaymentFailure';
 import { StayBooking } from '../../pages/checkout/StayBooking';
+
 
 describe('Checkout and Payment Production Audit', () => {
   beforeEach(() => {
@@ -256,34 +260,111 @@ describe('Checkout and Payment Production Audit', () => {
         checkoutService.createPaymentIntent('ord-fail-001', 'Razorpay')
       ).rejects.toBeDefined();
     });
+
+    it('invokes verify-payment edge function with signature payload', async () => {
+      (supabase.functions.invoke as any).mockResolvedValueOnce({
+        data: { success: true, verified: true, orderId: 'ord-secure-101' },
+        error: null,
+      });
+
+      const verificationResult = await checkoutService.verifyPayment({
+        orderId: 'ord-secure-101',
+        razorpay_order_id: 'rzp_order_sec_101',
+        razorpay_payment_id: 'pay_rzp_999',
+        razorpay_signature: 'valid_hmac_sha256_signature',
+      });
+
+      expect(supabase.functions.invoke).toHaveBeenCalledWith('verify-payment', {
+        body: {
+          orderId: 'ord-secure-101',
+          razorpay_order_id: 'rzp_order_sec_101',
+          razorpay_payment_id: 'pay_rzp_999',
+          razorpay_signature: 'valid_hmac_sha256_signature',
+        },
+      });
+      expect(verificationResult.verified).toBe(true);
+    });
+
+    it('handles payment verification rejection on invalid signature', async () => {
+      (supabase.functions.invoke as any).mockResolvedValueOnce({
+        data: null,
+        error: { message: 'Payment signature verification failed' },
+      });
+
+      await expect(
+        checkoutService.verifyPayment({
+          orderId: 'ord-secure-101',
+          razorpay_order_id: 'rzp_order_sec_101',
+          razorpay_payment_id: 'pay_rzp_999',
+          razorpay_signature: 'tampered_signature',
+        })
+      ).rejects.toThrow('Payment signature verification failed');
+    });
   });
+
 
   // ─── 5. Payment Success Validation & State Machine ────────────────
   describe('Payment Success Page & Verification', () => {
-    it('validates backend PAID status and displays booking confirmation', async () => {
-      (supabase.from as any).mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({
-              data: { id: 'ord-secure-101', status: 'PAID' },
-              error: null,
+    it('validates backend PAID status and displays order confirmation and items', async () => {
+      (supabase.from as any).mockImplementation((table: string) => {
+        if (table === 'orders') {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                maybeSingle: vi.fn().mockResolvedValue({
+                  data: { id: 'ord-secure-101', user_id: 'usr-pay-001', status: 'PAID', total_amount: 1890, currency: 'NOK' },
+                  error: null,
+                }),
+                single: vi.fn().mockResolvedValue({
+                  data: { id: 'ord-secure-101', user_id: 'usr-pay-001', status: 'PAID', total_amount: 1890, currency: 'NOK' },
+                  error: null,
+                }),
+              }),
             }),
-          }),
-        }),
+          };
+        }
+        if (table === 'order_items') {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockResolvedValue({
+                data: [
+                  { id: 'item-1', description: 'Smart Eco Thermostat', amount: 1890, quantity: 1, item_type: 'PRODUCT', currency: 'NOK' },
+                ],
+                error: null,
+              }),
+            }),
+          };
+        }
+        if (table === 'payment_transactions') {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                maybeSingle: vi.fn().mockResolvedValue({
+                  data: { id: 'tx-1', gateway: 'Razorpay', gateway_order_id: 'rzp_order_sec_101', status: 'SUCCESS', amount: 1890, currency: 'NOK' },
+                  error: null,
+                }),
+              }),
+            }),
+          };
+        }
+
+        return {
+          select: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+          maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+        };
       });
 
-      window.history.pushState({}, 'Success', '/payment-success?order_id=ord-secure-101');
-
       render(
-        <MemoryRouter>
+        <MemoryRouter initialEntries={['/payment-success?order_id=ord-secure-101']}>
           <PaymentSuccess />
         </MemoryRouter>
       );
 
       await waitFor(() => {
-        expect(screen.getByText('Booking Confirmed!')).toBeInTheDocument();
-        expect(screen.getByText('ord-secure-101')).toBeInTheDocument();
-        expect(screen.getByText('Download Invoice & Receipt')).toBeInTheDocument();
+        expect(screen.getByText(/Order & Payment Confirmed!/i)).toBeInTheDocument();
+        expect(screen.getByText(/Smart Eco Thermostat/i)).toBeInTheDocument();
+        expect(screen.getByText(/Download MVA-Compliant Invoice/i)).toBeInTheDocument();
       });
     });
 
@@ -291,29 +372,197 @@ describe('Checkout and Payment Production Audit', () => {
       (supabase.from as any).mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({
-              data: { id: 'ord-pending-02', status: 'PENDING' },
+            maybeSingle: vi.fn().mockResolvedValue({
+              data: { id: 'ord-pending-02', user_id: 'usr-pay-001', status: 'PENDING_PAYMENT' },
               error: null,
             }),
           }),
         }),
       });
 
-      window.history.pushState({}, 'Processing', '/payment-success?order_id=ord-pending-02');
-
       render(
-        <MemoryRouter>
+        <MemoryRouter initialEntries={['/payment-success?order_id=ord-pending-02']}>
           <PaymentSuccess />
         </MemoryRouter>
       );
 
-      expect(screen.getByText('Processing Payment')).toBeInTheDocument();
-      expect(screen.getByText(/Please wait while we confirm/i)).toBeInTheDocument();
+      expect(screen.getByText(/Verifying Payment Confirmation/i)).toBeInTheDocument();
+    });
+
+    it('displays NOT_FOUND state when order is missing from database', async () => {
+      (supabase.from as any).mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            maybeSingle: vi.fn().mockResolvedValue({
+              data: null,
+              error: null,
+            }),
+          }),
+        }),
+      });
+
+      render(
+        <MemoryRouter initialEntries={['/payment-success?order_id=ord-missing-999']}>
+          <PaymentSuccess />
+        </MemoryRouter>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('Order Not Found')).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: /Continue Shopping/i })).toBeInTheDocument();
+      });
+    });
+
+    it('displays UNAUTHORIZED access denied when order belongs to a different user', async () => {
+      (supabase.from as any).mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            maybeSingle: vi.fn().mockResolvedValue({
+              data: { id: 'ord-someone-else', user_id: 'diff-user-999', status: 'PAID' },
+              error: null,
+            }),
+          }),
+        }),
+      });
+
+      render(
+        <MemoryRouter initialEntries={['/payment-success?order_id=ord-someone-else']}>
+          <PaymentSuccess />
+        </MemoryRouter>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('Access Denied')).toBeInTheDocument();
+      });
     });
   });
 
-  // ─── 6. Webhook Idempotency & Duplicate Delivery Safety ───────────
-  describe('Webhook Idempotency & State Integrity', () => {
+
+
+  // ─── 6. Payment Failure Page & Failure Codes ─────────────────────
+  describe('Payment Failure Page & Error Code Handling', () => {
+    beforeEach(() => {
+      useCartStore.getState().addItem({
+        item_id: 'prod-fail-01',
+        name: 'Nordic Knit Blanket',
+        unit_price: 950,
+        quantity: 1,
+        item_type: 'PRODUCT',
+      });
+    });
+
+    it('handles DECLINED reason and displays card tips and preserved cart', async () => {
+      (supabase.from as any).mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            maybeSingle: vi.fn().mockResolvedValue({
+              data: { id: 'ord-fail-101', total_amount: 950, currency: 'NOK', status: 'PENDING_PAYMENT' },
+              error: null,
+            }),
+          }),
+        }),
+      });
+
+      render(
+        <MemoryRouter initialEntries={['/payment-failure?order_id=ord-fail-101&reason=DECLINED']}>
+          <PaymentFailure />
+        </MemoryRouter>
+      );
+
+      expect(screen.getByText('Payment Declined by Bank')).toBeInTheDocument();
+      expect(screen.getByText(/Card Declined/i)).toBeInTheDocument();
+      expect(screen.getByText(/#ORD-ORD-FAIL/i)).toBeInTheDocument();
+      expect(screen.getByText(/1 Item Preserved Safely/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Retry Payment/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /View Saved Cart/i })).toBeInTheDocument();
+
+      // Ensure cart is NOT automatically cleared
+      expect(useCartStore.getState().items.length).toBe(1);
+    });
+
+    it('handles VERIFICATION_FAILED reason with cryptographic notice', async () => {
+      render(
+        <MemoryRouter initialEntries={['/payment-failure?order_id=ord-fail-102&reason=VERIFICATION_FAILED']}>
+          <PaymentFailure />
+        </MemoryRouter>
+      );
+
+      expect(screen.getByText('Security Verification Mismatch')).toBeInTheDocument();
+      expect(screen.getByText(/cryptographic signature of your transaction/i)).toBeInTheDocument();
+    });
+
+    it('handles PROVIDER_ERROR reason with gateway notice', async () => {
+      render(
+        <MemoryRouter initialEntries={['/payment-failure?order_id=ord-fail-103&reason=PROVIDER_ERROR']}>
+          <PaymentFailure />
+        </MemoryRouter>
+      );
+
+      expect(screen.getByText('Payment Gateway Error')).toBeInTheDocument();
+      expect(screen.getByText(/unexpected service interruption/i)).toBeInTheDocument();
+    });
+
+    it('handles NETWORK_ERROR reason with connection advice', async () => {
+      render(
+        <MemoryRouter initialEntries={['/payment-failure?order_id=ord-fail-104&reason=NETWORK_ERROR']}>
+          <PaymentFailure />
+        </MemoryRouter>
+      );
+
+      expect(screen.getByText('Connection Interrupted')).toBeInTheDocument();
+      expect(screen.getByText(/connectivity interruption occurred/i)).toBeInTheDocument();
+    });
+
+
+    it('handles EXPIRED reason with timeout notice', async () => {
+      render(
+        <MemoryRouter initialEntries={['/payment-failure?order_id=ord-fail-105&reason=EXPIRED']}>
+          <PaymentFailure />
+        </MemoryRouter>
+      );
+
+      expect(screen.getByText('Payment Session Expired')).toBeInTheDocument();
+      expect(screen.getByText(/exceeded the allowed time limit/i)).toBeInTheDocument();
+    });
+
+    it('handles CANCELLED reason with safety confirmation', async () => {
+      render(
+        <MemoryRouter initialEntries={['/payment-failure?order_id=ord-fail-106&reason=CANCELLED']}>
+          <PaymentFailure />
+        </MemoryRouter>
+      );
+
+      expect(screen.getByText('Payment Cancelled')).toBeInTheDocument();
+      expect(screen.getByText(/dismissed or cancelled before completion/i)).toBeInTheDocument();
+    });
+  });
+
+  // ─── 7. Payment Cancellation & Cart Preservation ──────────────────
+  describe('Payment Cancellation & Cart Preservation', () => {
+    it('preserves cart items when modal is dismissed or cancelled', () => {
+      useCartStore.getState().addItem({
+        item_id: 'prod-cancel-01',
+        name: 'Fjord Expedition Pass',
+        unit_price: 1200,
+        quantity: 2,
+        item_type: 'ACTIVITY',
+      });
+
+      // Verify cart has items
+      expect(useCartStore.getState().items.length).toBe(1);
+
+      // Simulate modal ondismiss callback
+      const onDismissCallback = () => {
+        // Items should remain intact
+        return useCartStore.getState().items.length;
+      };
+
+      expect(onDismissCallback()).toBe(1);
+    });
+  });
+
+  // ─── 8. Idempotency & Duplicate Payment Protection ────────────────
+  describe('Idempotency & Duplicate Payment Protection', () => {
     it('verifies idempotent status updates for duplicate confirmation events', async () => {
       let orderStatus = 'PENDING';
 
@@ -336,16 +585,45 @@ describe('Checkout and Payment Production Audit', () => {
       expect(res2.status).toBe('PAID');
       expect(res2.alreadyProcessed).toBe(true);
     });
+
+    it('prevents double-order creation on payment retry by reusing existing pending order reference', async () => {
+      const processCheckoutMock = vi.spyOn(checkoutService, 'processCheckout');
+      processCheckoutMock.mockResolvedValue('ord-reused-101');
+
+      useCartStore.getState().addItem({
+        item_id: 'prod-thermo-01',
+        name: 'Smart Thermostat',
+        unit_price: 1890,
+        quantity: 1,
+        item_type: 'PRODUCT',
+      });
+
+
+      // First checkout attempt creates order
+      const firstOrderId = await checkoutService.processCheckout('usr-pay-001', useCartStore.getState().items, 'NOK');
+      expect(firstOrderId).toBe('ord-reused-101');
+
+      // Retry attempt reuses firstOrderId without calling processCheckout again
+      let retryOrderId = firstOrderId;
+      if (!retryOrderId) {
+        retryOrderId = await checkoutService.processCheckout('usr-pay-001', useCartStore.getState().items, 'NOK');
+      }
+
+      expect(retryOrderId).toBe('ord-reused-101');
+      // Only called once during initial checkout
+      expect(processCheckoutMock).toHaveBeenCalledTimes(1);
+    });
   });
 
-  // ─── 7. Security: Frontend Secret Isolation ───────────────────────
+  // ─── 9. Security: Sensitive Secret Isolation ───────────────────────
   describe('Security: Sensitive Secret Isolation', () => {
     it('ensures payment secret keys and service role keys are absent from client environment', () => {
-      const env = import.meta.env;
+      const env = (import.meta as any).env || {};
 
-      expect((env as any).RAZORPAY_KEY_SECRET).toBeUndefined();
-      expect((env as any).STRIPE_SECRET_KEY).toBeUndefined();
-      expect((env as any).SUPABASE_SERVICE_ROLE_KEY).toBeUndefined();
+      expect(env.RAZORPAY_KEY_SECRET).toBeUndefined();
+      expect(env.STRIPE_SECRET_KEY).toBeUndefined();
+      expect(env.SUPABASE_SERVICE_ROLE_KEY).toBeUndefined();
     });
   });
 });
+

@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
   MapPin, Star, Share2, Heart, Clock, Users, ShieldCheck, ChevronRight, Check,
   Activity as ActivityIcon, Navigation, Calendar, Info
 } from 'lucide-react';
 import { useCurrencyStore } from '../store/useCurrencyStore';
+import { useCartStore } from '../store/useCartStore';
 import { activityService, Activity } from '../services/activityService';
 import { getActivityImage } from '../services/home/homeContentService';
 import { OptimizedImage } from '../components/shared/OptimizedImage';
+import { SEO } from '../components/shared/SEO';
 
 const DATES = [
   { date: '14', day: 'Mon', available: true },
@@ -25,12 +27,14 @@ const TIMES = [
 
 export const ActivityDetails = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { formatPrice } = useCurrencyStore();
+  const { addItem } = useCartStore();
   
   const [activity, setActivity] = useState<Activity | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState('14');
-  const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [selectedTime, setSelectedTime] = useState<string | null>('18:00');
   const [tickets, setTickets] = useState(2);
 
   useEffect(() => {
@@ -40,23 +44,63 @@ export const ActivityDetails = () => {
         setActivity(res);
         setLoading(false);
       });
+    } else {
+      setLoading(false);
     }
   }, [id]);
 
-  const actImage = activity ? getActivityImage(activity.type, activity.image_url) : '/images/fjords_1786935800026.jpg';
-  const durationText = activity?.duration_minutes 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-deep-night flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-[#2F5233] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!activity) {
+    return (
+      <div className="min-h-screen bg-deep-night text-snow flex flex-col items-center justify-center p-8 text-center">
+        <h1 className="text-3xl font-bold font-display mb-4">Activity Not Found</h1>
+        <p className="text-snow/60 mb-8 max-w-md">The requested experience could not be located or may have ended.</p>
+        <Link to="/activities" className="bg-[#2F5233] text-snow px-6 py-3 font-bold uppercase tracking-widest text-xs hover:bg-[#A3B899] hover:text-deep-night transition-colors">
+          Browse All Activities
+        </Link>
+      </div>
+    );
+  }
+
+  const actImage = getActivityImage(activity.type, activity.image_url);
+  const durationText = activity.duration_minutes 
     ? `${Math.floor(activity.duration_minutes / 60)}h ${activity.duration_minutes % 60 ? (activity.duration_minutes % 60) + 'm' : ''}`.trim() 
     : '3 hours';
-  const difficultyText = activity?.difficulty_level || activity?.difficulty || 'Moderate';
-  const activityPrice = activity?.price || 1200;
-  const activityName = activity?.name || 'Fjord Experience';
-  const activityType = activity?.type || 'Adventure';
-  const activityDesc = activity?.description || 'Experience the pristine beauty of Norway with certified guides and premium gear.';
-  const equipment = activity?.equipment_needed || ['Warm layers', 'Camera', 'Water bottle'];
+  const difficultyText = activity.difficulty_level || activity.difficulty || 'Moderate';
+  const activityPrice = activity.price || 1200;
+  const activityName = activity.name || 'Fjord Experience';
+  const activityType = activity.type || 'Adventure';
+  const activityDesc = activity.description || 'Experience the pristine beauty of Norway with certified guides and premium gear.';
+  const equipment = activity.equipment_needed || ['Warm layers', 'Camera', 'Water bottle'];
+
+  const handleBookExperience = () => {
+    if (!activity || !selectedTime) return;
+    addItem({
+      item_type: 'ACTIVITY',
+      item_id: activity.id,
+      name: `${activity.name} (${selectedDate} Aug @ ${selectedTime})`,
+      description: activity.description,
+      unit_price: activity.price,
+      quantity: tickets,
+      image: actImage,
+      pax: tickets
+    });
+    navigate('/checkout');
+  };
 
   return (
     <div className="min-h-screen bg-deep-night text-snow font-sans pb-24 selection:bg-[#2F5233]/40">
-      
+      <SEO 
+        title={`${activityName} | Norway SmartLife`}
+        description={activityDesc}
+      />
       {/* Pine Theme Hero */}
       <div className="h-[50vh] w-full relative">
         <OptimizedImage 
@@ -213,8 +257,9 @@ export const ActivityDetails = () => {
 
             <button 
               disabled={!selectedTime}
+              onClick={handleBookExperience}
               className={`w-full py-4 text-sm font-bold uppercase tracking-widest transition-colors ${
-                selectedTime ? 'bg-[#2F5233] text-snow hover:bg-[#A3B899] hover:text-deep-night' : 'bg-white/5 text-snow/30 cursor-not-allowed'
+                selectedTime ? 'bg-[#2F5233] text-snow hover:bg-[#A3B899] hover:text-deep-night cursor-pointer' : 'bg-white/5 text-snow/30 cursor-not-allowed'
               }`}
             >
               Book Experience

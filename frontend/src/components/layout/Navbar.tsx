@@ -163,6 +163,12 @@ export const Navbar = () => {
                     <Link to="/dashboard" role="menuitem" className="px-4 py-2.5 hover:bg-arctic-mist rounded-lg font-sans font-medium text-sm transition-colors">
                       My Norway
                     </Link>
+                    <Link to="/trips" role="menuitem" className="px-4 py-2.5 hover:bg-arctic-mist rounded-lg font-sans font-medium text-sm transition-colors">
+                      Planned Trips
+                    </Link>
+                    <Link to="/favorites" role="menuitem" className="px-4 py-2.5 hover:bg-arctic-mist rounded-lg font-sans font-medium text-sm transition-colors">
+                      Saved Favorites
+                    </Link>
                     <Link to="/user/bookings" role="menuitem" className="px-4 py-2.5 hover:bg-arctic-mist rounded-lg font-sans font-medium text-sm transition-colors">
                       My Bookings
                     </Link>
@@ -170,9 +176,9 @@ export const Navbar = () => {
                       Invoices & Receipts
                     </Link>
                     <Link to="/profile" role="menuitem" className="px-4 py-2.5 hover:bg-arctic-mist rounded-lg font-sans font-medium text-sm transition-colors">
-                      Profile
+                      Profile & Settings
                     </Link>
-                    <Link to="/settings/notifications" role="menuitem" className="px-4 py-2.5 hover:bg-arctic-mist rounded-lg font-sans font-medium text-sm transition-colors flex items-center justify-between">
+                    <Link to="/notifications" role="menuitem" className="px-4 py-2.5 hover:bg-arctic-mist rounded-lg font-sans font-medium text-sm transition-colors flex items-center justify-between">
                       Notifications <Bell className="w-4 h-4 text-slate" />
                     </Link>
                     <div className="h-px bg-gray-100 my-1"></div>

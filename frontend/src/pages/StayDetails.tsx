@@ -1,47 +1,50 @@
-import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useState, useEffect, useMemo } from 'react';
+import { useParams, useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { staysService } from '../services/stay/staysService';
+import { staysService, AccommodationRoom } from '../services/stay/staysService';
 import { 
   MapPin, Star, Share2, Heart, Wifi, Car, Coffee, Wind, TreePine, 
-  ChevronRight, Calendar, Users, Info, ShieldCheck, Check
+  ChevronRight, Calendar, Users, Info, ShieldCheck, Check, ArrowRight,
+  Sparkles, CheckCircle2, AlertCircle, ShoppingBag
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useCurrencyStore } from '../store/useCurrencyStore';
+import { useCartStore } from '../store/useCartStore';
 import { OptimizedImage } from '../components/shared/OptimizedImage';
-
-const MOCK_ROOMS = [
-  {
-    id: 'room-1',
-    name: 'Fjord View Suite',
-    description: 'Floor-to-ceiling windows offering panoramic views of the fjord.',
-    size: '45m²',
-    bed: '1 King Bed',
-    occupancy: 2,
-    amenities: ['Breakfast included', 'Free Wi-Fi', 'Minibar', 'Espresso machine'],
-    cancellation: 'Free cancellation before Aug 10',
-    price: 3200,
-    image: '/images/hotel_juvet_1787013813000.jpg',
-    remaining: 2
-  },
-  {
-    id: 'room-2',
-    name: 'Mountain Panorama Room',
-    description: 'Cozy and luxurious, featuring rustic wood interiors and heated floors.',
-    size: '32m²',
-    bed: '1 Queen Bed',
-    occupancy: 2,
-    amenities: ['Breakfast included', 'Free Wi-Fi'],
-    cancellation: 'Non-refundable',
-    price: 2400,
-    image: '/images/fjords_1786935800026.jpg',
-    remaining: 5
-  }
-];
+import { SEO } from '../components/shared/SEO';
+import { toast } from 'sonner';
 
 export const StayDetails = () => {
   const { id } = useParams<{ id: string }>();
-  const { data: stay, isLoading } = useQuery({
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { formatPrice } = useCurrencyStore();
+  const { addItem } = useCartStore();
+
+  // Initialize dates
+  const defaultCheckIn = useMemo(() => {
+    if (searchParams.get('checkIn')) return searchParams.get('checkIn')!;
+    const d = new Date();
+    d.setDate(d.getDate() + 7);
+    return d.toISOString().split('T')[0];
+  }, [searchParams]);
+
+  const defaultCheckOut = useMemo(() => {
+    if (searchParams.get('checkOut')) return searchParams.get('checkOut')!;
+    const d = new Date();
+    d.setDate(d.getDate() + 11);
+    return d.toISOString().split('T')[0];
+  }, [searchParams]);
+
+  const [checkIn, setCheckIn] = useState<string>(defaultCheckIn);
+  const [checkOut, setCheckOut] = useState<string>(defaultCheckOut);
+  const [guests, setGuests] = useState<number>(Number(searchParams.get('guests')) || 2);
+  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
+  const [availabilityMap, setAvailabilityMap] = useState<Record<string, boolean>>({});
+  const [checkingAvailability, setCheckingAvailability] = useState(false);
+
+  // Fetch stay details
+  const { data: stay, isLoading: stayLoading } = useQuery({
     queryKey: ['stay-detail', id],
     queryFn: async () => {
       if (!id) return null;
@@ -49,124 +52,213 @@ export const StayDetails = () => {
     },
     enabled: !!id
   });
-  const { formatPrice } = useCurrencyStore();
 
-  const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
+  // Fetch rooms
+  const { data: rooms = [], isLoading: roomsLoading } = useQuery({
+    queryKey: ['stay-rooms', id],
+    queryFn: async () => {
+      if (!id) return [];
+      return staysService.getStayRooms(id);
+    },
+    enabled: !!id
+  });
+
+  // Default selected room when rooms are loaded
+  useEffect(() => {
+    if (rooms.length > 0 && !selectedRoomId) {
+      setSelectedRoomId(rooms[0].id);
+    }
+  }, [rooms, selectedRoomId]);
+
+  // Check availability when dates or rooms change
+  useEffect(() => {
+    let isMounted = true;
+    const checkAllRooms = async () => {
+      if (!rooms || rooms.length === 0 || !checkIn || !checkOut) return;
+      setCheckingAvailability(true);
+      const newMap: Record<string, boolean> = {};
+      
+      for (const room of rooms) {
+        const isAvail = await staysService.checkRoomAvailability(room.id, checkIn, checkOut);
+        newMap[room.id] = isAvail;
+      }
+
+      if (isMounted) {
+        setAvailabilityMap(newMap);
+        setCheckingAvailability(false);
+      }
+    };
+
+    checkAllRooms();
+    return () => { isMounted = false; };
+  }, [rooms, checkIn, checkOut]);
+
+  // Calculate nights
+  const nights = useMemo(() => {
+    if (!checkIn || !checkOut) return 0;
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
+    if (isNaN(start.getTime()) || isNaN(end.getTime()) || start >= end) return 0;
+    return Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 3600 * 24)));
+  }, [checkIn, checkOut]);
+
+  const activeRoom = useMemo(() => {
+    return rooms.find(r => r.id === selectedRoomId) || rooms[0] || null;
+  }, [rooms, selectedRoomId]);
+
+  const activePricePerNight = Number(activeRoom?.price_per_night || stay?.price_per_night || 2400);
+  const totalBasePrice = nights * activePricePerNight;
+  const vatIncluded = Math.round(totalBasePrice * 0.20); // 25% MVA included in gross
+
+  const isRoomAvailable = activeRoom ? (availabilityMap[activeRoom.id] ?? true) : true;
+
+  // Handlers
+  const handleReserveNow = () => {
+    if (!id || !activeRoom) return;
+    if (nights <= 0) {
+      toast.error('Please select valid check-in and check-out dates.');
+      return;
+    }
+    if (!isRoomAvailable) {
+      toast.error('This room is not available for the selected dates. Please select alternative dates or rooms.');
+      return;
+    }
+
+    navigate(`/checkout/stay/${id}?roomId=${activeRoom.id}&checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`);
+  };
+
+  const handleAddToCart = () => {
+    if (!stay || !activeRoom) return;
+    if (nights <= 0) {
+      toast.error('Please select valid check-in and check-out dates.');
+      return;
+    }
+
+    addItem({
+      item_type: 'ACCOMMODATION',
+      item_id: activeRoom.id,
+      name: `${stay.name} - ${activeRoom.name}`,
+      description: `${nights} nights (${checkIn} to ${checkOut}) for ${guests} guests. ${activeRoom.bed}`,
+      unit_price: activePricePerNight,
+      quantity: nights,
+      image: activeRoom.image_url || stay.image_url,
+      start_time: new Date(checkIn).toISOString(),
+      end_time: new Date(checkOut).toISOString(),
+      pax: guests,
+    });
+
+    toast.success(`${activeRoom.name} added to cart!`);
+  };
 
   // Scroll to top on mount
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+  }, [id]);
 
-  if (isLoading || !stay) {
+  if (stayLoading || !stay) {
     return (
-      <div className="min-h-screen bg-[#FDFBF7] text-[#1A1A1A] flex items-center justify-center pt-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#C17F59] border-t-transparent"></div>
+      <div className="min-h-screen bg-deep-night text-snow flex items-center justify-center pt-20">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-arctic-gold border-t-transparent"></div>
       </div>
     );
   }
 
-  // Use Copper theme background for header (#1A1A1A or very dark brown/copper tint)
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-[#1A1A1A] font-sans pb-24 relative selection:bg-[#C17F59]/20">
-      
-      {/* Immersive Gallery Hero */}
-      <div className="h-[60vh] md:h-[70vh] w-full relative grid grid-cols-4 gap-2 pt-20 bg-black">
-        <div className="col-span-4 md:col-span-2 h-full relative group cursor-pointer overflow-hidden">
+    <div className="min-h-screen bg-deep-night text-snow font-sans pb-24 relative selection:bg-arctic-gold/30">
+      <SEO 
+        title={`${stay.name} | Norway SmartLife`}
+        description={stay.description?.slice(0, 160) || `Stay at ${stay.name} in Norway.`}
+      />
+
+      {/* Hero Gallery */}
+      <div className="h-[55vh] md:h-[65vh] w-full relative grid grid-cols-4 gap-2 pt-20 bg-black">
+        <div className="col-span-4 md:col-span-2 h-full relative group overflow-hidden">
           <OptimizedImage 
             src={stay.image_url} 
             alt={stay.name} 
             category="stay"
+            fallbackSrc="/images/hotel_juvet_1787013813000.jpg"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
             containerClassName="w-full h-full"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-deep-night/80 via-transparent to-transparent pointer-events-none" />
         </div>
-        <div className="hidden md:block col-span-1 h-full relative group cursor-pointer overflow-hidden">
+        <div className="hidden md:block col-span-1 h-full relative group overflow-hidden">
           <OptimizedImage 
             src="/images/northern_lights_1786935879330.jpg" 
-            alt="Gallery 1" 
+            alt="Gallery Aurora" 
             category="aurora"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
             containerClassName="w-full h-full"
           />
         </div>
         <div className="hidden md:flex col-span-1 h-full flex-col gap-2">
-          <div className="h-1/2 relative group cursor-pointer overflow-hidden">
+          <div className="h-1/2 relative group overflow-hidden">
             <OptimizedImage 
               src="/images/fjords_1786935800026.jpg" 
-              alt="Gallery 2" 
+              alt="Gallery Fjord" 
               category="landscape"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
               containerClassName="w-full h-full"
             />
           </div>
-          <div className="h-1/2 relative group cursor-pointer overflow-hidden">
+          <div className="h-1/2 relative group overflow-hidden">
             <OptimizedImage 
               src="/images/besseggen_1786936349992.jpg" 
-              alt="Gallery 3" 
+              alt="Gallery Nature" 
               category="trail"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
               containerClassName="w-full h-full"
             />
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white font-bold tracking-widest text-sm hover:bg-black/60 transition-colors pointer-events-none">
-              VIEW ALL 24 PHOTOS
-            </div>
           </div>
         </div>
         
-        {/* Navigation / Actions over Hero */}
-        <div className="absolute top-24 left-6 md:left-12 text-white/70 text-sm font-bold tracking-widest flex items-center gap-2 drop-shadow-md z-10">
-          <Link to="/stay" className="hover:text-white transition-colors">STAYS</Link> 
-          <ChevronRight className="w-4 h-4" /> 
-          <span className="text-white">{stay.name.toUpperCase()}</span>
-        </div>
-        <div className="absolute top-24 right-6 md:right-12 flex gap-4 z-10">
-          <button className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white hover:bg-white hover:text-[#1A1A1A] transition-colors border border-white/20">
-            <Share2 className="w-4 h-4" />
-          </button>
-          <button className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white hover:bg-white hover:text-red-500 transition-colors border border-white/20">
-            <Heart className="w-4 h-4" />
-          </button>
+        {/* Navigation Breadcrumb */}
+        <div className="absolute top-24 left-6 md:left-12 text-snow/70 text-xs font-bold tracking-widest flex items-center gap-2 drop-shadow-md z-10">
+          <Link to="/stay" className="hover:text-arctic-gold transition-colors">STAYS</Link> 
+          <ChevronRight className="w-3.5 h-3.5" /> 
+          <span className="text-snow">{stay.name.toUpperCase()}</span>
         </div>
       </div>
 
-      <div className="max-w-[1440px] mx-auto px-6 md:px-12 mt-12 flex flex-col lg:flex-row gap-12 relative">
+      <div className="max-w-[1440px] mx-auto px-6 md:px-12 mt-8 flex flex-col lg:flex-row gap-12 relative">
         
-        {/* Left Content Column */}
+        {/* Left Main Content */}
         <div className="flex-1 w-full lg:w-2/3">
           
           {/* Header Info */}
-          <div className="mb-12 border-b border-gray-200 pb-12">
-            <div className="flex items-center gap-2 text-[#C17F59] font-bold text-xs uppercase tracking-widest mb-4">
-              <TreePine className="w-4 h-4" /> Eco-Certified Property
+          <div className="mb-10 border-b border-white/10 pb-8">
+            <div className="flex items-center gap-2 text-green-400 font-bold text-xs uppercase tracking-widest mb-3">
+              <TreePine className="w-4 h-4" /> {stay.eco_certified ? 'Eco-Certified Nordic Property' : 'Certified Hospitality Partner'}
             </div>
-            <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">{stay.name}</h1>
-            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-6">
-              <span className="flex items-center gap-1"><MapPin className="w-4 h-4"/> Valldal, Norway</span>
+            <h1 className="text-3xl md:text-5xl font-display font-bold mb-4">{stay.name}</h1>
+            <div className="flex flex-wrap items-center gap-4 text-sm text-snow/70 mb-4">
+              <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4 text-arctic-gold"/> {(stay as any).locations?.name || 'Vestland, Norway'}</span>
               <span>•</span>
-              <span className="flex items-center gap-1 text-[#C17F59] font-bold"><Star className="w-4 h-4 fill-[#C17F59]"/> {stay.rating} (124 Reviews)</span>
+              <span className="flex items-center gap-1 text-arctic-gold font-bold"><Star className="w-4 h-4 fill-arctic-gold"/> {stay.rating || 4.9} (128 Verified Reviews)</span>
               <span>•</span>
-              <a href="#map" className="underline hover:text-[#1A1A1A]">Show on map</a>
+              <span className="text-xs uppercase tracking-wider px-2 py-0.5 bg-white/10 rounded">{stay.type?.replace(/_/g, ' ')}</span>
             </div>
-            <p className="text-lg leading-relaxed text-gray-700">
+            <p className="text-base md:text-lg leading-relaxed text-snow/80">
               {stay.description}
             </p>
           </div>
 
-          {/* Amenities */}
-          <div className="mb-12 border-b border-gray-200 pb-12">
-            <h2 className="text-2xl font-display font-bold mb-6">Property Amenities</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {/* Property Amenities */}
+          <div className="mb-10 border-b border-white/10 pb-8">
+            <h2 className="text-xl font-display font-bold mb-6 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-arctic-gold" /> Included Highlights & Amenities
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { icon: <Wifi className="w-6 h-6"/>, label: 'Free High-Speed Wi-Fi' },
-                { icon: <Car className="w-6 h-6"/>, label: 'Free Parking' },
-                { icon: <Wind className="w-6 h-6"/>, label: 'Spa & Wellness' },
-                { icon: <Coffee className="w-6 h-6"/>, label: 'Exceptional Breakfast' },
+                { icon: <Wifi className="w-5 h-5"/>, label: 'High-Speed Fiber Wi-Fi' },
+                { icon: <Car className="w-5 h-5"/>, label: 'Free Parking & EV Station' },
+                { icon: <Wind className="w-5 h-5"/>, label: 'Sauna & Nordic Bath' },
+                { icon: <Coffee className="w-5 h-5"/>, label: 'Local Organic Breakfast' },
               ].map((item, i) => (
-                <div key={i} className="flex flex-col items-start gap-3">
-                  <div className="text-[#C17F59] bg-[#C17F59]/10 p-3 rounded-xl">{item.icon}</div>
-                  <span className="text-sm font-bold text-gray-700">{item.label}</span>
+                <div key={i} className="flex flex-col items-start gap-2 bg-white/5 border border-white/5 p-4 rounded-xl">
+                  <div className="text-arctic-gold">{item.icon}</div>
+                  <span className="text-xs font-bold text-snow/90">{item.label}</span>
                 </div>
               ))}
             </div>
@@ -174,170 +266,226 @@ export const StayDetails = () => {
 
           {/* Room Selection */}
           <div className="mb-12" id="rooms">
-            <h2 className="text-2xl font-display font-bold mb-6">Available Rooms</h2>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-display font-bold">Select Accommodation Option</h2>
+              {checkingAvailability && (
+                <span className="text-xs text-arctic-gold animate-pulse flex items-center gap-1">
+                  Checking real availability...
+                </span>
+              )}
+            </div>
             
             <div className="space-y-6">
-              {MOCK_ROOMS.map(room => (
-                <div key={room.id} className={`flex flex-col md:flex-row border transition-all duration-300 ${selectedRoom === room.id ? 'border-[#C17F59] shadow-lg ring-1 ring-[#C17F59]' : 'border-gray-200 hover:border-gray-300'} bg-white overflow-hidden`}>
-                  <div className="w-full md:w-1/3 h-48 md:h-auto relative">
-                    <OptimizedImage 
-                      src={room.image} 
-                      alt={room.name} 
-                      category="stay"
-                      className="w-full h-full object-cover" 
-                      containerClassName="w-full h-full"
-                    />
-                    {room.remaining <= 3 && (
-                      <div className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold uppercase tracking-widest px-2 py-1 z-10">
-                        Only {room.remaining} left
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="p-6 flex-1 flex flex-col justify-between">
-                    <div>
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="text-xl font-bold">{room.name}</h3>
-                        <div className="text-right">
-                          <div className="text-xl font-bold text-[#C17F59]">{formatPrice(room.price)}</div>
-                          <div className="text-[10px] text-gray-400 uppercase tracking-widest">Per night</div>
-                        </div>
-                      </div>
-                      <p className="text-sm text-gray-500 mb-4">{room.description}</p>
-                      
-                      <div className="flex flex-wrap gap-4 text-xs font-bold text-gray-600 mb-4">
-                        <span className="flex items-center gap-1"><Users className="w-4 h-4 text-gray-400"/> Max {room.occupancy}</span>
-                        <span className="flex items-center gap-1"><Info className="w-4 h-4 text-gray-400"/> {room.size}</span>
-                        <span className="flex items-center gap-1"><Info className="w-4 h-4 text-gray-400"/> {room.bed}</span>
-                      </div>
+              {rooms.map(room => {
+                const isSelected = selectedRoomId === room.id;
+                const isAvail = availabilityMap[room.id] ?? true;
+                const roomPrice = Number(room.price_per_night) || activePricePerNight;
 
-                      <div className="flex flex-wrap gap-2 mb-6">
-                        {room.amenities.map(a => (
-                          <span key={a} className="bg-gray-100 px-2 py-1 text-[10px] uppercase font-bold tracking-widest text-gray-500 rounded-sm">
-                            {a}
-                          </span>
-                        ))}
-                      </div>
+                return (
+                  <div 
+                    key={room.id} 
+                    onClick={() => setSelectedRoomId(room.id)}
+                    className={`flex flex-col md:flex-row border transition-all duration-300 rounded-xl overflow-hidden cursor-pointer ${
+                      isSelected 
+                        ? 'border-arctic-gold bg-white/10 shadow-xl ring-1 ring-arctic-gold' 
+                        : 'border-white/10 bg-white/5 hover:border-white/20'
+                    }`}
+                  >
+                    <div className="w-full md:w-1/3 h-52 md:h-auto relative">
+                      <OptimizedImage 
+                        src={room.image_url || stay.image_url} 
+                        alt={room.name} 
+                        category="stay"
+                        fallbackSrc="/images/hotel_juvet_1787013813000.jpg"
+                        className="w-full h-full object-cover" 
+                        containerClassName="w-full h-full"
+                      />
+                      {room.remaining && room.remaining <= 3 && (
+                        <div className="absolute top-2 left-2 bg-amber-500 text-deep-night text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded shadow">
+                          Only {room.remaining} left
+                        </div>
+                      )}
                     </div>
                     
-                    <div className="flex justify-between items-end border-t border-gray-100 pt-4">
-                      <div className="text-sm font-bold text-gray-500 flex items-center gap-1">
-                        <ShieldCheck className="w-4 h-4 text-green-500" /> {room.cancellation}
+                    <div className="p-6 flex-1 flex flex-col justify-between">
+                      <div>
+                        <div className="flex justify-between items-start mb-2">
+                          <h3 className="text-xl font-bold text-snow">{room.name}</h3>
+                          <div className="text-right">
+                            <div className="text-xl font-bold text-arctic-gold">{formatPrice(roomPrice)}</div>
+                            <div className="text-[10px] text-snow/40 uppercase tracking-widest">per night</div>
+                          </div>
+                        </div>
+                        <p className="text-sm text-snow/70 mb-4">{room.description}</p>
+                        
+                        <div className="flex flex-wrap gap-4 text-xs font-bold text-snow/80 mb-4">
+                          <span className="flex items-center gap-1"><Users className="w-4 h-4 text-arctic-gold"/> Max {room.capacity || 2} Guests</span>
+                          <span className="flex items-center gap-1"><Info className="w-4 h-4 text-arctic-gold"/> {room.size || '36m²'}</span>
+                          <span className="flex items-center gap-1"><Info className="w-4 h-4 text-arctic-gold"/> {room.bed || '1 King Bed'}</span>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {(room.amenities || ['Breakfast included', 'Wi-Fi', 'Fjord View']).map((a, i) => (
+                            <span key={i} className="bg-white/10 px-2 py-0.5 text-[10px] uppercase font-bold tracking-widest text-snow/80 rounded">
+                              {a}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                      <button 
-                        onClick={() => setSelectedRoom(room.id)}
-                        className={`px-8 py-3 text-sm font-bold uppercase tracking-widest transition-colors ${
-                          selectedRoom === room.id 
-                            ? 'bg-[#C17F59] text-white' 
-                            : 'border border-[#1A1A1A] text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white'
-                        }`}
-                      >
-                        {selectedRoom === room.id ? 'Selected' : 'Select'}
-                      </button>
+                      
+                      <div className="flex flex-wrap justify-between items-center border-t border-white/10 pt-4 gap-4">
+                        <div className="text-xs font-bold flex items-center gap-1.5">
+                          {isAvail ? (
+                            <span className="text-green-400 flex items-center gap-1">
+                              <CheckCircle2 className="w-4 h-4" /> Available for {nights} night{nights > 1 ? 's' : ''}
+                            </span>
+                          ) : (
+                            <span className="text-red-400 flex items-center gap-1">
+                              <AlertCircle className="w-4 h-4" /> Unavailable for these dates
+                            </span>
+                          )}
+                        </div>
+                        <button 
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedRoomId(room.id);
+                          }}
+                          className={`px-6 py-2.5 text-xs font-bold uppercase tracking-widest rounded transition-colors ${
+                            isSelected 
+                              ? 'bg-arctic-gold text-deep-night' 
+                              : 'border border-white/20 text-snow hover:border-arctic-gold'
+                          }`}
+                        >
+                          {isSelected ? 'Selected' : 'Select Room'}
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
 
         {/* Right Sticky Booking Panel */}
         <div className="w-full lg:w-1/3 relative">
-          <div className="sticky top-28 bg-white border border-gray-200 p-8 shadow-xl">
-            <div className="text-xl font-bold mb-6 border-b border-gray-100 pb-4">
-              <span className="text-[#C17F59]">{formatPrice(selectedRoom ? MOCK_ROOMS.find(r => r.id === selectedRoom)!.price : parseInt(String(stay.price_per_night).replace(/[^0-9]/g, ''), 10) || 2400)}</span> 
-              <span className="text-sm text-gray-400 font-normal"> / night</span>
-            </div>
-            
-            <div className="grid grid-cols-2 border border-gray-300 mb-4 text-sm cursor-pointer">
-              <div className="p-3 border-r border-gray-300">
-                <div className="text-[10px] uppercase font-bold text-gray-500 mb-1">Check-in</div>
-                <div className="font-bold">12 Aug 2026</div>
+          <div className="sticky top-28 bg-white/5 border border-white/10 backdrop-blur-xl p-6 md:p-8 rounded-2xl shadow-2xl">
+            <div className="flex justify-between items-baseline mb-6 border-b border-white/10 pb-4">
+              <div>
+                <span className="text-2xl font-display font-bold text-arctic-gold">{formatPrice(activePricePerNight)}</span>
+                <span className="text-xs text-snow/50 font-normal"> / night</span>
               </div>
-              <div className="p-3">
-                <div className="text-[10px] uppercase font-bold text-gray-500 mb-1">Check-out</div>
-                <div className="font-bold">16 Aug 2026</div>
-              </div>
-              <div className="p-3 border-t border-gray-300 col-span-2 flex justify-between items-center">
-                <div>
-                  <div className="text-[10px] uppercase font-bold text-gray-500 mb-1">Guests</div>
-                  <div className="font-bold">2 Guests, 1 Room</div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
+              <div className="text-xs text-snow/60 flex items-center gap-1">
+                <Star className="w-3.5 h-3.5 fill-arctic-gold text-arctic-gold" /> {stay.rating || 4.9}
               </div>
             </div>
 
-            {!selectedRoom ? (
-              <a href="#rooms" className="block w-full bg-[#1A1A1A] text-white text-center py-4 text-sm font-bold uppercase tracking-widest hover:bg-[#C17F59] transition-colors mb-4">
-                Select a Room
-              </a>
-            ) : (
-              <div className="mb-6">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-bold text-gray-600 underline">
-                    {formatPrice(MOCK_ROOMS.find(r => r.id === selectedRoom)!.price)} x 4 nights
-                  </span>
-                  <span className="text-sm font-bold text-gray-800">
-                    {formatPrice(MOCK_ROOMS.find(r => r.id === selectedRoom)!.price * 4)}
-                  </span>
+            {/* Date Pickers */}
+            <div className="space-y-4 mb-6">
+              <div className="grid grid-cols-2 gap-3 bg-black/30 p-3 rounded-xl border border-white/10">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-snow/50 mb-1">Check-in</label>
+                  <input 
+                    type="date" 
+                    value={checkIn}
+                    min={new Date().toISOString().split('T')[0]}
+                    onChange={(e) => setCheckIn(e.target.value)}
+                    className="bg-transparent text-xs text-snow outline-none w-full cursor-pointer"
+                  />
                 </div>
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-sm font-bold text-gray-600 underline">Taxes & Fees</span>
-                  <span className="text-sm font-bold text-gray-800">{formatPrice(450)}</span>
+                <div className="border-l border-white/10 pl-3">
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-snow/50 mb-1">Check-out</label>
+                  <input 
+                    type="date" 
+                    value={checkOut}
+                    min={checkIn || new Date().toISOString().split('T')[0]}
+                    onChange={(e) => setCheckOut(e.target.value)}
+                    className="bg-transparent text-xs text-snow outline-none w-full cursor-pointer"
+                  />
                 </div>
-                <div className="flex justify-between items-center border-t border-gray-200 pt-4 mb-6">
-                  <span className="font-bold text-lg">Total</span>
-                  <span className="font-bold text-lg text-[#C17F59]">
-                    {formatPrice((MOCK_ROOMS.find(r => r.id === selectedRoom)!.price * 4) + 450)}
-                  </span>
+              </div>
+
+              {/* Guest Count */}
+              <div className="bg-black/30 p-3 rounded-xl border border-white/10 flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-arctic-gold" />
+                  <span className="text-xs font-bold text-snow/80">Guests</span>
                 </div>
-                <button className="w-full bg-[#C17F59] text-white py-4 text-sm font-bold uppercase tracking-widest hover:bg-[#1A1A1A] transition-colors">
-                  Reserve Now
-                </button>
-                <div className="text-center text-xs text-gray-500 mt-4">
-                  You won't be charged yet
+                <div className="flex items-center gap-3">
+                  <button 
+                    type="button"
+                    onClick={() => setGuests(Math.max(1, guests - 1))}
+                    className="w-6 h-6 rounded bg-white/10 flex items-center justify-center text-snow hover:bg-white/20"
+                  >
+                    -
+                  </button>
+                  <span className="text-xs font-bold w-4 text-center">{guests}</span>
+                  <button 
+                    type="button"
+                    onClick={() => setGuests(Math.min(6, guests + 1))}
+                    className="w-6 h-6 rounded bg-white/10 flex items-center justify-center text-snow hover:bg-white/20"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Price Summary Breakdown */}
+            {nights > 0 && (
+              <div className="space-y-3 mb-6 border-t border-white/10 pt-4 text-xs">
+                <div className="flex justify-between text-snow/70">
+                  <span>{formatPrice(activePricePerNight)} × {nights} nights</span>
+                  <span>{formatPrice(totalBasePrice)}</span>
+                </div>
+                <div className="flex justify-between text-snow/70">
+                  <span>Norwegian MVA (25% VAT Included)</span>
+                  <span>{formatPrice(vatIncluded)}</span>
+                </div>
+                <div className="flex justify-between text-snow/70">
+                  <span className="flex items-center gap-1"><TreePine className="w-3.5 h-3.5 text-green-400" /> Eco Preservation Tax</span>
+                  <span className="text-green-400">Included</span>
+                </div>
+                <div className="flex justify-between text-base font-bold text-snow border-t border-white/10 pt-3">
+                  <span>Total Amount</span>
+                  <span className="text-arctic-gold">{formatPrice(totalBasePrice)}</span>
                 </div>
               </div>
             )}
-            
-            <div className="flex items-start gap-3 bg-gray-50 p-4 border border-gray-100 rounded-lg">
-              <ShieldCheck className="w-5 h-5 text-green-500 shrink-0" />
-              <div>
-                <div className="text-xs font-bold text-gray-800 mb-1">Book with confidence</div>
-                <div className="text-[10px] text-gray-500 leading-relaxed">
-                  Price match guarantee. 24/7 customer support. Secure transaction processing via Norway SmartLife.
-                </div>
-              </div>
+
+            {/* Action Buttons */}
+            <div className="space-y-3">
+              <button 
+                type="button"
+                onClick={handleReserveNow}
+                disabled={!isRoomAvailable || nights <= 0}
+                className="w-full py-3.5 bg-arctic-gold hover:bg-snow text-deep-night font-bold uppercase tracking-widest text-xs rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isRoomAvailable ? 'Reserve Accommodation' : 'Room Unavailable'} <ArrowRight className="w-4 h-4" />
+              </button>
+
+              <button 
+                type="button"
+                onClick={handleAddToCart}
+                disabled={!isRoomAvailable || nights <= 0}
+                className="w-full py-3 bg-white/10 hover:bg-white/20 text-snow font-bold uppercase tracking-widest text-xs rounded-xl border border-white/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                <ShoppingBag className="w-4 h-4 text-arctic-gold" /> Add Stay to Cart
+              </button>
+            </div>
+
+            <div className="mt-4 text-center">
+              <span className="text-[10px] text-snow/50 flex items-center justify-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-green-400" /> Free cancellation up to 48 hours before check-in
+              </span>
             </div>
           </div>
         </div>
 
       </div>
-
-      {/* Mobile Sticky Booking Bar */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] z-50 flex justify-between items-center">
-        <div>
-          <div className="text-lg font-bold text-[#C17F59]">
-            {formatPrice(selectedRoom ? MOCK_ROOMS.find(r => r.id === selectedRoom)!.price : parseInt(String(stay.price_per_night).replace(/[^0-9]/g, ''), 10) || 2400)}
-          </div>
-          <div className="text-xs text-gray-500 font-bold uppercase tracking-widest">
-            12 Aug - 16 Aug
-          </div>
-        </div>
-        <button 
-          onClick={() => {
-            if (!selectedRoom) {
-              const el = document.getElementById('rooms');
-              if (el) el.scrollIntoView({ behavior: 'smooth' });
-            }
-          }}
-          className="bg-[#1A1A1A] text-white px-8 py-3 text-sm font-bold uppercase tracking-widest hover:bg-[#C17F59] transition-colors"
-        >
-          {selectedRoom ? 'Reserve' : 'Select Room'}
-        </button>
-      </div>
-
     </div>
   );
 };
+
+export default StayDetails;

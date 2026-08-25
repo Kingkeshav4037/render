@@ -6,6 +6,7 @@ import { supabase } from '../../lib/supabase';
 import { toast } from '../../store/useToastStore';
 import { authService } from '../../services/auth/authService';
 import { AuthLayout } from '../../components/layout/AuthLayout';
+import { useAuthStore } from '../../store/useAuthStore';
 
 const COUNTRY_CODES = [
   { code: '+47', country: 'Norway 🇳🇴' },
@@ -22,10 +23,25 @@ const COUNTRY_CODES = [
   { code: '+61', country: 'Australia 🇦🇺' },
 ];
 
+/**
+ * Validates and sanitizes internal application redirects to prevent open-redirect vulnerabilities.
+ */
+export const sanitizeRedirectUrl = (rawUrl: string | null | undefined): string => {
+  if (!rawUrl) return '/home';
+  // Allow only valid internal relative paths starting with a single '/'
+  if (rawUrl.startsWith('/') && !rawUrl.startsWith('//') && !rawUrl.includes('\\')) {
+    return rawUrl;
+  }
+  return '/home';
+};
+
 export const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/home';
+  const { user } = useAuthStore();
+
+  const rawRedirect = new URLSearchParams(location.search).get('redirect') || location.state?.from?.pathname;
+  const targetRedirect = sanitizeRedirectUrl(rawRedirect);
 
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
@@ -42,6 +58,13 @@ export const Login = () => {
   const [resendTimer, setResendTimer] = useState(0);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (user) {
+      navigate(targetRedirect, { replace: true });
+    }
+  }, [user, navigate, targetRedirect]);
 
   useEffect(() => {
     let interval: any;
@@ -67,23 +90,24 @@ export const Login = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      if (from !== '/home') {
-        sessionStorage.setItem('returnTo', from);
+      if (targetRedirect !== '/home') {
+        sessionStorage.setItem('returnTo', targetRedirect);
       }
       setLoading(true);
       setError(null);
       await authService.loginWithGoogle();
     } catch (e: any) {
-      console.error(e);
-      setError(e.message || 'Google sign-in failed');
+      console.warn('Google login notice:', e);
+      setError(e.message || 'Unable to connect to Google sign-in. Please use Email or Phone.');
       setLoading(false);
     }
   };
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!phoneNumber.trim()) {
-      setError('Please enter a valid phone number');
+    const digitsOnly = phoneNumber.replace(/\D/g, '');
+    if (!digitsOnly || digitsOnly.length < 5) {
+      setError('Please enter a valid phone number.');
       return;
     }
     try {
@@ -93,24 +117,26 @@ export const Login = () => {
       setOtpSent(true);
       setResendTimer(60);
       setLoading(false);
+      toast.info(`Verification code dispatched to ${fullPhoneNumber}`);
     } catch (e: any) {
-      console.error(e);
-      setError(e.message || 'Failed to send SMS code. Please check your number.');
+      console.warn('SMS dispatch error:', e);
+      setError(e.message || 'Failed to send SMS code. Please check your phone number and country code.');
       setLoading(false);
     }
   };
 
   const handleResendOtp = async () => {
-    if (resendTimer > 0) return;
+    if (resendTimer > 0 || loading) return;
     try {
       setLoading(true);
       setError(null);
       await authService.sendPhoneOtp(fullPhoneNumber);
       setResendTimer(60);
       setLoading(false);
+      toast.info('Verification code resent.');
     } catch (e: any) {
-      console.error(e);
-      setError(e.message || 'Failed to resend code');
+      console.warn('Resend error:', e);
+      setError(e.message || 'Failed to resend code. Please try again in a few moments.');
       setLoading(false);
     }
   };
@@ -118,7 +144,7 @@ export const Login = () => {
   const handleOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!otp.trim() || otp.trim().length < 6) {
-      setError('Please enter the complete 6-digit verification code');
+      setError('Please enter the complete 6-digit verification code.');
       return;
     }
     try {
@@ -133,7 +159,7 @@ export const Login = () => {
             phone: fullPhoneNumber,
             phone_verified: true,
             email: data.user.email || `${fullPhoneNumber.replace(/\+/g, '')}@phone.norwaysmartlife.local`,
-            full_name: data.user.user_metadata?.full_name || `User ${fullPhoneNumber.slice(-4)}`,
+            full_name: data.user.user_metadata?.full_name || `Traveler ${fullPhoneNumber.slice(-4)}`,
             updated_at: new Date().toISOString(),
           }, { onConflict: 'id', ignoreDuplicates: true });
         } catch (profileErr) {
@@ -141,25 +167,44 @@ export const Login = () => {
         }
       }
 
-      toast.success('Signed in successfully with phone number');
-      setTimeout(() => navigate(from, { replace: true }), 500);
+      toast.success('Signed in successfully with phone number.');
+      navigate(targetRedirect, { replace: true });
     } catch (e: any) {
-      console.error(e);
-      setError(e.message || 'Invalid or expired verification code. Please try again.');
+      console.warn('OTP verification error:', e);
+      setError(e.message || 'Invalid or expired verification code. Please request a new code.');
       setLoading(false);
     }
   };
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      setError('Please enter your email address.');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+
+    if (!password) {
+      setError('Please enter your password.');
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
-      await authService.loginWithEmail(email, password);
-      setTimeout(() => navigate(from, { replace: true }), 500);
+      await authService.loginWithEmail(trimmedEmail, password);
+      toast.success('Signed in successfully. Welcome back!');
+      navigate(targetRedirect, { replace: true });
     } catch (e: any) {
-      console.error(e);
-      setError(e.message || 'Invalid email or password');
+      console.warn('Login failure:', e);
+      setError(e.message || 'Unable to sign in with these credentials. Please check your email and password.');
       setLoading(false);
     }
   };
@@ -175,7 +220,7 @@ export const Login = () => {
         <button
           type="button"
           onClick={() => { setLoginMethod('email'); setError(null); }}
-          className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-2 ${
+          className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer ${
             loginMethod === 'email' 
               ? 'bg-aurora-green text-navy-900 shadow-[0_0_15px_rgba(0,255,135,0.2)]' 
               : 'text-snow/70 hover:text-snow'
@@ -186,7 +231,7 @@ export const Login = () => {
         <button
           type="button"
           onClick={() => { setLoginMethod('phone'); setError(null); }}
-          className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-2 ${
+          className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer ${
             loginMethod === 'phone' 
               ? 'bg-aurora-green text-navy-900 shadow-[0_0_15px_rgba(0,255,135,0.2)]' 
               : 'text-snow/70 hover:text-snow'
@@ -204,7 +249,7 @@ export const Login = () => {
             exit={{ opacity: 0, height: 0 }}
             className="bg-red-500/10 border border-red-500/30 text-red-400 p-3.5 rounded-xl text-sm text-center mb-6 overflow-hidden"
             role="alert"
-            aria-live="assertive"
+            aria-live="polite"
           >
             {error}
           </motion.div>
@@ -273,7 +318,7 @@ export const Login = () => {
           <button 
             type="submit" 
             disabled={loading} 
-            className="group relative w-full flex justify-center items-center gap-2 py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-navy-900 bg-aurora-green hover:bg-green-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-navy-900 focus:ring-aurora-green transition-all disabled:opacity-70 shadow-[0_0_20px_rgba(0,255,135,0.3)] hover:shadow-[0_0_30px_rgba(0,255,135,0.5)]"
+            className="group relative w-full flex justify-center items-center gap-2 py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-navy-900 bg-aurora-green hover:bg-green-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-navy-900 focus:ring-aurora-green transition-all disabled:opacity-70 shadow-[0_0_20px_rgba(0,255,135,0.3)] hover:shadow-[0_0_30px_rgba(0,255,135,0.5)] cursor-pointer"
           >
             {loading ? 'Signing in...' : 'Sign In'}
             {!loading && <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
@@ -294,7 +339,7 @@ export const Login = () => {
                 type="button"
                 onClick={handleGoogleLogin}
                 disabled={loading}
-                className="w-full flex justify-center items-center gap-3 py-3 px-4 border border-white/10 rounded-xl text-snow bg-deep-night/40 hover:bg-deep-night/80 hover:border-white/20 transition-all group"
+                className="w-full flex justify-center items-center gap-3 py-3 px-4 border border-white/10 rounded-xl text-snow bg-deep-night/40 hover:bg-deep-night/80 hover:border-white/20 transition-all group cursor-pointer"
               >
                 <svg className="h-5 w-5" aria-hidden="true" viewBox="0 0 24 24">
                   <path d="M12.0003 4.75C13.7703 4.75 15.3553 5.36002 16.6053 6.54998L20.0303 3.125C17.9502 1.19 15.2353 0 12.0003 0C7.31028 0 3.25527 2.69 1.28027 6.60998L5.27028 9.70498C6.21525 6.86002 8.87028 4.75 12.0003 4.75Z" fill="#EA4335" />
@@ -326,7 +371,7 @@ export const Login = () => {
                   <button
                     type="button"
                     onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)}
-                    className="w-full flex items-center justify-between py-3.5 px-3 border border-white/10 rounded-xl bg-deep-night/40 text-snow focus:outline-none focus:ring-2 focus:ring-aurora-green/50 transition-all text-sm font-medium hover:bg-deep-night/60"
+                    className="w-full flex items-center justify-between py-3.5 px-3 border border-white/10 rounded-xl bg-deep-night/40 text-snow focus:outline-none focus:ring-2 focus:ring-aurora-green/50 transition-all text-sm font-medium hover:bg-deep-night/60 cursor-pointer"
                   >
                     <span>{countryCode}</span>
                     <ChevronDown className={`w-4 h-4 text-snow/50 transition-transform ${isCountryDropdownOpen ? 'rotate-180' : ''}`} />
@@ -348,7 +393,7 @@ export const Login = () => {
                               setCountryCode(c.code);
                               setIsCountryDropdownOpen(false);
                             }}
-                            className={`w-full text-left px-4 py-2 text-sm hover:bg-white/10 transition-colors flex items-center justify-between ${countryCode === c.code ? 'text-aurora-green font-bold bg-white/5' : 'text-snow'}`}
+                            className={`w-full text-left px-4 py-2 text-sm hover:bg-white/10 transition-colors flex items-center justify-between cursor-pointer ${countryCode === c.code ? 'text-aurora-green font-bold bg-white/5' : 'text-snow'}`}
                           >
                             <span>{c.country.split(' ')[0]}</span>
                             <span className="text-snow/50">{c.code}</span>
@@ -390,7 +435,7 @@ export const Login = () => {
                 <button
                   type="button"
                   onClick={() => { setOtpSent(false); setOtp(''); }}
-                  className="text-xs text-aurora-green hover:text-green-300 font-semibold px-3 py-1.5 rounded-lg hover:bg-aurora-green/10 transition-colors"
+                  className="text-xs text-aurora-green hover:text-green-300 font-semibold px-3 py-1.5 rounded-lg hover:bg-aurora-green/10 transition-colors cursor-pointer"
                 >
                   Change
                 </button>
@@ -419,7 +464,7 @@ export const Login = () => {
                   type="button"
                   onClick={handleResendOtp}
                   disabled={resendTimer > 0 || loading}
-                  className="text-aurora-green hover:text-green-300 font-bold disabled:opacity-50 disabled:hover:text-aurora-green flex items-center gap-1 transition-colors"
+                  className="text-aurora-green hover:text-green-300 font-bold disabled:opacity-50 disabled:hover:text-aurora-green flex items-center gap-1 transition-colors cursor-pointer"
                 >
                   <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
                   {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend Code'}
@@ -431,7 +476,7 @@ export const Login = () => {
           <button 
             type="submit" 
             disabled={loading} 
-            className="group relative w-full flex justify-center items-center gap-2 py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-navy-900 bg-aurora-green hover:bg-green-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-navy-900 focus:ring-aurora-green transition-all disabled:opacity-70 shadow-[0_0_20px_rgba(0,255,135,0.3)] hover:shadow-[0_0_30px_rgba(0,255,135,0.5)] mt-6"
+            className="group relative w-full flex justify-center items-center gap-2 py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-navy-900 bg-aurora-green hover:bg-green-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-navy-900 focus:ring-aurora-green transition-all disabled:opacity-70 shadow-[0_0_20px_rgba(0,255,135,0.3)] hover:shadow-[0_0_30px_rgba(0,255,135,0.5)] mt-6 cursor-pointer"
           >
             {loading ? 'Processing...' : (otpSent ? 'Verify & Sign In' : 'Send Verification Code')}
             {!loading && <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}

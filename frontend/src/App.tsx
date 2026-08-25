@@ -27,16 +27,19 @@ const RootRedirect = () => {
 };
 
 // --- 404 Not Found page (ISSUE-009) ---
-const NotFound = () => (
-  <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-navy-900 text-center px-6">
-    <div className="text-8xl font-black text-blue-500 mb-4">404</div>
-    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Page Not Found</h1>
-    <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md">The page you're looking for doesn't exist or has been moved.</p>
-    <a href="/home" className="px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors">
-      Go to Home
-    </a>
-  </div>
-);
+const NotFound = () => {
+  const { Link } = require('react-router-dom');
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-navy-900 text-center px-6">
+      <div className="text-8xl font-black text-blue-500 mb-4">404</div>
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Page Not Found</h1>
+      <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md">The page you're looking for doesn't exist or has been moved.</p>
+      <Link to="/home" className="px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors">
+        Go to Home
+      </Link>
+    </div>
+  );
+};
 
 // --- Lazy-loaded Pages ---
 const Home = lazy(() => import('./pages/Home').then(m => ({ default: m.Home })));
@@ -97,6 +100,10 @@ const Impact = lazy(() => import('./pages/user/Impact').then(m => ({ default: m.
 const Wildlife = lazy(() => import('./pages/nature/Wildlife').then(m => ({ default: m.Wildlife })));
 const WildlifeDetail = lazy(() => import('./pages/nature/WildlifeDetail').then(m => ({ default: m.WildlifeDetail })));
 const Flora = lazy(() => import('./pages/nature/Flora').then(m => ({ default: m.Flora })));
+const Places = lazy(() => import('./pages/places/Places').then(m => ({ default: m.Places })));
+const NatureHub = lazy(() => import('./pages/nature/NatureHub').then(m => ({ default: m.NatureHub })));
+const Fjords = lazy(() => import('./pages/nature/Fjords').then(m => ({ default: m.Fjords })));
+const Mountains = lazy(() => import('./pages/adventure/Mountains').then(m => ({ default: m.Mountains })));
 const History = lazy(() => import('./pages/History').then(m => ({ default: m.History })));
 const Invoices = lazy(() => import('./pages/user/Invoices').then(m => ({ default: m.Invoices })));
 const LiveWeather = lazy(() => import('./pages/nature/LiveWeather').then(m => ({ default: m.LiveWeather })));
@@ -110,9 +117,13 @@ const TrailDetails = lazy(() => import('./pages/adventure/TrailDetails').then(m 
 const WinterSports = lazy(() => import('./pages/adventure/WinterSports').then(m => ({ default: m.WinterSports })));
 const WinterResortDetails = lazy(() => import('./pages/adventure/WinterResortDetails').then(m => ({ default: m.WinterResortDetails })));
 const Products = lazy(() => import('./pages/marketplace/Products').then(m => ({ default: m.Products })));
+const ProductDetails = lazy(() => import('./pages/marketplace/ProductDetails').then(m => ({ default: m.ProductDetails })));
+const ShopCart = lazy(() => import('./pages/marketplace/ShopCart').then(m => ({ default: m.ShopCart })));
 const Checkout = lazy(() => import('./pages/checkout/Checkout').then(m => ({ default: m.Checkout })));
 const PaymentSuccess = lazy(() => import('./pages/checkout/PaymentSuccess').then(m => ({ default: m.PaymentSuccess })));
+const PaymentFailure = lazy(() => import('./pages/checkout/PaymentFailure').then(m => ({ default: m.PaymentFailure })));
 const StayBooking = lazy(() => import('./pages/checkout/StayBooking').then(m => ({ default: m.StayBooking })));
+
 const MyBookings = lazy(() => import('./pages/user/MyBookings').then(m => ({ default: m.MyBookings })));
 const BookingDetails = lazy(() => import('./pages/user/BookingDetails').then(m => ({ default: m.BookingDetails })));
 const Infrastructure = lazy(() => import('./pages/industry/Infrastructure').then(m => ({ default: m.Infrastructure })));
@@ -138,6 +149,8 @@ const AdminProviderVerification = lazy(() => import('./pages/admin/providers/Adm
 const AdminModeration = lazy(() => import('./pages/admin/moderation/AdminModeration').then(m => ({ default: m.AdminModeration })));
 const AdminBookings = lazy(() => import('./pages/admin/AdminBookings').then(m => ({ default: m.AdminBookings })));
 const AdminPayments = lazy(() => import('./pages/admin/commerce/AdminPayments').then(m => ({ default: m.AdminPayments })));
+const AdminOrders = lazy(() => import('./pages/admin/commerce/AdminOrders').then(m => ({ default: m.AdminOrders })));
+const AdminProducts = lazy(() => import('./pages/admin/commerce/AdminProducts').then(m => ({ default: m.AdminProducts })));
 const AdminDestinations = lazy(() => import('./pages/admin/AdminDestinations').then(m => ({ default: m.AdminDestinations })));
 const AdminContent = lazy(() => import('./pages/admin/content/AdminContent').then(m => ({ default: m.AdminContent })));
 const AdminWildlifeCMS = lazy(() => import('./pages/admin/content/AdminWildlifeCMS').then(m => ({ default: m.AdminWildlifeCMS })));
@@ -211,17 +224,24 @@ function App() {
               <Route path="/winter" element={<WinterSports />} />
               <Route path="/winter/:id" element={<WinterResortDetails />} />
               <Route path="/shop" element={<Products />} />
+              <Route path="/shop/cart" element={<ShopCart />} />
+              <Route path="/shop/:id" element={<ProductDetails />} />
               <Route path="/products" element={<Products />} />
+              <Route path="/products/cart" element={<ShopCart />} />
+              <Route path="/products/:id" element={<ProductDetails />} />
+              <Route path="/cart" element={<ShopCart />} />
               {/* /industry removed — duplicate of /infrastructure (ISSUE-010) */}
+
+
 
               {/* Site Directory */}
               <Route path="/sitemap" element={<Sitemap />} />
 
-              {/* Redirected Destination Categories */}
-              <Route path="/places" element={<Navigate to="/explore?type=LANDMARK" replace />} />
-              <Route path="/nature" element={<Navigate to="/explore?type=NATIONAL_PARK" replace />} />
-              <Route path="/fjords" element={<Navigate to="/explore?type=FJORD" replace />} />
-              <Route path="/mountains" element={<Navigate to="/trails" replace />} />
+              {/* Dedicated & Category Landing Hubs */}
+              <Route path="/places" element={<Places />} />
+              <Route path="/nature" element={<NatureHub />} />
+              <Route path="/fjords" element={<Fjords />} />
+              <Route path="/mountains" element={<Mountains />} />
               <Route path="/wildlife" element={<Wildlife />} />
               <Route path="/wildlife/:id" element={<WildlifeDetail />} />
               <Route path="/flora" element={<Flora />} />
@@ -235,6 +255,7 @@ function App() {
               <Route path="/hotels" element={<Navigate to="/stay" replace />} />
               <Route path="/stay" element={<Stay />} />
               <Route path="/stay/:id" element={<StayDetails />} />
+              <Route path="/stay/:id/book" element={<StayBooking />} />
               <Route path="/food/:id" element={<FoodDetails />} />
               <Route path="/activities" element={<Activities />} />
               <Route path="/activities/:id" element={<ActivityDetails />} />
@@ -250,35 +271,49 @@ function App() {
               <Route path="/guides" element={<Guides />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/checkout/stay/:id" element={<StayBooking />} />
+              <Route path="/checkout/booking/:roomId" element={<StayBooking />} />
               <Route path="/payment-success" element={<PaymentSuccess />} />
+              <Route path="/payment-failure" element={<PaymentFailure />} />
+              <Route path="/payment-failed" element={<Navigate to="/payment-failure" replace />} />
 
-              {/* ── GROUP 2: Dashboard routes ───────────────────────────── */}
-              <Route path="/dashboard" element={
-                <RouteErrorBoundary groupName="Dashboard">
-                  <Dashboard />
-                </RouteErrorBoundary>
-              } />
-              <Route path="/profile" element={<ProfileLayout />}>
-                <Route index element={<ProfileOverview />} />
-                <Route path="preferences" element={<ProfilePreferences />} />
-                <Route path="security" element={<ProfileSecurity />} />
-                <Route path="privacy" element={<ProfilePrivacy />} />
+
+              {/* ── GROUP 2: Protected User routes ───────────────────────────── */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/dashboard" element={
+                  <RouteErrorBoundary groupName="Dashboard">
+                    <Dashboard />
+                  </RouteErrorBoundary>
+                } />
+                <Route path="/profile" element={<ProfileLayout />}>
+                  <Route index element={<ProfileOverview />} />
+                  <Route path="preferences" element={<ProfilePreferences />} />
+                  <Route path="security" element={<ProfileSecurity />} />
+                  <Route path="privacy" element={<ProfilePrivacy />} />
+                </Route>
+                <Route path="/wishlist" element={<Wishlist />} />
+                <Route path="/favorites" element={<Wishlist />} />
+                <Route path="/saved" element={<Navigate to="/favorites" replace />} />
+                <Route path="/trips" element={<TripsList />} />
+                <Route path="/trips/:id" element={<TripDetails />} />
+                <Route path="/wallet" element={<TravelWallet />} />
+                <Route path="/notifications" element={<Notifications />} />
+                <Route path="/reviews" element={<Reviews />} />
+                <Route path="/user/history" element={<TravelHistory />} />
+                <Route path="/user/travel-history" element={<TravelHistory />} />
+                <Route path="/impact" element={<Impact />} />
+                <Route path="/expenses" element={<Expenses />} />
+                <Route path="/settings" element={<Navigate to="/profile" replace />} />
+                <Route path="/settings/preferences" element={<Navigate to="/profile/preferences" replace />} />
+                <Route path="/settings/security" element={<Navigate to="/profile/security" replace />} />
+                <Route path="/settings/privacy" element={<Navigate to="/profile/privacy" replace />} />
+                <Route path="/settings/notifications" element={<NotificationSettings />} />
+                <Route path="/user/bookings" element={<MyBookings />} />
+                <Route path="/bookings" element={<Navigate to="/user/bookings" replace />} />
+                <Route path="/user/bookings/:id" element={<BookingDetails />} />
+                <Route path="/bookings/:id" element={<BookingDetails />} />
+                <Route path="/invoices" element={<Invoices />} />
+                <Route path="/user/invoices" element={<Invoices />} />
               </Route>
-              <Route path="/wishlist" element={<Wishlist />} />
-              <Route path="/trips" element={<TripsList />} />
-              <Route path="/trips/:id" element={<TripDetails />} />
-              <Route path="/wallet" element={<TravelWallet />} />
-              <Route path="/notifications" element={<Notifications />} />
-              <Route path="/reviews" element={<Reviews />} />
-              <Route path="/user/history" element={<TravelHistory />} />
-              <Route path="/user/travel-history" element={<TravelHistory />} />
-              <Route path="/impact" element={<Impact />} />
-              <Route path="/expenses" element={<Expenses />} />
-              <Route path="/settings/notifications" element={<NotificationSettings />} />
-              <Route path="/user/bookings" element={<MyBookings />} />
-              <Route path="/user/bookings/:id" element={<BookingDetails />} />
-              <Route path="/invoices" element={<Invoices />} />
-              <Route path="/user/invoices" element={<Invoices />} />
 
               {/* ── GROUP 3: Maps & Smart City ──────────────────────────── */}
               <Route path="/map" element={
@@ -384,6 +419,8 @@ function App() {
                 <Route path="providers/verification" element={<AdminProviderVerification />} />
                 <Route path="moderation" element={<AdminModeration />} />
                 <Route path="bookings" element={<AdminBookings />} />
+                <Route path="orders" element={<AdminOrders />} />
+                <Route path="products" element={<AdminProducts />} />
                 <Route path="payments" element={<AdminPayments />} />
                 <Route path="destinations" element={<AdminDestinations />} />
                 

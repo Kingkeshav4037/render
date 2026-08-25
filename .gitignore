@@ -81,6 +81,26 @@ dist-ssr/
 tmp-sb/
 **/tmp-sb/
 
+# ── Test & Audit Artifacts ──────────────────────────────────────────────────
+playwright-report/
+**/playwright-report/
+test-results/
+**/test-results/
+coverage/
+**/coverage/
+audit_results.json
+**/audit_results.json
+audit-report.txt
+**/audit-report.txt
+linter_report.txt
+**/linter_report.txt
+audit_patterns.json
+**/audit_patterns.json
+routes.json
+**/routes.json
+audit_layout.mjs
+**/audit_layout.mjs
+
 # ── Logs & Debugging ──────────────────────────────────────────────────────────
 logs/
 **/logs/

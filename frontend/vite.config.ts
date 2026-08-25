@@ -38,6 +38,7 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/setupTests.ts',
+    exclude: ['**/node_modules/**', '**/dist/**', '**/src/tests/playwright/**'],
     // Prevent worker spawn timeouts when running the full test suite
     testTimeout: 30000,
     maxConcurrency: 4,

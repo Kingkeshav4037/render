@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
-import { Calendar, MapPin, CheckCircle2, XCircle, Clock, FileText, Download, AlertTriangle, ArrowLeft, Ticket } from 'lucide-react';
+import { Calendar, MapPin, CheckCircle2, XCircle, Download, AlertTriangle, ArrowLeft, Ticket } from 'lucide-react';
 import { useCurrencyStore } from '../../store/useCurrencyStore';
 import { invoiceService } from '../../services/invoice/invoiceService';
 import { useAuthStore } from '../../store/useAuthStore';

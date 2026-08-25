@@ -52,8 +52,9 @@ serve(async (req) => {
 
     if (gateway === 'Razorpay') {
       const razorpayKeyId = Deno.env.get('RAZORPAY_KEY_ID');
-      const razorpaySecret = Deno.env.get('RAZORPAY_SECRET');
+      const razorpaySecret = Deno.env.get('RAZORPAY_KEY_SECRET') || Deno.env.get('RAZORPAY_SECRET');
       if (!razorpayKeyId || !razorpaySecret) throw new Error('Razorpay configuration missing');
+
       
       const basicAuth = btoa(`${razorpayKeyId}:${razorpaySecret}`);
       

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { supabase } from '../../../lib/supabase';
 import { GenericDataTable, ColumnDef } from '../components/GenericDataTable';
 import { JSONEditorModal } from '../components/JSONEditorModal';
@@ -10,7 +10,7 @@ export const AuroraCMS = () => {
   const [editRow, setEditRow] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const fetchItems = async () => {
+  const fetchItems = useCallback(async () => {
     setLoading(true);
     // Fetch northern locations or viewpoints suited for Aurora
     const { data } = await supabase
@@ -21,11 +21,11 @@ export const AuroraCMS = () => {
       
     if (data) setItems(data);
     setLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
     fetchItems();
-  }, []);
+  }, [fetchItems]);
 
 
   const columns: ColumnDef[] = [

@@ -4,14 +4,17 @@ import { Link } from 'react-router-dom';
 import { CinematicBackground } from '../../design/backgrounds/CinematicBackground';
 import { Container } from '../../components/layout/Container';
 import { trailService, Trail } from '../../services/trailService';
-import { Map, Mountain, Clock, TrendingUp, Sun, CloudRain, AlertTriangle, Snowflake } from 'lucide-react';
+import { Map, Mountain, Clock, TrendingUp, Sun, CloudRain, AlertTriangle, Snowflake, Search, X } from 'lucide-react';
 import { OptimizedImage } from '../../components/shared/OptimizedImage';
+import { SEO } from '../../components/shared/SEO';
 
 const FILTER_DIFFICULTY = ['All', 'Easy', 'Moderate', 'Hard', 'Extreme'];
 const FILTER_DURATION = ['All', '< 2 hours', '2–4 hours', '4–8 hours', 'Full day', 'Multi-day'];
 
 export const HikingTrails = () => {
   const [activeDiff, setActiveDiff] = useState('All');
+  const [activeDur, setActiveDur] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
   const [trails, setTrails] = useState<Trail[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -34,9 +37,38 @@ export const HikingTrails = () => {
     fetchTrails();
   }, []);
 
-  const filteredTrails = trails.filter(t => activeDiff === 'All' || t.difficulty === activeDiff);
+  const [sortBy, setSortBy] = useState<'default' | 'distance' | 'elevation'>('default');
+
+  const filteredTrails = trails
+    .filter(t => {
+      const matchesDiff = activeDiff === 'All' || t.difficulty.toLowerCase() === activeDiff.toLowerCase();
+      const matchesSearch = !searchQuery.trim() || 
+        t.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        t.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (t as any).description?.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const durNum = parseFloat(t.duration_hrs) || 0;
+      let matchesDuration = true;
+      if (activeDur === '< 2 hours') matchesDuration = durNum < 2;
+      else if (activeDur === '2–4 hours') matchesDuration = durNum >= 2 && durNum <= 4;
+      else if (activeDur === '4–8 hours') matchesDuration = durNum > 4 && durNum <= 8;
+      else if (activeDur === 'Full day') matchesDuration = durNum > 8 && durNum <= 14;
+      else if (activeDur === 'Multi-day') matchesDuration = durNum > 14;
+
+      return matchesDiff && matchesSearch && matchesDuration;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'distance') return a.distance_km - b.distance_km;
+      if (sortBy === 'elevation') return b.elevation_gain_m - a.elevation_gain_m;
+      return 0;
+    });
+
   return (
     <div className="min-h-screen bg-moss text-white relative">
+      <SEO 
+        title="Norway Hiking Trails & Mountain Treks | Norway SmartLife"
+        description="Discover Norway's most iconic hiking trails, from Preikestolen and Besseggen to Trolltunga. Check live trail statuses, elevation gains, and difficulty ratings."
+      />
       <CinematicBackground 
         imageUrl="/images/besseggen_1786936349992.jpg"
         overlayOpacity={0.7}
@@ -91,19 +123,45 @@ export const HikingTrails = () => {
             </motion.div>
           </div>
 
+          {/* Search Bar */}
+          <div className="max-w-2xl mb-12 relative">
+            <Search className="w-5 h-5 text-gray-400 absolute left-5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search trails, peaks, national parks (e.g. Besseggen, Trolltunga)..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-14 pr-4 py-4 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/20 text-white placeholder-gray-400 text-sm outline-none focus:border-nordic-sage transition-all shadow-xl"
+            />
+          </div>
+
           <div className="flex flex-col lg:flex-row gap-12">
             {/* Filters Sidebar */}
             <div className="w-full lg:w-1/4">
               <div className="sticky top-24 glass-panel p-6 rounded-3xl">
-                <h3 className="text-xl font-display font-bold mb-6 flex items-center gap-2">
-                  <Map className="w-5 h-5 text-nordic-sage" /> Filters
-                </h3>
+                <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
+                  <h3 className="text-xl font-display font-bold flex items-center gap-2">
+                    <Map className="w-5 h-5 text-nordic-sage" /> Filters
+                  </h3>
+                  {(activeDiff !== 'All' || activeDur !== 'All' || searchQuery) && (
+                    <button
+                      onClick={() => { setActiveDiff('All'); setActiveDur('All'); setSearchQuery(''); }}
+                      className="text-xs font-bold uppercase tracking-wider text-red-400 hover:text-white transition-colors cursor-pointer"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
 
                 <div className="mb-8">
                   <h4 className="text-sm uppercase tracking-wider text-gray-400 mb-3">Difficulty</h4>
                   <div className="flex flex-col gap-2">
                     {FILTER_DIFFICULTY.map(diff => (
-                      <label key={diff} className="flex items-center gap-3 cursor-pointer group">
+                      <label 
+                        key={diff} 
+                        onClick={() => setActiveDiff(diff)}
+                        className="flex items-center gap-3 cursor-pointer group"
+                      >
                         <div className={`w-5 h-5 rounded border ${activeDiff === diff ? 'bg-nordic-sage border-nordic-sage' : 'border-gray-500 group-hover:border-nordic-sage'} flex items-center justify-center transition-colors`}>
                           {activeDiff === diff && <div className="w-2.5 h-2.5 bg-pine-forest rounded-sm" />}
                         </div>
@@ -117,9 +175,15 @@ export const HikingTrails = () => {
                   <h4 className="text-sm uppercase tracking-wider text-gray-400 mb-3">Duration</h4>
                   <div className="flex flex-col gap-2">
                     {FILTER_DURATION.map(dur => (
-                      <label key={dur} className="flex items-center gap-3 cursor-pointer group">
-                        <div className="w-5 h-5 rounded border border-gray-500 group-hover:border-nordic-sage transition-colors" />
-                        <span className="text-sm text-gray-300 group-hover:text-white">{dur}</span>
+                      <label 
+                        key={dur} 
+                        onClick={() => setActiveDur(dur)}
+                        className="flex items-center gap-3 cursor-pointer group"
+                      >
+                        <div className={`w-5 h-5 rounded border ${activeDur === dur ? 'bg-nordic-sage border-nordic-sage' : 'border-gray-500 group-hover:border-nordic-sage'} flex items-center justify-center transition-colors`}>
+                          {activeDur === dur && <div className="w-2.5 h-2.5 bg-pine-forest rounded-sm" />}
+                        </div>
+                        <span className={`text-sm ${activeDur === dur ? 'text-white font-bold' : 'text-gray-300 group-hover:text-white'}`}>{dur}</span>
                       </label>
                     ))}
                   </div>
@@ -140,7 +204,27 @@ export const HikingTrails = () => {
 
             {/* Trail Cards Grid */}
             <div className="w-full lg:w-3/4">
-              <div className="flex flex-col gap-8">
+              <div className="flex flex-col gap-6">
+                {/* Result header & Sorting */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-panel px-6 py-4 rounded-2xl">
+                  <span className="text-xs font-bold uppercase tracking-widest text-gray-300">
+                    {filteredTrails.length} Hiking Trails Found
+                  </span>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">Sort by:</span>
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value as any)}
+                      className="bg-black/40 border border-white/20 rounded-xl px-3 py-1.5 text-xs text-white outline-none focus:border-nordic-sage cursor-pointer"
+                    >
+                      <option value="default" className="bg-deep-night text-white">Featured / Default</option>
+                      <option value="distance" className="bg-deep-night text-white">Distance (Shortest first)</option>
+                      <option value="elevation" className="bg-deep-night text-white">Elevation Gain (Highest first)</option>
+                    </select>
+                  </div>
+                </div>
+
                 {isLoading ? (
                   <div className="space-y-6">
                     {[1, 2, 3].map(n => (
@@ -172,15 +256,15 @@ export const HikingTrails = () => {
                 ) : filteredTrails.length === 0 ? (
                   <div className="glass-panel rounded-3xl p-12 text-center max-w-xl mx-auto">
                     <Mountain className="w-12 h-12 text-nordic-sage mx-auto mb-4 opacity-70" />
-                    <h3 className="text-white text-xl font-display font-bold mb-2">No trails match "{activeDiff}"</h3>
+                    <h3 className="text-white text-xl font-display font-bold mb-2">No trails match your filters</h3>
                     <p className="text-gray-400 text-sm mb-6 leading-relaxed">
-                      We couldn't find any hiking routes with {activeDiff} difficulty level in our active catalog.
+                      We couldn't find any hiking routes matching your selected difficulty, duration, or search terms.
                     </p>
                     <button
-                      onClick={() => setActiveDiff('All')}
-                      className="px-6 py-2.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-xs uppercase tracking-wider border border-white/20 transition-all cursor-pointer"
+                      onClick={() => { setActiveDiff('All'); setActiveDur('All'); setSearchQuery(''); setSortBy('default'); }}
+                      className="px-6 py-2.5 bg-nordic-sage text-pine-forest hover:bg-white font-bold rounded-xl text-xs uppercase tracking-wider transition-all cursor-pointer shadow-lg"
                     >
-                      Show All Difficulties
+                      Reset All Filters
                     </button>
                   </div>
                 ) : (

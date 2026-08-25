@@ -24,6 +24,7 @@ interface CartState {
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
   getCartTotal: () => number;
+  getItemCount: () => number;
   setIsOpen: (isOpen: boolean) => void;
 }
 
@@ -34,11 +35,13 @@ export const useCartStore = create<CartState>()(
       isOpen: false,
       
       addItem: (item) => {
-        toast.success(`${item.name} added to itinerary`);
+        toast.success(`${item.name} added to cart`);
         set((state) => {
-          // If it's a physical product, we can just increment quantity
-          if (item.item_type === 'PRODUCT') {
-            const existingItem = state.items.find((i) => i.item_id === item.item_id && i.item_type === 'PRODUCT');
+          // If it's a physical product or an item without specific booking dates, increment quantity if exists
+          if (item.item_type === 'PRODUCT' || (!item.start_time && !item.end_time && item.item_type === 'RESTAURANT')) {
+            const existingItem = state.items.find(
+              (i) => i.item_id === item.item_id && i.item_type === item.item_type
+            );
             if (existingItem) {
               return {
                 items: state.items.map((i) =>
@@ -82,6 +85,11 @@ export const useCartStore = create<CartState>()(
         const { items } = get();
         return items.reduce((total, item) => total + item.unit_price * item.quantity, 0);
       },
+
+      getItemCount: () => {
+        const { items } = get();
+        return items.reduce((count, item) => count + item.quantity, 0);
+      },
       
       setIsOpen: (isOpen) => set({ isOpen })
     }),
@@ -96,3 +104,4 @@ export const useCartStore = create<CartState>()(
 export const useCart = () => {
   return useCartStore();
 };
+

@@ -143,7 +143,7 @@ export const trailService = {
         .single();
 
       if (error || !data) {
-        return DEFAULT_TRAILS[0];
+        return null;
       }
 
       const trailData = data as any;
@@ -163,7 +163,7 @@ export const trailService = {
         image: (heroImage && !heroImage.includes('placeholder')) ? heroImage : firstImage || '/images/besseggen_1786936349992.jpg'
       };
     } catch {
-      return DEFAULT_TRAILS.find(t => t.id === id) || DEFAULT_TRAILS[0];
+      return DEFAULT_TRAILS.find(t => t.id === id) || null;
     }
   }
 };
