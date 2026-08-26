@@ -157,6 +157,7 @@ export const Register = () => {
   };
 
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [googleProviderDisabled, setGoogleProviderDisabled] = useState(false);
 
   const handleGoogleLogin = async () => {
     try {
@@ -166,11 +167,33 @@ export const Register = () => {
       setGoogleLoading(true);
       setLoading(true);
       setError('');
-      await authService.loginWithGoogle();
+      const res: any = await authService.loginWithGoogle();
+      if (res?.providerNotEnabled) {
+        setGoogleLoading(false);
+        setLoading(false);
+        setGoogleProviderDisabled(true);
+        setError('Google Sign-In is not enabled yet in your Supabase project. You can register with Email or use Demo Google Account.');
+        return;
+      }
     } catch (e: any) {
       console.warn('Google sign-in note:', e);
       setError(e.message || 'Unable to connect to Google sign-in. Please use Email registration.');
       setGoogleLoading(false);
+      setLoading(false);
+    }
+  };
+
+  const handleDemoGoogleLogin = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      const { user } = await authService.loginWithDemoGoogle();
+      useAuthStore.getState().setUser(user);
+      toast.success('Signed in with Google Traveler profile!');
+      navigate(targetRedirect, { replace: true });
+    } catch (e: any) {
+      setError(e.message || 'Failed to sign in with demo Google account.');
+    } finally {
       setLoading(false);
     }
   };
@@ -411,6 +434,26 @@ export const Register = () => {
                 <span className="text-xs font-semibold group-hover:text-white transition-colors">Phone OTP</span>
               </button>
             </div>
+
+            {googleProviderDisabled && (
+              <motion.div 
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-3 bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 text-left text-xs text-snow/90 space-y-2"
+              >
+                <p className="text-amber-300 font-semibold text-[11px]">
+                  Google Provider is not enabled in your Supabase project (kyzlavxznlftzwjwzoah).
+                </p>
+                <button
+                  type="button"
+                  onClick={handleDemoGoogleLogin}
+                  disabled={loading}
+                  className="w-full py-2 px-3 bg-aurora-green/20 hover:bg-aurora-green/30 text-aurora-green hover:text-white font-bold rounded-lg border border-aurora-green/40 transition-all text-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  Sign in with Demo Google Traveler
+                </button>
+              </motion.div>
+            )}
           </div>
         </form>
       )}
