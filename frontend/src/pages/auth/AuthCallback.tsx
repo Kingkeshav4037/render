@@ -8,11 +8,31 @@ export const AuthCallback = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
+
     const handleAuthCallback = async () => {
       try {
         const searchParams = new URLSearchParams(window.location.search);
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+
+        // 1. Check for OAuth error in query or hash params
+        const oauthError = 
+          searchParams.get('error_description') || 
+          searchParams.get('error') || 
+          hashParams.get('error_description') || 
+          hashParams.get('error');
+
+        if (oauthError) {
+          const formattedError = decodeURIComponent(oauthError).replace(/\+/g, ' ');
+          if (isMounted) setError(formattedError);
+          setTimeout(() => {
+            if (isMounted) navigate('/login', { replace: true });
+          }, 3500);
+          return;
+        }
+
+        // 2. Handle PKCE authorization code exchange
         const code = searchParams.get('code');
-        
         if (code) {
           const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
           if (exchangeError) {
@@ -20,36 +40,68 @@ export const AuthCallback = () => {
           }
         }
 
+        // 3. Handle implicit grant flow (access_token in hash)
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+        if (accessToken && refreshToken) {
+          const { error: setSessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+          if (setSessionError) {
+            console.warn('Hash session set note:', setSessionError.message);
+          }
+        }
+
+        // 4. Retrieve current active session
         const { data, error: sessionError } = await supabase.auth.getSession();
         if (sessionError) throw sessionError;
 
-        if (data.session) {
-          const user = data.session.user;
-          if (user && user.id) {
-            // User session verified. Profile creation is handled securely via backend trigger on auth.users insert.
-          }
-
-          const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        if (data?.session?.user) {
           const type = hashParams.get('type') || searchParams.get('type');
           
           if (type === 'recovery') {
-            navigate('/reset-password');
+            navigate('/reset-password', { replace: true });
           } else {
             const returnTo = sessionStorage.getItem('returnTo') || '/home';
             sessionStorage.removeItem('returnTo');
-            navigate(returnTo);
+            navigate(returnTo, { replace: true });
           }
         } else {
-          navigate('/login');
+          // Check onAuthStateChange fallback in case of latency
+          const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+            if (session?.user && isMounted) {
+              authListener.subscription.unsubscribe();
+              const returnTo = sessionStorage.getItem('returnTo') || '/home';
+              sessionStorage.removeItem('returnTo');
+              navigate(returnTo, { replace: true });
+            }
+          });
+
+          // Timeout fallback to login
+          setTimeout(() => {
+            if (isMounted) {
+              authListener.subscription.unsubscribe();
+              navigate('/login', { replace: true });
+            }
+          }, 2000);
         }
       } catch (err: any) {
         console.error('Auth callback error:', err);
-        setError(err.message || 'Authentication verification failed.');
-        setTimeout(() => navigate('/login'), 3000);
+        if (isMounted) {
+          setError(err.message || 'Authentication verification failed. Please sign in again.');
+          setTimeout(() => {
+            if (isMounted) navigate('/login', { replace: true });
+          }, 3000);
+        }
       }
     };
 
     handleAuthCallback();
+
+    return () => {
+      isMounted = false;
+    };
   }, [navigate]);
 
   return (
@@ -68,9 +120,9 @@ export const AuthCallback = () => {
             role="alert"
             aria-live="assertive"
           >
-            <p className="font-bold mb-2 text-lg">Authentication Error</p>
+            <p className="font-bold mb-2 text-lg">Authentication Notice</p>
             <p className="text-sm">{error}</p>
-            <p className="text-xs mt-4 opacity-70">Redirecting to login...</p>
+            <p className="text-xs mt-4 opacity-70">Redirecting to login in a moment...</p>
           </div>
         ) : (
           <LoadingState 
@@ -84,3 +136,4 @@ export const AuthCallback = () => {
 };
 
 export default AuthCallback;
+

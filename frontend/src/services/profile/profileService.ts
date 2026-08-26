@@ -13,54 +13,63 @@ export { type UserProfile };
 
 export const profileService = {
   async getProfile(userId: string): Promise<UserProfileWithPermissions | null> {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
 
-    if (error) {
-      console.error('Error fetching profile:', error);
+      if (error || !data) {
+        return null;
+      }
+
+      // Fetch profile
+      const profileData: UserProfileWithPermissions = {
+        id: data.id,
+        email: data.email || '',
+        fullName: data.full_name || '',
+        avatarUrl: data.avatar_url || undefined,
+        phone: data.phone || undefined,
+        phoneVerified: data.phone_verified || Boolean(data.phone),
+        country: data.country || undefined,
+        city: data.city || undefined,
+        dateOfBirth: data.date_of_birth || undefined,
+        gender: data.gender || undefined,
+        preferredLanguage: data.preferred_language || 'en',
+        role: data.role || 'USER',
+        permissions: [] as string[]
+      };
+
+      // Attempt to fetch granular permissions from Phase 10 RBAC tables
+      try {
+        const { data: perms } = await supabase.rpc('get_user_permissions', { p_user_id: userId });
+        if (perms && Array.isArray(perms)) {
+          profileData.permissions = perms.map((p: any) => p.name);
+        }
+      } catch {
+        // RBAC permissions optional or gracefully omitted
+      }
+
+      return profileData;
+    } catch (err) {
+      console.warn('Error fetching profile:', err);
       return null;
     }
-
-    // Fetch legacy profile
-    const profileData = {
-      id: data.id,
-      email: data.email,
-      fullName: data.full_name || '',
-      avatarUrl: data.avatar_url || undefined,
-      phone: data.phone || undefined,
-      phoneVerified: data.phone_verified || false,
-      country: data.country || undefined,
-      city: data.city || undefined,
-      dateOfBirth: data.date_of_birth || undefined,
-      gender: data.gender || undefined,
-      preferredLanguage: data.preferred_language || 'en',
-      role: data.role || 'USER',
-      permissions: [] as string[]
-    };
-
-    // Attempt to fetch granular permissions from Phase 10 RBAC tables
-    try {
-      const { data: perms } = await supabase.rpc('get_user_permissions', { p_user_id: userId });
-      if (perms && Array.isArray(perms)) {
-        profileData.permissions = perms.map((p: any) => p.name);
-      }
-    } catch {
-      // RBAC permissions optional or gracefully omitted
-    }
-
-    return profileData;
   },
 
   async ensureProfileExists(userId: string, email: string, role: string = 'USER') {
-    const profile = await this.getProfile(userId);
-    if (!profile) {
-      const { error } = await supabase.from('profiles').insert({ id: userId, email, role });
-      if (error) {
-        console.error('Failed to create profile during ensureProfileExists:', error);
+    try {
+      const profile = await this.getProfile(userId);
+      if (!profile) {
+        const safeEmail = email || `${userId}@user.norwaysmartlife.local`;
+        const { error } = await supabase.from('profiles').insert({ id: userId, email: safeEmail, role });
+        if (error) {
+          console.warn('Note during ensureProfileExists insert:', error.message);
+        }
       }
+    } catch (err) {
+      console.warn('ensureProfileExists error:', err);
     }
   },
 

@@ -56,6 +56,10 @@ vi.mock('../../lib/supabase', () => {
           data: { user: null, session: null },
           error: null,
         }),
+        signInWithOAuth: vi.fn().mockResolvedValue({
+          data: { url: 'https://accounts.google.com/o/oauth2/v2/auth' },
+          error: null,
+        }),
         verifyOtp: vi.fn().mockResolvedValue({
           data: { user: { id: 'u1' }, session: { access_token: 'valid-token' } },
           error: null,
@@ -100,6 +104,24 @@ describe('Integration Tests: Authentication & Profile Lifecycle', () => {
       await authService.loginWithEmail('magic@norway.no');
       expect(supabase.auth.signInWithOtp).toHaveBeenCalledWith({
         email: 'magic@norway.no',
+      });
+    });
+
+    it('initiates Google OAuth authentication with redirect URL', async () => {
+      const result: any = await authService.loginWithGoogle();
+      expect(supabase.auth.signInWithOAuth).toHaveBeenCalledWith({
+        provider: 'google',
+        options: expect.objectContaining({
+          redirectTo: expect.stringContaining('/auth/callback'),
+        }),
+      });
+      expect(result.url).toBe('https://accounts.google.com/o/oauth2/v2/auth');
+    });
+
+    it('sends phone SMS OTP with normalized E.164 number', async () => {
+      await authService.sendPhoneOtp(' 0987 65 432 ');
+      expect(supabase.auth.signInWithOtp).toHaveBeenCalledWith({
+        phone: '+4798765432',
       });
     });
 

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Mail, Lock, ArrowRight, Phone, RefreshCw, KeyRound, Eye, EyeOff, ChevronDown } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Phone, RefreshCw, KeyRound, Eye, EyeOff, ChevronDown, Sparkles, AlertCircle } from 'lucide-react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../lib/supabase';
 import { toast } from '../../store/useToastStore';
-import { authService } from '../../services/auth/authService';
+import { authService, normalizePhoneNumber } from '../../services/auth/authService';
 import { AuthLayout } from '../../components/layout/AuthLayout';
 import { useAuthStore } from '../../store/useAuthStore';
 
@@ -44,6 +44,7 @@ export const Login = () => {
   const targetRedirect = sanitizeRedirectUrl(rawRedirect);
 
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -56,8 +57,10 @@ export const Login = () => {
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
+  const [isDemoMode, setIsDemoMode] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const otpInputRef = useRef<HTMLInputElement>(null);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -86,38 +89,70 @@ export const Login = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const fullPhoneNumber = `${countryCode}${phoneNumber.replace(/\D/g, '')}`;
+  useEffect(() => {
+    if (otpSent && otpInputRef.current) {
+      otpInputRef.current.focus();
+    }
+  }, [otpSent]);
+
+  const cleanDigits = phoneNumber.replace(/\D/g, '').replace(/^0+/, '');
+  const fullPhoneNumber = normalizePhoneNumber(
+    phoneNumber.startsWith('+') ? phoneNumber : `${countryCode}${cleanDigits}`,
+    countryCode
+  );
+
+  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let val = e.target.value;
+    if (val.startsWith('+')) {
+      for (const item of COUNTRY_CODES) {
+        if (val.startsWith(item.code)) {
+          setCountryCode(item.code);
+          val = val.slice(item.code.length);
+          break;
+        }
+      }
+    }
+    setPhoneNumber(val);
+    setError(null);
+  };
 
   const handleGoogleLogin = async () => {
     try {
       if (targetRedirect !== '/home') {
         sessionStorage.setItem('returnTo', targetRedirect);
       }
+      setGoogleLoading(true);
       setLoading(true);
       setError(null);
       await authService.loginWithGoogle();
     } catch (e: any) {
       console.warn('Google login notice:', e);
       setError(e.message || 'Unable to connect to Google sign-in. Please use Email or Phone.');
+      setGoogleLoading(false);
       setLoading(false);
     }
   };
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const digitsOnly = phoneNumber.replace(/\D/g, '');
-    if (!digitsOnly || digitsOnly.length < 5) {
-      setError('Please enter a valid phone number.');
+    if (!cleanDigits || cleanDigits.length < 5) {
+      setError('Please enter a valid phone number (minimum 5 digits).');
       return;
     }
     try {
       setLoading(true);
       setError(null);
-      await authService.sendPhoneOtp(fullPhoneNumber);
+      const res: any = await authService.sendPhoneOtp(fullPhoneNumber);
       setOtpSent(true);
       setResendTimer(60);
       setLoading(false);
-      toast.info(`Verification code dispatched to ${fullPhoneNumber}`);
+
+      if (res?.data?.demoMode || res?.demoMode) {
+        setIsDemoMode(true);
+        toast.info(`Verification code sent. (Demo code: 123456)`);
+      } else {
+        toast.info(`Verification code dispatched to ${fullPhoneNumber}`);
+      }
     } catch (e: any) {
       console.warn('SMS dispatch error:', e);
       setError(e.message || 'Failed to send SMS code. Please check your phone number and country code.');
@@ -130,10 +165,15 @@ export const Login = () => {
     try {
       setLoading(true);
       setError(null);
-      await authService.sendPhoneOtp(fullPhoneNumber);
+      const res: any = await authService.sendPhoneOtp(fullPhoneNumber);
       setResendTimer(60);
       setLoading(false);
-      toast.info('Verification code resent.');
+      if (res?.data?.demoMode || res?.demoMode) {
+        setIsDemoMode(true);
+        toast.info('Verification code resent. (Demo code: 123456)');
+      } else {
+        toast.info('Verification code resent.');
+      }
     } catch (e: any) {
       console.warn('Resend error:', e);
       setError(e.message || 'Failed to resend code. Please try again in a few moments.');
@@ -143,27 +183,27 @@ export const Login = () => {
 
   const handleOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!otp.trim() || otp.trim().length < 6) {
+    const cleanOtp = otp.trim();
+    if (!cleanOtp || cleanOtp.length < 6) {
       setError('Please enter the complete 6-digit verification code.');
       return;
     }
     try {
       setLoading(true);
       setError(null);
-      const data = await authService.verifyPhoneOtp(fullPhoneNumber, otp.trim());
+      const data: any = await authService.verifyPhoneOtp(fullPhoneNumber, cleanOtp);
       
-      if (data?.user?.id) {
+      const authUser = data?.user || (data?.session?.user);
+      if (authUser?.id) {
+        useAuthStore.getState().setUser(authUser);
         try {
-          await supabase.from('profiles').upsert({
-            id: data.user.id,
+          await supabase.from('profiles').update({
             phone: fullPhoneNumber,
             phone_verified: true,
-            email: data.user.email || `${fullPhoneNumber.replace(/\+/g, '')}@phone.norwaysmartlife.local`,
-            full_name: data.user.user_metadata?.full_name || `Traveler ${fullPhoneNumber.slice(-4)}`,
             updated_at: new Date().toISOString(),
-          }, { onConflict: 'id', ignoreDuplicates: true });
+          }).eq('id', authUser.id);
         } catch (profileErr) {
-          console.warn('Phone profile init note:', profileErr);
+          console.warn('Phone profile update note:', profileErr);
         }
       }
 
@@ -247,11 +287,12 @@ export const Login = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="bg-red-500/10 border border-red-500/30 text-red-400 p-3.5 rounded-xl text-sm text-center mb-6 overflow-hidden"
+            className="bg-red-500/10 border border-red-500/30 text-red-400 p-3.5 rounded-xl text-sm text-center mb-6 overflow-hidden flex items-center justify-center gap-2"
             role="alert"
             aria-live="polite"
           >
-            {error}
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            <span>{error}</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -338,16 +379,22 @@ export const Login = () => {
               <button
                 type="button"
                 onClick={handleGoogleLogin}
-                disabled={loading}
-                className="w-full flex justify-center items-center gap-3 py-3 px-4 border border-white/10 rounded-xl text-snow bg-deep-night/40 hover:bg-deep-night/80 hover:border-white/20 transition-all group cursor-pointer"
+                disabled={loading || googleLoading}
+                className="w-full flex justify-center items-center gap-3 py-3 px-4 border border-white/10 rounded-xl text-snow bg-deep-night/40 hover:bg-deep-night/80 hover:border-white/20 transition-all group cursor-pointer disabled:opacity-60"
               >
-                <svg className="h-5 w-5" aria-hidden="true" viewBox="0 0 24 24">
-                  <path d="M12.0003 4.75C13.7703 4.75 15.3553 5.36002 16.6053 6.54998L20.0303 3.125C17.9502 1.19 15.2353 0 12.0003 0C7.31028 0 3.25527 2.69 1.28027 6.60998L5.27028 9.70498C6.21525 6.86002 8.87028 4.75 12.0003 4.75Z" fill="#EA4335" />
-                  <path d="M23.49 12.275C23.49 11.49 23.415 10.73 23.3 10H12V14.51H18.47C18.18 15.99 17.34 17.25 16.08 18.1L19.945 21.1C22.2 19.01 23.49 15.92 23.49 12.275Z" fill="#4285F4" />
-                  <path d="M5.26498 14.2949C5.02498 13.5699 4.88501 12.7999 4.88501 11.9999C4.88501 11.1999 5.01998 10.4299 5.26498 9.7049L1.275 6.60986C0.46 8.22986 0 10.0599 0 11.9999C0 13.9399 0.46 15.7699 1.28 17.3899L5.26498 14.2949Z" fill="#FBBC05" />
-                  <path d="M12.0004 24.0001C15.2404 24.0001 17.9654 22.935 19.9454 21.095L16.0804 18.095C15.0054 18.82 13.6204 19.245 12.0004 19.245C8.8704 19.245 6.21537 17.135 5.26537 14.29L1.27539 17.385C3.25539 21.31 7.3104 24.0001 12.0004 24.0001Z" fill="#34A853" />
-                </svg>
-                <span className="text-sm font-semibold text-snow/90 group-hover:text-snow">Continue with Google</span>
+                {googleLoading ? (
+                  <RefreshCw className="h-5 w-5 animate-spin text-aurora-green" />
+                ) : (
+                  <svg className="h-5 w-5" aria-hidden="true" viewBox="0 0 24 24">
+                    <path d="M12.0003 4.75C13.7703 4.75 15.3553 5.36002 16.6053 6.54998L20.0303 3.125C17.9502 1.19 15.2353 0 12.0003 0C7.31028 0 3.25527 2.69 1.28027 6.60998L5.27028 9.70498C6.21525 6.86002 8.87028 4.75 12.0003 4.75Z" fill="#EA4335" />
+                    <path d="M23.49 12.275C23.49 11.49 23.415 10.73 23.3 10H12V14.51H18.47C18.18 15.99 17.34 17.25 16.08 18.1L19.945 21.1C22.2 19.01 23.49 15.92 23.49 12.275Z" fill="#4285F4" />
+                    <path d="M5.26498 14.2949C5.02498 13.5699 4.88501 12.7999 4.88501 11.9999C4.88501 11.1999 5.01998 10.4299 5.26498 9.7049L1.275 6.60986C0.46 8.22986 0 10.0599 0 11.9999C0 13.9399 0.46 15.7699 1.28 17.3899L5.26498 14.2949Z" fill="#FBBC05" />
+                    <path d="M12.0004 24.0001C15.2404 24.0001 17.9654 22.935 19.9454 21.095L16.0804 18.095C15.0054 18.82 13.6204 19.245 12.0004 19.245C8.8704 19.245 6.21537 17.135 5.26537 14.29L1.27539 17.385C3.25539 21.31 7.3104 24.0001 12.0004 24.0001Z" fill="#34A853" />
+                  </svg>
+                )}
+                <span className="text-sm font-semibold text-snow/90 group-hover:text-snow">
+                  {googleLoading ? 'Connecting to Google...' : 'Continue with Google'}
+                </span>
               </button>
             </div>
           </div>
@@ -415,7 +462,7 @@ export const Login = () => {
                     autoComplete="tel"
                     required 
                     value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    onChange={handlePhoneNumberChange}
                     className="block w-full pl-10 pr-3 py-3.5 border border-white/10 rounded-xl bg-deep-night/40 text-snow placeholder-snow/40 focus:outline-none focus:ring-2 focus:ring-aurora-green/50 focus:border-transparent focus:bg-deep-night/60 transition-all sm:text-sm" 
                     placeholder="987 65 432"
                   />
@@ -434,25 +481,33 @@ export const Login = () => {
                 </div>
                 <button
                   type="button"
-                  onClick={() => { setOtpSent(false); setOtp(''); }}
+                  onClick={() => { setOtpSent(false); setOtp(''); setIsDemoMode(false); }}
                   className="text-xs text-aurora-green hover:text-green-300 font-semibold px-3 py-1.5 rounded-lg hover:bg-aurora-green/10 transition-colors cursor-pointer"
                 >
                   Change
                 </button>
               </div>
 
+              {isDemoMode && (
+                <div className="bg-aurora-green/10 border border-aurora-green/30 rounded-xl p-3 flex items-center gap-2 text-xs text-aurora-green font-medium">
+                  <Sparkles className="w-4 h-4 flex-shrink-0 text-aurora-green" />
+                  <span>Demo Mode Active: Enter verification code <strong>123456</strong></span>
+                </div>
+              )}
+
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <KeyRound className="h-5 w-5 text-snow/40 group-focus-within:text-aurora-green transition-colors" />
                 </div>
                 <input 
+                  ref={otpInputRef}
                   type="text" 
                   name="otp"
                   autoComplete="one-time-code"
                   required 
                   maxLength={6}
                   value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                   className="block w-full pl-11 pr-3 py-3.5 border border-white/10 rounded-xl bg-deep-night/40 text-snow placeholder-snow/30 text-center tracking-[0.75em] font-mono text-xl font-bold focus:outline-none focus:ring-2 focus:ring-aurora-green/50 focus:border-transparent focus:bg-deep-night/60 transition-all" 
                   placeholder="••••••"
                 />
@@ -495,3 +550,4 @@ export const Login = () => {
 };
 
 export default Login;
+

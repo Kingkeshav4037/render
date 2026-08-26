@@ -47,8 +47,35 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ initialized: true });
 
     const fetchProfile = async (user: User) => {
-      await profileService.ensureProfileExists(user.id, user.email || '');
+      const email = user.email || (user.phone ? `${user.phone.replace(/\D/g, '')}@phone.norwaysmartlife.local` : '');
+      await profileService.ensureProfileExists(user.id, email);
       let profile = await profileService.getProfile(user.id);
+      
+      if (!profile) {
+        profile = {
+          id: user.id,
+          email: email,
+          fullName: user.user_metadata?.full_name || user.user_metadata?.name || (user.phone ? `Traveler ${user.phone.slice(-4)}` : 'Traveler'),
+          avatarUrl: user.user_metadata?.avatar_url || user.user_metadata?.picture,
+          phone: user.phone || undefined,
+          phoneVerified: !!user.phone || !!user.phone_confirmed_at,
+          role: (user.user_metadata?.role as AppRole) || 'USER',
+          country: 'Norway',
+          city: 'Oslo',
+          permissions: [],
+        };
+      } else if (user.phone && !profile.phone) {
+        try {
+          await profileService.updateProfile(user.id, {
+            phone: user.phone,
+            phoneVerified: true,
+          });
+          profile.phone = user.phone;
+          profile.phoneVerified = true;
+        } catch {
+          // Graceful fallback if update is blocked
+        }
+      }
       
       const role = profile?.role as AppRole | undefined;
       const isAdmin = role === 'SUPER_ADMIN' || role === 'ADMIN';
@@ -57,8 +84,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       
       const permissions = profile?.permissions || [];
       
-      const { data: mfaData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-      const mfaLevel = (mfaData?.currentLevel as 'aal1' | 'aal2') || 'aal1';
+      let mfaLevel: 'aal1' | 'aal2' = 'aal1';
+      try {
+        const { data: mfaData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+        mfaLevel = (mfaData?.currentLevel as 'aal1' | 'aal2') || 'aal1';
+      } catch {
+        // MFA optional in dev
+      }
       
       set({ user, profile, isAdmin, isProvider, isAnalyst, permissions, mfaLevel, loading: false });
     };
