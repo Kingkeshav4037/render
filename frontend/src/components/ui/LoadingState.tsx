@@ -1,5 +1,5 @@
 import React from 'react';
-import { Loader2, Compass } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 export const LoadingState: React.FC<{ 
@@ -15,15 +15,22 @@ export const LoadingState: React.FC<{
 }) => {
   return (
     <div className={cn(
-      "flex flex-col items-center justify-center p-8 text-center",
+      "flex flex-col items-center justify-center p-8 text-center select-none font-sans",
       fullScreen ? "min-h-[70vh] w-full" : "w-full py-16",
       className
     )}>
-      <div className="relative mb-5">
-        <div className="w-14 h-14 rounded-full bg-royal-fjord/15 border border-royal-fjord/30 flex items-center justify-center shadow-[0_0_20px_rgba(29,78,216,0.2)]">
-          <Compass className="w-7 h-7 text-glacier-blue animate-spin" style={{ animationDuration: '3s' }} />
+      <div className="relative mb-5 flex items-center justify-center">
+        <div className="relative">
+          <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-2xl border border-cyan-500/30 ring-4 ring-cyan-500/10 animate-pulse bg-slate-950">
+            <img 
+              src="/images/logo.png" 
+              alt="Norway SmartLife" 
+              className="w-full h-full object-cover"
+              loading="eager"
+            />
+          </div>
+          <Loader2 className="w-6 h-6 animate-spin text-cyan-400 absolute -bottom-2 -right-2 bg-slate-950 rounded-full p-0.5 border border-cyan-500/40 shadow-lg" />
         </div>
-        <Loader2 className="w-6 h-6 animate-spin text-glacier-blue absolute -bottom-1 -right-1" />
       </div>
       <h4 className="text-base font-bold text-snow tracking-tight mb-1">{message}</h4>
       {submessage && (

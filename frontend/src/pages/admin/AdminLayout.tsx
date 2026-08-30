@@ -8,6 +8,7 @@ import {
   Settings, Zap, AlertCircle
 } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
+import { BrandLogo } from '../../components/shared/BrandLogo';
 
 // Command Palette Mock Component
 const CommandPalette = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
@@ -102,21 +103,17 @@ export const AdminLayout = () => {
           bg-slate-900 text-slate-300 flex flex-col transition-all duration-300 ease-in-out shrink-0 z-20 relative
         `}
       >
-        <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800">
-          {sidebarOpen ? (
-            <div className="font-bold text-white tracking-tight truncate">
-              Norway <span className="text-blue-500">Admin</span>
-            </div>
-          ) : (
-            <div className="font-bold text-white w-full text-center">NA</div>
-          )}
+        <div className="h-16 flex items-center justify-between px-3.5 border-b border-slate-800">
+          <div className="overflow-hidden min-w-0">
+            <BrandLogo size="sm" showText={sidebarOpen} linkTo="/admin" />
+          </div>
           <button 
             onClick={() => setSidebarOpen(!sidebarOpen)}
             aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
             aria-expanded={sidebarOpen}
-            className="text-slate-500 hover:text-white transition-colors p-1 rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+            className="text-slate-500 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none shrink-0"
           >
-            {sidebarOpen ? <X size={20} /> : <Menu size={20} className="mx-auto" />}
+            {sidebarOpen ? <X size={18} /> : <Menu size={18} className="mx-auto" />}
           </button>
         </div>
 

@@ -14,12 +14,14 @@ export const SEO = ({
   title, 
   description, 
   canonicalUrl, 
-  ogImage = '/images/logo.jpg', 
+  ogImage = '/images/logo.png', 
   ogType = 'website',
   keywords,
   schema
 }: SEOProps) => {
-  const siteTitle = `${title} | Norway Smart Life`;
+  const siteTitle = title.includes('Norway SmartLife') 
+    ? title 
+    : `${title} | Norway SmartLife`;
   
   return (
     <Helmet>

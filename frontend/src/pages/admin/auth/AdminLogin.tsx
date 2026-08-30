@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, Fingerprint, LogIn, Lock, Mail, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '../../../store/useAuthStore';
+import { BrandLogo } from '../../../components/shared/BrandLogo';
 import { toast } from 'sonner';
 
 export const AdminLogin = () => {
@@ -85,16 +86,14 @@ export const AdminLogin = () => {
 
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 via-emerald-500 to-amber-500 z-10"></div>
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 text-center">
         <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-900/50">
-            <Shield size={32} className="text-white" />
-          </div>
+          <BrandLogo size="lg" showTagline linkTo="/" />
         </div>
-        <h2 className="text-center text-2xl font-bold tracking-tight text-white">
-          Norway SmartLife Administration
+        <h2 className="text-center text-xl font-bold tracking-tight text-white mt-2">
+          Administration Portal
         </h2>
-        <p className="mt-2 text-center text-sm text-slate-400">
+        <p className="mt-1 text-center text-xs text-slate-400">
           Restricted access. Authorized personnel only.
         </p>
       </div>

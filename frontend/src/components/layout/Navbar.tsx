@@ -7,6 +7,7 @@ import { useCartStore } from '../../store/useCartStore';
 import { useCurrencyStore, Currency, CURRENCIES } from '../../store/useCurrencyStore';
 import { LANGUAGES, LanguageOption } from '../../i18n';
 import { NotificationDropdown } from '../common/NotificationDropdown';
+import { BrandLogo } from '../shared/BrandLogo';
 import { Button } from '../ui/Button';
 import { Drawer } from '../ui/Drawer';
 import { clsx, type ClassValue } from 'clsx';
@@ -72,16 +73,9 @@ export const Navbar = () => {
     )}>
       <div className="max-w-[1440px] mx-auto px-6 md:px-12 flex justify-between items-center">
         
-        {/* Logo */}
+        {/* Official Brand Logo */}
         <div className="flex-shrink-0 flex items-center">
-          <Link to={user ? "/home" : "/"} className="flex items-center gap-3 group">
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-snow text-deep-night shadow-md group-hover:scale-105 transition-transform">
-              <Compass className="w-5 h-5" />
-            </div>
-            <span className="text-xl font-display font-bold tracking-wide text-snow hidden sm:inline-block">
-              NORDIC LIVING
-            </span>
-          </Link>
+          <BrandLogo size="sm" linkTo={user ? "/home" : "/"} />
         </div>
         
         {/* Desktop Navigation */}
@@ -215,8 +209,12 @@ export const Navbar = () => {
         title="Norway SmartLife"
         side="right"
       >
-        <div className="flex flex-col space-y-6 p-3 max-h-[85vh] overflow-y-auto font-sans">
-          
+        <div className="flex flex-col space-y-5 p-3 max-h-[85vh] overflow-y-auto font-sans">
+          {/* Brand Logo in Mobile Drawer */}
+          <div className="pb-3 border-b border-slate-800 flex justify-center">
+            <BrandLogo size="md" showTagline linkTo="/" />
+          </div>
+
           {/* Quick Language & Currency on Mobile */}
           <div className="flex flex-col gap-2 p-3 bg-slate-900 border border-slate-800 rounded-2xl text-white shadow-inner">
             <div className="flex items-center justify-between">

@@ -1,27 +1,20 @@
 import { Link } from 'react-router-dom';
 import { Container } from './Container';
-import { Compass } from 'lucide-react';
+import { BrandLogo } from '../shared/BrandLogo';
 
 export const Footer = () => {
   return (
     <footer className="bg-deep-night text-snow py-20 border-t border-white/5 mt-auto relative overflow-hidden z-10">
       {/* Decorative gradient */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-arctic-gold/30 to-transparent"></div>
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent"></div>
       
       <Container>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
           
           <div className="lg:col-span-2 space-y-6">
-            <Link to="/" className="flex items-center gap-3 group inline-block">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-snow text-deep-night shadow-md">
-                <Compass className="w-6 h-6" />
-              </div>
-              <span className="text-2xl font-display font-semibold tracking-wide text-snow">
-                NORDIC LIVING
-              </span>
-            </Link>
+            <BrandLogo size="lg" showTagline linkTo="/" />
             <p className="text-sm font-sans text-snow/60 leading-relaxed max-w-sm">
-              Discover the beauty, sustainability, and technological innovation of Norway. Your premium guide to exploring and experiencing the Nordic way of life.
+              Discover the beauty, sustainability, and technological innovation of Norway. Your premium ecosystem for exploring and experiencing the Nordic way of life.
             </p>
             <div className="flex gap-4 pt-2">
               <a href="#" className="w-auto h-10 px-6 rounded-none border border-white/20 flex items-center justify-center hover:bg-snow hover:text-deep-night transition-all text-snow text-xs font-sans uppercase tracking-widest font-semibold">
@@ -72,11 +65,11 @@ export const Footer = () => {
         
         <div className="mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs font-sans tracking-wide text-snow/40">
-            © {new Date().getFullYear()} NORDIC LIVING. All rights reserved.
+            © {new Date().getFullYear()} Norway SmartLife AS. All rights reserved.
           </p>
           <div className="flex items-center gap-2 text-xs font-sans tracking-wide text-snow/40">
             <span>Powered by</span>
-            <span className="text-arctic-gold font-semibold">Norway SmartLife Ecosystem</span>
+            <span className="text-cyan-400 font-semibold">Norway SmartLife Platform</span>
           </div>
         </div>
       </Container>

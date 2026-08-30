@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Compass } from 'lucide-react';
+import { BrandLogo } from '../shared/BrandLogo';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -27,11 +27,8 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
         <div className="absolute inset-0 bg-gradient-to-t from-deep-night/90 via-navy-900/40 to-transparent" />
         
         <div className="relative z-10 w-full p-12 flex flex-col justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/20">
-              <Compass className="w-6 h-6 text-aurora-green shadow-aurora-green" />
-            </div>
-            <span className="text-xl font-bold tracking-wide text-snow">Norway SmartLife</span>
+          <div>
+            <BrandLogo size="md" showTagline linkTo="/" />
           </div>
           
           <motion.div 
@@ -55,11 +52,8 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
         <div className="w-full max-w-md relative z-10">
           
           {/* Mobile Logo (Hidden on Desktop) */}
-          <div className="lg:hidden flex items-center justify-center gap-3 mb-10">
-            <div className="p-2 bg-white/5 rounded-xl border border-white/10">
-              <Compass className="w-7 h-7 text-aurora-green" />
-            </div>
-            <span className="text-2xl font-bold tracking-wide text-snow">Norway SmartLife</span>
+          <div className="lg:hidden flex items-center justify-center mb-8">
+            <BrandLogo size="lg" showTagline linkTo="/" />
           </div>
 
           <div className="mb-10 text-center lg:text-left">
