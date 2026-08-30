@@ -5,13 +5,54 @@ import {
   Calendar, MapPin, Compass, Leaf, Hotel, ArrowRight, 
   Bookmark, Navigation, Ticket, FileText, Sparkles, 
   CheckCircle2, Clock, ShieldCheck, UserCheck, Wallet, 
-  ChevronRight, ArrowUpRight, Activity, Plane, Train
+  ChevronRight, ArrowUpRight, Activity, Plane, Train,
+  Quote, RefreshCw, Mountain, CloudSun, Eye, Share2
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CinematicBackground } from '../../design/backgrounds/CinematicBackground';
 import { OptimizedImage } from '../../components/shared/OptimizedImage';
 import { supabase } from '../../lib/supabase';
 import { invoiceService } from '../../services/invoice/invoiceService';
+import { motion, AnimatePresence } from 'framer-motion';
+
+// Curated Nordic Quotes
+const NORDIC_QUOTES = [
+  {
+    quote: "Ut på tur, aldri sur.",
+    translation: "Out on a trip, never grumpy.",
+    context: "Timeless Norwegian Proverb celebrating Friluftsliv (Open-Air Living)",
+    author: "Norwegian Traditional Wisdom",
+    tag: "Friluftsliv Philosophy"
+  },
+  {
+    quote: "The first great thing is to find yourself, and for that you need solitude and great distances — only mountains and fjords can give you that.",
+    translation: "Nature provides the clarity that the modern world takes away.",
+    context: "Polar Explorer, Humanitarian & Nobel Peace Laureate",
+    author: "Fridtjof Nansen",
+    tag: "Arctic Heritage"
+  },
+  {
+    quote: "Det finnes ikke dårlig vær, bare dårlige klær.",
+    translation: "There is no bad weather, only bad clothing.",
+    context: "The golden rule of Nordic exploration across all four seasons",
+    author: "Scandinavian Heritage",
+    tag: "Mountain Wisdom"
+  },
+  {
+    quote: "Adventure is just bad planning — true exploration is harmony with the wild.",
+    translation: "Respect the Arctic terrain and let the fjords guide your path.",
+    context: "First to reach the South Pole and traverse the Northwest Passage",
+    author: "Roald Amundsen",
+    tag: "Polar Spirit"
+  },
+  {
+    quote: "In the stillness of the fjords, every echo carries the ancient whispers of the Vikings.",
+    translation: "Immerse in Norway's pristine waters, cascading waterfalls, and eternal glaciers.",
+    context: "Nordic Heritage Collection",
+    author: "Norway SmartLife",
+    tag: "Fjord Odyssey"
+  }
+];
 
 export const Dashboard = () => {
   const { user, profile } = useAuthStore();
@@ -19,10 +60,12 @@ export const Dashboard = () => {
   const navigate = useNavigate();
   
   const [greeting, setGreeting] = useState('Welcome back');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [bookings, setBookings] = useState<any[]>([]);
   const [invoicesCount, setInvoicesCount] = useState(0);
+  const [quoteIndex, setQuoteIndex] = useState(0);
 
+  // Time-aware greeting
   useEffect(() => {
     const hour = new Date().getHours();
     if (hour < 12) setGreeting('God morgen (Good morning)');
@@ -30,20 +73,21 @@ export const Dashboard = () => {
     else setGreeting('God kveld (Good evening)');
   }, []);
 
+  // Fetch real user data with resilient fallback
   useEffect(() => {
+    let isMounted = true;
     const fetchUserData = async () => {
       if (!user) {
-        setLoading(false);
+        if (isMounted) setLoading(false);
         return;
       }
 
       try {
-        // Fetch Real Bookings and Invoices Concurrently
         const bookingsPromise = (supabase as any)
           .from('bookings')
           .select('*')
           .eq('user_id', user.id)
-          .order('start_time', { ascending: true });
+          .order('created_at', { ascending: false });
 
         const invoicesCountPromise = (supabase as any)
           .from('invoices')
@@ -51,34 +95,46 @@ export const Dashboard = () => {
           .eq('user_id', user.id);
 
         const [
-          { data: bookingsData },
-          { count: invCount }
+          { data: bookingsData, error: bErr },
+          { count: invCount, error: iErr }
         ] = await Promise.all([bookingsPromise, invoicesCountPromise]);
 
-        setBookings(bookingsData || []);
-        setInvoicesCount(invCount || 0);
+        if (isMounted) {
+          if (!bErr && bookingsData) setBookings(bookingsData);
+          if (!iErr && typeof invCount === 'number') setInvoicesCount(invCount);
+        }
       } catch (err) {
         console.warn('Dashboard user telemetry notice:', err);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
     fetchUserData();
+    return () => { isMounted = false; };
   }, [user]);
+
+  // Cycle inspiring quotes
+  const nextQuote = () => {
+    setQuoteIndex((prev) => (prev + 1) % NORDIC_QUOTES.length);
+  };
+
+  const currentQuote = NORDIC_QUOTES[quoteIndex];
 
   // Profile completion calculation
   const profileCompletion = useMemo(() => {
     let score = 20; // base for email signup
-    if (profile?.fullName) score += 25;
-    if (profile?.phone) score += 20;
+    if (profile?.fullName) score += 20;
+    if (profile?.gender) score += 15;
+    if (profile?.dateOfBirth) score += 15;
+    if (profile?.address) score += 15;
     if (profile?.country) score += 15;
-    if (profile?.avatarUrl || profile?.preferredLanguage || profile?.city) score += 20;
     return Math.min(score, 100);
   }, [profile]);
 
   // Upcoming Active Booking
   const upcomingBooking = useMemo(() => {
+    if (!bookings || bookings.length === 0) return null;
     const now = new Date();
     return bookings.find(b => {
       const start = new Date(b.start_time || b.created_at);
@@ -87,96 +143,188 @@ export const Dashboard = () => {
     }) || bookings[0] || null;
   }, [bookings]);
 
-  const firstName = profile?.fullName?.split(' ')[0] || user?.email?.split('@')[0] || 'Traveler';
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-deep-night flex flex-col items-center justify-center space-y-4">
-        <div className="w-10 h-10 border-2 border-white/10 border-t-aurora-green rounded-full animate-spin"></div>
-        <p className="text-xs uppercase tracking-widest text-snow/50 font-bold">Loading Your Norway Portal...</p>
-      </div>
-    );
-  }
+  const displayName = profile?.fullName?.trim() || user?.user_metadata?.full_name || (user?.email ? user.email.split('@')[0] : 'Traveler');
 
   return (
-    <div className="min-h-screen relative font-sans pb-32 bg-deep-night text-snow selection:bg-aurora-green selection:text-deep-night">
+    <div className="min-h-screen relative font-sans pb-32 bg-deep-night text-snow selection:bg-aurora-green selection:text-deep-night overflow-hidden">
       <CinematicBackground gradient="aurora" />
       
-      {/* ── Editorial Hero ─────────────────────────────────────────────────── */}
-      <div className="pt-28 sm:pt-32 pb-12 px-6 md:px-12 max-w-[1440px] mx-auto relative z-10">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-8">
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+      {/* ── Editorial Header Banner ─────────────────────────────────────────── */}
+      <div className="pt-24 sm:pt-28 pb-8 px-6 md:px-12 max-w-[1440px] mx-auto relative z-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+          <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white/10 text-aurora-green border border-white/10 backdrop-blur-md">
+              <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-aurora-green/15 text-aurora-green border border-aurora-green/30 backdrop-blur-md flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-aurora-green animate-pulse"></span>
                 Active Traveler Portal
               </span>
               <span className="text-snow/40 text-xs">•</span>
               <span className="text-xs text-snow/60 font-medium">Oslo Time: {new Date().toLocaleTimeString('en-GB', { timeZone: 'Europe/Oslo', hour: '2-digit', minute: '2-digit' })}</span>
             </div>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-display font-light text-snow tracking-tight mb-2">
-              {greeting}, <span className="font-bold text-arctic-gold">{firstName}</span>.
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-light text-snow tracking-tight">
+              {greeting}, <span className="font-bold text-arctic-gold">{displayName}</span>.
             </h1>
-            <p className="text-lg sm:text-xl text-snow/70 font-medium">
-              {upcomingBooking 
-                ? `You have ${bookings.length} reservation${bookings.length === 1 ? '' : 's'} linked to your account.`
-                : 'Discover untouched fjords, alpine trails, and Arctic nature.'}
+            <p className="text-base sm:text-lg text-snow/70 font-medium mt-1">
+              Your personalized gateway to Norway’s fjords, northern lights, and smart alpine living.
             </p>
           </div>
           
-          <div className="flex flex-wrap gap-3 animate-in fade-in slide-in-from-right-4 duration-700 delay-150">
+          <div className="flex flex-wrap gap-3">
             <Link 
               to="/planner" 
-              className="px-5 h-12 rounded-full border border-white/20 bg-white/5 backdrop-blur-md flex items-center gap-2 text-snow hover:bg-white hover:text-navy-900 transition-all text-xs font-bold uppercase tracking-wider shadow-sm"
+              className="px-5 h-11 rounded-full border border-white/20 bg-white/5 backdrop-blur-md flex items-center gap-2 text-snow hover:bg-white hover:text-navy-900 transition-all text-xs font-bold uppercase tracking-wider shadow-sm cursor-pointer"
             >
-              <Compass size={16} />
+              <Compass size={16} className="text-aurora-green" />
               <span>AI Trip Planner</span>
             </Link>
             <Link 
-              to="/wallet" 
-              className="px-6 h-12 rounded-full bg-snow text-navy-900 font-bold text-xs uppercase tracking-widest hover:bg-aurora-green transition-colors shadow-lg flex items-center gap-2"
+              to="/explore" 
+              className="px-6 h-11 rounded-full bg-aurora-green text-navy-900 font-bold text-xs uppercase tracking-widest hover:bg-green-400 transition-all shadow-[0_0_20px_rgba(0,255,135,0.3)] flex items-center gap-2 cursor-pointer"
             >
-              <Wallet size={16} />
-              <span>Travel Wallet</span>
+              <Navigation size={16} />
+              <span>Explore Destinations</span>
             </Link>
           </div>
         </div>
 
-        {/* Profile Completion Bar (if < 100%) */}
+        {/* Profile Completion Callout (if < 100%) */}
         {profileCompletion < 100 && (
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-arctic-gold/10 text-arctic-gold">
+              <div className="p-2 rounded-xl bg-amber-500/20 text-amber-300 shrink-0">
                 <UserCheck size={20} />
               </div>
               <div>
                 <div className="text-xs font-bold text-snow">Profile is {profileCompletion}% complete</div>
-                <div className="text-[11px] text-snow/50">Add your travel preferences and phone for instant SMS safety alerts</div>
+                <div className="text-[11px] text-snow/60">Complete your gender, date of birth, address & country for seamless booking access</div>
               </div>
             </div>
             <div className="flex items-center gap-4 w-full sm:w-auto">
               <div className="w-full sm:w-32 bg-white/10 rounded-full h-2 overflow-hidden">
-                <div className="bg-arctic-gold h-full rounded-full transition-all duration-1000" style={{ width: `${profileCompletion}%` }} />
+                <div className="bg-amber-400 h-full rounded-full transition-all duration-1000" style={{ width: `${profileCompletion}%` }} />
               </div>
-              <Link to="/profile" className="text-xs font-bold text-arctic-gold hover:underline whitespace-nowrap">
+              <Link to="/profile" className="text-xs font-bold text-amber-300 hover:underline whitespace-nowrap">
                 Complete Profile →
               </Link>
             </div>
           </div>
         )}
+
+        {/* ── FEATURED HERO CARD WITH NORDIC IMAGE & INSPIRING QUOTE ──────────── */}
+        <section className="relative rounded-3xl overflow-hidden border border-white/15 shadow-[0_12px_40px_rgba(0,0,0,0.6)] mb-10 group">
+          <div className="absolute inset-0 z-0">
+            <img 
+              src="https://images.pexels.com/photos/1559825/pexels-photo-1559825.jpeg?auto=compress&cs=tinysrgb&w=1600" 
+              alt="Majestic Norwegian Fjords and Mountains" 
+              className="w-full h-full object-cover object-center transition-transform duration-1000 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-900/60 to-navy-900/20 backdrop-blur-[1px]"></div>
+            <div className="absolute inset-0 bg-navy-950/30"></div>
+          </div>
+
+          <div className="relative z-10 p-8 sm:p-12 md:p-14 flex flex-col justify-between min-h-[380px] sm:min-h-[420px]">
+            {/* Top Badge & Quote Switcher */}
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-black/40 border border-white/20 text-aurora-green backdrop-blur-md flex items-center gap-1.5">
+                  <Sparkles size={13} className="text-aurora-green" />
+                  <span>Nordic Daily Inspiration</span>
+                </span>
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-white/10 text-snow/70 border border-white/10 backdrop-blur-md uppercase tracking-wider">
+                  {currentQuote.tag}
+                </span>
+              </div>
+
+              <button
+                onClick={nextQuote}
+                className="px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-snow text-xs font-semibold flex items-center gap-2 backdrop-blur-md transition-all cursor-pointer hover:border-aurora-green/50"
+                title="Read another Nordic quote"
+              >
+                <RefreshCw size={13} className="text-aurora-green" />
+                <span>Next Quote</span>
+              </button>
+            </div>
+
+            {/* Inspiring Quote Hero Text */}
+            <div className="my-6 max-w-3xl">
+              <div className="flex items-start gap-4">
+                <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-aurora-green shrink-0 shadow-lg hidden sm:flex">
+                  <Quote size={28} />
+                </div>
+                <div>
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={quoteIndex}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.35 }}
+                    >
+                      <blockquote className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-snow leading-tight tracking-tight drop-shadow-md">
+                        "{currentQuote.quote}"
+                      </blockquote>
+                      <p className="text-sm sm:text-base text-snow/80 mt-2 font-medium italic drop-shadow">
+                        {currentQuote.translation}
+                      </p>
+                      <div className="flex items-center gap-2 mt-4 text-xs font-bold text-arctic-gold tracking-wide">
+                        <span>— {currentQuote.author}</span>
+                        <span className="text-snow/40">•</span>
+                        <span className="text-snow/60 font-normal">{currentQuote.context}</span>
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Action Navigation Bar on Hero */}
+            <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-white/15">
+              <div className="flex items-center gap-2 text-xs text-snow/70">
+                <MapPin size={14} className="text-aurora-green" />
+                <span className="font-semibold text-snow">Featured Region:</span>
+                <span>Geirangerfjord & Lofoten Islands, Norway</span>
+              </div>
+
+              <div className="flex flex-wrap gap-2.5">
+                <Link
+                  to="/destinations"
+                  className="px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-snow text-xs font-bold flex items-center gap-1.5 backdrop-blur-md transition-all cursor-pointer"
+                >
+                  <Mountain size={13} className="text-cyan-300" />
+                  <span>Discover Fjords</span>
+                </Link>
+                <Link
+                  to="/aurora"
+                  className="px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-snow text-xs font-bold flex items-center gap-1.5 backdrop-blur-md transition-all cursor-pointer"
+                >
+                  <Sparkles size={13} className="text-aurora-green" />
+                  <span>Aurora Live</span>
+                </Link>
+                <Link
+                  to="/stay"
+                  className="px-4 py-2 rounded-xl bg-aurora-green text-navy-900 text-xs font-bold flex items-center gap-1.5 hover:bg-green-400 transition-all shadow-md cursor-pointer"
+                >
+                  <Hotel size={13} />
+                  <span>Book Stays</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
 
       {/* ── Main Dashboard Canvas ───────────────────────────────────────────── */}
       <div className="max-w-[1440px] mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 relative z-10">
         
-        {/* ── LEFT COLUMN (8 cols): Upcoming Trip & Bookings ───────────────── */}
+        {/* ── LEFT COLUMN (8 cols): Upcoming Trip & Hub ────────────────────── */}
         <div className="lg:col-span-8 space-y-10">
           
-          {/* Upcoming Trip / Active Reservation */}
-          <section className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
+          {/* Upcoming Trip / Active Reservation Section */}
+          <section>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xs font-bold uppercase tracking-widest text-snow/60 flex items-center gap-2">
                 <Navigation size={14} className="text-aurora-green" /> 
-                {upcomingBooking ? 'Active Reservation' : 'Curated Destination'}
+                {upcomingBooking ? 'Active Reservation' : 'Featured Nordic Expedition'}
               </h2>
               {upcomingBooking && (
                 <Link to="/user/bookings" className="text-xs font-bold text-aurora-green hover:underline">
@@ -191,27 +339,25 @@ export const Dashboard = () => {
                 onClick={() => navigate(`/user/bookings/${upcomingBooking.id}`)}
               >
                 <div className="absolute inset-0">
-                  <OptimizedImage 
-                    src="https://images.unsplash.com/photo-1513519107127-1ea506ce3c53?auto=format&fit=crop&q=80" 
+                  <img 
+                    src="https://images.pexels.com/photos/1559825/pexels-photo-1559825.jpeg?auto=compress&cs=tinysrgb&w=1200" 
                     alt="Norwegian Experience" 
-                    category={upcomingBooking.item_type === 'ACCOMMODATION' ? 'stay' : 'activity'}
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
-                    containerClassName="w-full h-full"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-navy-900 via-navy-900/50 to-transparent pointer-events-none"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-navy-900 via-navy-900/60 to-transparent pointer-events-none"></div>
                 </div>
                 
-                <div className="relative p-8 md:p-10 min-h-[360px] flex flex-col justify-end">
+                <div className="relative p-8 md:p-10 min-h-[340px] flex flex-col justify-end">
                   <div className="flex flex-col md:flex-row justify-between md:items-end gap-4">
                     <div>
                       <div className="flex items-center gap-3 text-white/80 font-bold text-xs uppercase tracking-widest mb-2">
-                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                          {upcomingBooking.status}
+                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                          {upcomingBooking.status || 'CONFIRMED'}
                         </span>
                         <span className="w-1 h-1 rounded-full bg-aurora-green"></span>
                         <span>{upcomingBooking.start_time ? new Date(upcomingBooking.start_time).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Confirmed'}</span>
                       </div>
-                      <h3 className="text-3xl md:text-5xl font-display font-black text-white leading-tight mb-2">
+                      <h3 className="text-3xl md:text-4xl font-display font-black text-white leading-tight mb-2">
                         {upcomingBooking.item_type || 'Norway Travel Experience'}
                       </h3>
                       <p className="text-white/80 font-medium text-sm">
@@ -225,14 +371,14 @@ export const Dashboard = () => {
                           e.stopPropagation();
                           invoiceService.downloadInvoiceForBooking(upcomingBooking, profile);
                         }}
-                        className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white hover:text-navy-900 transition-colors shadow-sm"
+                        className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white hover:text-navy-900 transition-colors shadow-sm cursor-pointer"
                         title="Download MVA Receipt"
                       >
                         <FileText size={18} />
                       </button>
                       <button 
                         onClick={() => navigate(`/user/bookings/${upcomingBooking.id}`)}
-                        className="px-6 py-3.5 bg-aurora-green text-navy-900 font-bold text-xs uppercase tracking-widest rounded-2xl hover:bg-green-400 transition-colors shadow-lg flex items-center gap-2"
+                        className="px-6 py-3.5 bg-aurora-green text-navy-900 font-bold text-xs uppercase tracking-widest rounded-2xl hover:bg-green-400 transition-colors shadow-lg flex items-center gap-2 cursor-pointer"
                       >
                         <Ticket size={16} />
                         <span>View Ticket</span>
@@ -242,46 +388,44 @@ export const Dashboard = () => {
                 </div>
               </div>
             ) : (
-              /* Curated Default Trip card for Lofoten to satisfy tests */
+              /* Curated Default Trip Card when user has no bookings */
               <div 
                 className="group relative rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.5)] bg-white/5 border border-white/10 cursor-pointer"
-                onClick={() => navigate('/trips/1')}
+                onClick={() => navigate('/planner')}
               >
                 <div className="absolute inset-0">
-                  <OptimizedImage 
-                    src="https://images.unsplash.com/photo-1513519107127-1ea506ce3c53?auto=format&fit=crop&q=80" 
-                    alt="Lofoten" 
-                    category="stay"
+                  <img 
+                    src="https://images.pexels.com/photos/1009136/pexels-photo-1009136.jpeg?auto=compress&cs=tinysrgb&w=1200" 
+                    alt="Lofoten Islands" 
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
-                    containerClassName="w-full h-full"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-navy-900 via-navy-900/50 to-transparent pointer-events-none"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-navy-900 via-navy-900/60 to-transparent pointer-events-none"></div>
                 </div>
                 
-                <div className="relative p-8 md:p-10 min-h-[360px] flex flex-col justify-end">
+                <div className="relative p-8 md:p-10 min-h-[340px] flex flex-col justify-end">
                   <div className="flex flex-col md:flex-row justify-between md:items-end gap-4">
                     <div>
                       <div className="flex items-center gap-3 text-white/80 font-bold text-xs uppercase tracking-widest mb-2">
-                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                          Confirmed
+                        <span className="px-2.5 py-0.5 rounded-full bg-aurora-green/20 text-aurora-green border border-aurora-green/30">
+                          Recommended
                         </span>
                         <span className="w-1 h-1 rounded-full bg-aurora-green"></span>
-                        <span>12 — 18 September</span>
+                        <span>7-Day Fjord & Arctic Route</span>
                       </div>
-                      <h3 className="text-3xl md:text-5xl font-display font-black text-white leading-tight mb-2">
-                        Lofoten
+                      <h3 className="text-3xl md:text-4xl font-display font-black text-white leading-tight mb-2">
+                        Lofoten Archipelago & Senja
                       </h3>
                       <p className="text-white/80 font-medium text-sm">
-                        Your next adventure starts in 12 days.
+                        Experience traditional rorbu cabins, midnight sun or auroras, and dramatic peaks rising from the sea.
                       </p>
                     </div>
                     <div className="flex items-center gap-3 shrink-0">
                       <button 
-                        onClick={() => navigate('/user/bookings')}
-                        className="px-6 py-3.5 bg-aurora-green text-navy-900 font-bold text-xs uppercase tracking-widest rounded-2xl hover:bg-green-400 transition-colors shadow-lg flex items-center gap-2"
+                        onClick={() => navigate('/planner')}
+                        className="px-6 py-3.5 bg-aurora-green text-navy-900 font-bold text-xs uppercase tracking-widest rounded-2xl hover:bg-green-400 transition-colors shadow-lg flex items-center gap-2 cursor-pointer"
                       >
-                        <Ticket size={16} />
-                        <span>View Ticket</span>
+                        <Compass size={16} />
+                        <span>Plan This Trip</span>
                       </button>
                     </div>
                   </div>
@@ -290,9 +434,8 @@ export const Dashboard = () => {
             )}
           </section>
 
-          {/* Quick Hub Grid: Recent Orders, Invoices, Passes */}
+          {/* Quick Hub Grid: Bookings, Invoices, Wallet */}
           <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            
             <Link 
               to="/user/bookings"
               className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/10 transition-all group flex flex-col justify-between"
@@ -346,11 +489,10 @@ export const Dashboard = () => {
                 </div>
               </div>
             </Link>
-
           </section>
 
-          {/* Quick Hub Grid: Travel Tools (Orphaned Features) */}
-          <section className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+          {/* Quick Hub Grid: Travel Tools */}
+          <section className="grid grid-cols-2 sm:grid-cols-5 gap-3">
             <Link 
               to="/assistant"
               className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/10 transition-all group flex flex-col items-center justify-center text-center gap-2"
@@ -358,7 +500,7 @@ export const Dashboard = () => {
               <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400 group-hover:scale-105 transition-transform">
                 <Sparkles size={18} />
               </div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-snow/70">AI Assistant</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-snow/70">AI Guide</span>
             </Link>
             
             <Link 
@@ -402,7 +544,7 @@ export const Dashboard = () => {
             </Link>
           </section>
 
-          {/* Recent Bookings List */}
+          {/* Recent Bookings List if any */}
           {bookings.length > 0 && (
             <section className="bg-white/5 rounded-3xl p-6 sm:p-8 border border-white/10">
               <div className="flex justify-between items-center mb-6">
@@ -435,7 +577,7 @@ export const Dashboard = () => {
                         b.status === 'CONFIRMED' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' :
                         'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                       }`}>
-                        {b.status}
+                        {b.status || 'CONFIRMED'}
                       </span>
                       <button
                         onClick={() => invoiceService.downloadInvoiceForBooking(b, profile)}
@@ -472,11 +614,12 @@ export const Dashboard = () => {
                 { title: 'Chasing Northern Lights in Tromsø', category: 'Aurora Safari', link: '/aurora' },
                 { title: 'Fjord Sightseeing & Electric Ferry', category: 'Geirangerfjord', link: '/mobility/ferry' },
                 { title: 'Preikestolen Pulpit Rock Hike', category: 'Mountain Trails', link: '/trails/tr-001' },
+                { title: 'Flåm Railway Scenic Journey', category: 'Alpine Transit', link: '/travel' }
               ].map((rec, i) => (
                 <Link
                   key={i}
                   to={rec.link}
-                  className="p-3.5 rounded-2xl bg-white/5 border border-white/5 hover:border-white/20 hover:bg-white/10 transition-all flex justify-between items-center group"
+                  className="p-3.5 rounded-2xl bg-white/5 border border-white/5 hover:border-white/20 hover:bg-white/10 transition-all flex justify-between items-center group cursor-pointer"
                 >
                   <div>
                     <div className="text-xs font-bold text-snow group-hover:text-arctic-gold transition-colors">{rec.title}</div>
@@ -504,7 +647,7 @@ export const Dashboard = () => {
                 <div className="text-sm font-bold text-snow">My Northern Norway</div>
                 <div className="text-xs text-snow/50 mt-0.5">Fjord Safaris & Ice Domes</div>
               </div>
-              <Link to="/wishlist" className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-snow transition-colors">
+              <Link to="/wishlist" className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-snow transition-colors cursor-pointer">
                 Open
               </Link>
             </div>
@@ -538,7 +681,7 @@ export const Dashboard = () => {
               
               <Link 
                 to="/impact" 
-                className="mt-6 w-full py-2.5 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl text-xs font-bold uppercase tracking-wider text-center block transition-colors"
+                className="mt-6 w-full py-2.5 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl text-xs font-bold uppercase tracking-wider text-center block transition-colors cursor-pointer"
               >
                 View Full Impact Score →
               </Link>
