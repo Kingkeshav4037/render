@@ -1,5 +1,5 @@
 import { useEffect, Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { ProtectedRoute } from "./components/layout/ProtectedRoute";
 import { GlobalOfflineBanner } from "./components/GlobalOfflineBanner";
@@ -28,7 +28,6 @@ const RootRedirect = () => {
 
 // --- 404 Not Found page (ISSUE-009) ---
 const NotFound = () => {
-  const { Link } = require('react-router-dom');
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-navy-900 text-center px-6">
       <div className="text-8xl font-black text-blue-500 mb-4">404</div>

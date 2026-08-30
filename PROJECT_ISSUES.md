@@ -22,15 +22,27 @@ The features previously mapped to placeholders or `ComingSoon` have been impleme
 
 - The database migrations include a file named `20260818000001_fix_rls_recursion.sql`, implying that previous Row Level Security (RLS) policies might have caused infinite recursion or lockups. This needs to be carefully monitored when the application is connected to the real database.
 
-## 5. Build Environment & Clean Release Packaging
+## 5. Build Environment & Clean Release Packaging (Resolved)
 
-- **Release Archive Cleanup**: To ensure the release archive is lightweight and portable (~10-20 MB instead of ~585 MB), exclude all generated development and environment artifacts before compressing:
+- **Release Archive Cleanup**: Automated clean distribution scripts have been added:
+  - `scripts/create-clean-zip.ps1` (PowerShell for Windows)
+  - `scripts/create-clean-zip.sh` (Bash for Linux/macOS/CI)
+- The scripts generate a lightweight and portable (~15 MB) archive strictly excluding:
   - `node_modules/` (prevents cross-platform native binding errors such as `@rolldown/binding-linux-x64-gnu`)
-  - `.venv/` and Python virtual environment caches (`__pycache__/`)
+  - `.venv/` and Python virtual environment caches (`__pycache__/`, `*.pyc`)
   - `dist/`, `dist-ssr/` (build outputs)
   - `playwright-report/`, `test-results/`, `coverage/`
-  - Generated audit & linter logs (`audit_results.json`, `audit-report.txt`, `linter_report.txt`)
-  - `.git/` (if producing a standalone distribution zip)
+  - `.git/` (standalone distribution)
 - Target deployment machines should run a clean `npm install` and `npm run build` directly.
 
-*(Note: The previous TypeScript and architecture errors relating to Supabase schema mismatches and missing tables have been resolved with `npx tsc -b` passing 0 errors, and primary linter warnings including `AuroraCMS` initialization and unused imports have been cleaned up.)*
+## 6. Runtime Module Resolution in `App.tsx` (Resolved)
+
+- **Issue**: The `NotFound` (404) component used `const { Link } = require('react-router-dom');` inside an ESM project (`"type": "module"`). In browser environments, this would result in a `require is not defined` runtime exception.
+- **Fix**: Replaced CJS `require` call with standard ESM `Link` import alongside `BrowserRouter, Routes, Route, Navigate` at top of `src/App.tsx`.
+
+## 7. ML Backend API Configuration Hardening (Resolved)
+
+- **Issue**: `src/services/api.ts` previously threw a fatal top-level error on module evaluation in production if `VITE_API_URL` / `VITE_ML_API_URL` was not set, causing the entire React bundle to crash on load.
+- **Fix**: Changed the fatal initialization exception to a non-fatal warning (`console.warn`) so that core application browsing, authentication, bookings, and commerce operate seamlessly even before the ML backend URL is configured.
+
+*(Note: The previous TypeScript and architecture errors relating to Supabase schema mismatches and missing tables have been resolved with `npx tsc -b` passing 0 errors.)*

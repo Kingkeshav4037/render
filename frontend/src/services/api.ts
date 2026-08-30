@@ -7,7 +7,7 @@ const isProd = import.meta.env.PROD;
 const envUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_ML_API_URL;
 
 if (isProd && !envUrl) {
-  throw new Error('Production ML API URL is missing! Set VITE_API_URL or VITE_ML_API_URL.');
+  console.warn('[Norway SmartLife] Production ML API URL is missing! Set VITE_API_URL or VITE_ML_API_URL in your deployment environment.');
 }
 
 const rawApiUrl = (envUrl || 'http://localhost:8000').replace(/\/+$/, '');
