@@ -8,6 +8,7 @@ import { useCurrencyStore, Currency, CURRENCIES } from '../../store/useCurrencyS
 import { LANGUAGES, LanguageOption } from '../../i18n';
 import { NotificationDropdown } from '../common/NotificationDropdown';
 import { BrandLogo } from '../shared/BrandLogo';
+import { GlobalSearchModal } from '../shared/GlobalSearchModal';
 import { Button } from '../ui/Button';
 import { Drawer } from '../ui/Drawer';
 import { clsx, type ClassValue } from 'clsx';
@@ -49,6 +50,7 @@ export const Navbar = () => {
 
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -56,6 +58,24 @@ export const Navbar = () => {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Global Keyboard Shortcut: Cmd+K / Ctrl+K or '/' to open search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const activeTag = (document.activeElement?.tagName || '').toLowerCase();
+      const isInput = activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select';
+      
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(open => !open);
+      } else if (e.key === '/' && !isInput) {
+        e.preventDefault();
+        setIsSearchOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const handleLogout = async () => {
@@ -98,11 +118,17 @@ export const Navbar = () => {
             onSelectCurrency={setCurrency} 
           />
 
+          {/* Search Trigger Button */}
           <button 
-            aria-label="Search site"
-            className="text-snow/80 hover:text-snow transition-colors focus-visible:ring-2 focus-visible:ring-aurora-green focus-visible:outline-none p-1.5 rounded-lg hover:bg-white/5 cursor-pointer"
+            onClick={() => setIsSearchOpen(true)}
+            aria-label="Search Norway SmartLife (Cmd+K)"
+            className="text-snow/80 hover:text-cyan-300 transition-all focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:outline-none px-2.5 py-1.5 rounded-xl hover:bg-white/10 flex items-center gap-2 cursor-pointer border border-transparent hover:border-white/10"
           >
-            <Search className="w-4.5 h-4.5" />
+            <Search className="w-4 h-4 text-cyan-400" />
+            <span className="hidden xl:inline text-xs text-snow/60">Search...</span>
+            <kbd className="hidden xl:inline-flex items-center px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 text-[10px] font-mono border border-slate-700">
+              ⌘K
+            </kbd>
           </button>
           
           {user ? (
@@ -176,8 +202,17 @@ export const Navbar = () => {
           )}
         </div>
 
-        {/* Mobile Menu Button */}
-        <div className="lg:hidden flex items-center gap-3">
+        {/* Mobile Menu Actions */}
+        <div className="lg:hidden flex items-center gap-2">
+          {/* Mobile Search Button */}
+          <button 
+            onClick={() => setIsSearchOpen(true)}
+            aria-label="Search Norway SmartLife"
+            className="text-snow/80 hover:text-cyan-300 transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:outline-none p-1.5 rounded-lg hover:bg-white/5 cursor-pointer"
+          >
+            <Search className="w-5 h-5 text-cyan-400" />
+          </button>
+
           <button 
             onClick={() => setIsOpen(true)}
             aria-label={`Shopping Cart${cartItemCount > 0 ? `, ${cartItemCount} items` : ''}`}
@@ -214,6 +249,21 @@ export const Navbar = () => {
           <div className="pb-3 border-b border-slate-800 flex justify-center">
             <BrandLogo size="md" showTagline linkTo="/" />
           </div>
+
+          {/* Quick Search Button on Mobile */}
+          <button
+            onClick={() => {
+              setShowMobileMenu(false);
+              setIsSearchOpen(true);
+            }}
+            className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-cyan-500/40 text-slate-400 hover:text-slate-200 transition-all cursor-pointer shadow-inner"
+          >
+            <div className="flex items-center gap-2 text-xs">
+              <Search className="w-4 h-4 text-cyan-400" />
+              <span>Search Norway...</span>
+            </div>
+            <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-[10px] font-mono text-slate-400 border border-slate-700">⌘K</kbd>
+          </button>
 
           {/* Quick Language & Currency on Mobile */}
           <div className="flex flex-col gap-2 p-3 bg-slate-900 border border-slate-800 rounded-2xl text-white shadow-inner">
@@ -338,6 +388,12 @@ export const Navbar = () => {
           )}
         </div>
       </Drawer>
+
+      {/* Global Interactive Search Modal */}
+      <GlobalSearchModal 
+        isOpen={isSearchOpen} 
+        onClose={() => setIsSearchOpen(false)} 
+      />
     </nav>
   );
 };
