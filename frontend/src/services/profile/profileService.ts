@@ -34,6 +34,8 @@ export const profileService = {
         phoneVerified: data.phone_verified || Boolean(data.phone),
         country: data.country || undefined,
         city: data.city || undefined,
+        address: data.address || undefined,
+        postalCode: data.postal_code || undefined,
         dateOfBirth: data.date_of_birth || undefined,
         gender: data.gender || undefined,
         preferredLanguage: data.preferred_language || 'en',
@@ -81,7 +83,11 @@ export const profileService = {
     if (updates.phone !== undefined) dbUpdates.phone = updates.phone;
     if (updates.country !== undefined) dbUpdates.country = updates.country;
     if (updates.city !== undefined) dbUpdates.city = updates.city;
-    if (updates.dateOfBirth !== undefined) dbUpdates.date_of_birth = updates.dateOfBirth;
+    if (updates.address !== undefined) dbUpdates.address = updates.address;
+    if (updates.postalCode !== undefined || (updates as any).postal_code !== undefined)
+      dbUpdates.postal_code = updates.postalCode ?? (updates as any).postal_code;
+    if (updates.dateOfBirth !== undefined || (updates as any).date_of_birth !== undefined)
+      dbUpdates.date_of_birth = updates.dateOfBirth ?? (updates as any).date_of_birth;
     if (updates.gender !== undefined) dbUpdates.gender = updates.gender;
     if (updates.preferredLanguage !== undefined) dbUpdates.preferred_language = updates.preferredLanguage;
     if (updates.preferences !== undefined) dbUpdates.preferences = updates.preferences;

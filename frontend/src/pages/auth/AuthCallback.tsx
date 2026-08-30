@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { LoadingState } from '../../components/ui/LoadingState';
+import { profileService } from '../../services/profile/profileService';
+import { isProfileComplete } from '../../types/profile';
 
 export const AuthCallback = () => {
   const navigate = useNavigate();
@@ -68,7 +70,14 @@ export const AuthCallback = () => {
             const safeDestination = rawReturnTo.startsWith('/') && !rawReturnTo.startsWith('//') && !rawReturnTo.includes('\\')
               ? rawReturnTo 
               : '/home';
-            navigate(safeDestination);
+
+            // Check if user profile has all required fields
+            const profile = await profileService.getProfile(data.session.user.id);
+            if (!isProfileComplete(profile)) {
+              navigate(`/complete-profile?returnTo=${encodeURIComponent(safeDestination)}`);
+            } else {
+              navigate(safeDestination);
+            }
           }
         } else {
           navigate('/login');

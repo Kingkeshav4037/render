@@ -13,10 +13,69 @@ export interface UserProfile {
   phoneVerified: boolean;
   country?: string;
   city?: string;
+  address?: string;
+  postalCode?: string;
   dateOfBirth?: string;
   gender?: string;
   preferredLanguage?: string;
   role?: string;
+}
+
+export const GENDER_OPTIONS = [
+  'Male',
+  'Female',
+  'Non-binary',
+  'Prefer not to say'
+] as const;
+
+export type GenderType = typeof GENDER_OPTIONS[number];
+
+export interface CountryOption {
+  code: string;
+  name: string;
+  flag: string;
+}
+
+export const POPULAR_COUNTRIES: CountryOption[] = [
+  { code: 'NO', name: 'Norway', flag: '🇳🇴' },
+  { code: 'SE', name: 'Sweden', flag: '🇸🇪' },
+  { code: 'DK', name: 'Denmark', flag: '🇩🇰' },
+  { code: 'FI', name: 'Finland', flag: '🇫🇮' },
+  { code: 'IS', name: 'Iceland', flag: '🇮🇸' },
+  { code: 'DE', name: 'Germany', flag: '🇩🇪' },
+  { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
+  { code: 'US', name: 'United States', flag: '🇺🇸' },
+  { code: 'CA', name: 'Canada', flag: '🇨🇦' },
+  { code: 'FR', name: 'France', flag: '🇫🇷' },
+  { code: 'NL', name: 'Netherlands', flag: '🇳🇱' },
+  { code: 'ES', name: 'Spain', flag: '🇪🇸' },
+  { code: 'IT', name: 'Italy', flag: '🇮🇹' },
+  { code: 'CH', name: 'Switzerland', flag: '🇨🇭' },
+  { code: 'AT', name: 'Austria', flag: '🇦🇹' },
+  { code: 'BE', name: 'Belgium', flag: '🇧🇪' },
+  { code: 'PL', name: 'Poland', flag: '🇵🇱' },
+  { code: 'AU', name: 'Australia', flag: '🇦🇺' },
+  { code: 'NZ', name: 'New Zealand', flag: '🇳🇿' },
+  { code: 'JP', name: 'Japan', flag: '🇯🇵' },
+  { code: 'KR', name: 'South Korea', flag: '🇰🇷' },
+  { code: 'SG', name: 'Singapore', flag: '🇸🇬' },
+  { code: 'IN', name: 'India', flag: '🇮🇳' },
+  { code: 'BR', name: 'Brazil', flag: '🇧🇷' },
+  { code: 'OTHER', name: 'Other / International', flag: '🌍' },
+];
+
+/**
+ * Checks if all required traveler profile fields are present and non-empty.
+ */
+export function isProfileComplete(profile: Partial<UserProfile> | null | undefined): boolean {
+  if (!profile) return false;
+  
+  const hasGender = Boolean(profile.gender && profile.gender.trim().length > 0);
+  const hasDob = Boolean(profile.dateOfBirth && profile.dateOfBirth.trim().length > 0);
+  const hasAddress = Boolean(profile.address && profile.address.trim().length > 0);
+  const hasCountry = Boolean(profile.country && profile.country.trim().length > 0);
+
+  return hasGender && hasDob && hasAddress && hasCountry;
 }
 
 // ── Travel ──────────────────────────────────────────────────────────

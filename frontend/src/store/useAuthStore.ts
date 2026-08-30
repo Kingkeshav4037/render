@@ -18,6 +18,7 @@ interface AuthState {
   hasPermission: (permission: string) => boolean;
   signOut: () => Promise<void>;
   initialize: () => (() => void) | void;
+  refreshProfile: () => Promise<UserProfileWithPermissions | null>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -41,6 +42,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     await supabase.auth.signOut();
     set({ user: null, profile: null, isAdmin: false, isProvider: false, isAnalyst: false, permissions: [], mfaLevel: 'aal1' });
   },
+  refreshProfile: async () => {
+    const currentUser = get().user;
+    if (!currentUser) return null;
+    const profile = await profileService.getProfile(currentUser.id);
+    if (profile) {
+      const role = profile.role as AppRole | undefined;
+      const isAdmin = role === 'SUPER_ADMIN' || role === 'ADMIN';
+      const isProvider = role === 'PROVIDER';
+      const isAnalyst = role === 'ANALYST';
+      const permissions = profile.permissions || [];
+      set({ profile, isAdmin, isProvider, isAnalyst, permissions });
+    }
+    return profile;
+  },
   initialize: () => {
     if (get().initialized) return;
 
@@ -60,8 +75,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           phone: user.phone || undefined,
           phoneVerified: !!user.phone || !!user.phone_confirmed_at,
           role: (user.user_metadata?.role as AppRole) || 'USER',
-          country: 'Norway',
-          city: 'Oslo',
+          country: user.user_metadata?.country || 'Norway',
+          city: user.user_metadata?.city || 'Oslo',
+          address: user.user_metadata?.address || undefined,
+          postalCode: user.user_metadata?.postal_code || undefined,
+          dateOfBirth: user.user_metadata?.date_of_birth || undefined,
+          gender: user.user_metadata?.gender || undefined,
           permissions: [],
         };
       } else if (user.phone && !profile.phone) {

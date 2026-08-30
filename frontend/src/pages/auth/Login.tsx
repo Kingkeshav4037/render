@@ -7,6 +7,8 @@ import { toast } from '../../store/useToastStore';
 import { authService, normalizePhoneNumber } from '../../services/auth/authService';
 import { AuthLayout } from '../../components/layout/AuthLayout';
 import { useAuthStore } from '../../store/useAuthStore';
+import { profileService } from '../../services/profile/profileService';
+import { isProfileComplete } from '../../types/profile';
 
 const COUNTRY_CODES = [
   { code: '+47', country: 'Norway 🇳🇴' },
@@ -271,8 +273,17 @@ export const Login = () => {
     try {
       setLoading(true);
       setError(null);
-      await authService.loginWithEmail(trimmedEmail, password);
+      const { user: loggedInUser } = await authService.loginWithEmail(trimmedEmail, password);
       toast.success('Signed in successfully. Welcome back!');
+
+      if (loggedInUser) {
+        const profile = await profileService.getProfile(loggedInUser.id);
+        if (!isProfileComplete(profile)) {
+          navigate(`/complete-profile?returnTo=${encodeURIComponent(targetRedirect)}`, { replace: true });
+          return;
+        }
+      }
+
       navigate(targetRedirect, { replace: true });
     } catch (e: any) {
       console.warn('Login failure:', e);

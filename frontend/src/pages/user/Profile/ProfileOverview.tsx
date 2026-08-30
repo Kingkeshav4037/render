@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuthStore } from '../../../store/useAuthStore';
-import { Camera, Mail, Phone, Globe, Edit2, Check, FileText, ArrowRight, X, MapPin, User as UserIcon, Upload, Trash2 } from 'lucide-react';
+import { Camera, Mail, Phone, Globe, Edit2, Check, FileText, ArrowRight, X, MapPin, User as UserIcon, Upload, Trash2, Calendar, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from '../../../store/useToastStore';
 import { profileService } from '../../../services/profile/profileService';
 import { motion, AnimatePresence } from 'framer-motion';
+import { GENDER_OPTIONS, POPULAR_COUNTRIES, isProfileComplete } from '../../../types/profile';
 
 export const ProfileOverview = () => {
-  const { user, profile } = useAuthStore();
+  const { user, profile, refreshProfile } = useAuthStore();
   const [completion, setCompletion] = useState(80);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -16,9 +17,13 @@ export const ProfileOverview = () => {
   // Form State
   const [formData, setFormData] = useState({
     fullName: profile?.fullName || '',
-    phone: profile?.phone || '',
-    country: profile?.country || 'Norway',
+    gender: profile?.gender || '',
+    dateOfBirth: profile?.dateOfBirth || '',
+    address: profile?.address || '',
     city: profile?.city || 'Oslo',
+    postalCode: profile?.postalCode || '',
+    country: profile?.country || 'Norway',
+    phone: profile?.phone || '',
     avatarUrl: profile?.avatarUrl || '',
     bio: (profile as any)?.bio || 'Exploring the fjords, peaks, and arctic wilderness of Norway.'
   });
@@ -27,9 +32,13 @@ export const ProfileOverview = () => {
     if (profile) {
       setFormData({
         fullName: profile.fullName || '',
-        phone: profile.phone || '',
-        country: profile.country || 'Norway',
+        gender: profile.gender || '',
+        dateOfBirth: profile.dateOfBirth || '',
+        address: profile.address || '',
         city: profile.city || 'Oslo',
+        postalCode: profile.postalCode || '',
+        country: profile.country || 'Norway',
+        phone: profile.phone || '',
         avatarUrl: profile.avatarUrl || '',
         bio: (profile as any)?.bio || 'Exploring the fjords, peaks, and arctic wilderness of Norway.'
       });
@@ -38,27 +47,29 @@ export const ProfileOverview = () => {
 
   // Completion calculation
   useEffect(() => {
-    let score = 40; // baseline email
-    if (formData.fullName) score += 20;
-    if (formData.phone) score += 15;
+    let score = 20; // baseline email
+    if (formData.fullName) score += 15;
+    if (formData.gender) score += 15;
+    if (formData.dateOfBirth) score += 15;
+    if (formData.address) score += 15;
     if (formData.country) score += 10;
-    if (formData.city) score += 5;
-    if (formData.avatarUrl) score += 10;
+    if (formData.phone) score += 5;
+    if (formData.avatarUrl) score += 5;
     setCompletion(Math.min(score, 100));
   }, [formData]);
+
+  const maxDobDate = new Date().toISOString().split('T')[0];
 
   const handleAvatarFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif'];
     if (!validTypes.includes(file.type)) {
       toast.error('Please upload a valid image file (JPG, PNG, WEBP, or GIF).');
       return;
     }
 
-    // Validate file size (<= 2MB)
     if (file.size > 2 * 1024 * 1024) {
       toast.error('Image file exceeds the 2MB size limit. Please choose a smaller photo.');
       return;
@@ -85,12 +96,18 @@ export const ProfileOverview = () => {
       if (user?.id) {
         await profileService.updateProfile(user.id, {
           fullName: formData.fullName.trim(),
-          phone: formData.phone.trim(),
-          country: formData.country.trim(),
+          gender: formData.gender,
+          dateOfBirth: formData.dateOfBirth,
+          address: formData.address.trim(),
           city: formData.city.trim(),
+          postalCode: formData.postalCode.trim(),
+          country: formData.country.trim(),
+          phone: formData.phone.trim(),
           avatarUrl: formData.avatarUrl
         });
       }
+
+      await refreshProfile();
 
       // Local storage backup
       localStorage.setItem('nsl_user_profile', JSON.stringify({
@@ -99,23 +116,10 @@ export const ProfileOverview = () => {
         updatedAt: new Date().toISOString()
       }));
 
-      // Update in memory profile
-      if (profile) {
-        Object.assign(profile, {
-          fullName: formData.fullName.trim(),
-          phone: formData.phone.trim(),
-          country: formData.country.trim(),
-          city: formData.city.trim(),
-          avatarUrl: formData.avatarUrl,
-          bio: formData.bio.trim()
-        });
-      }
-
       toast.success('Profile updated successfully!');
       setIsEditing(false);
     } catch (err: any) {
       console.warn('Profile save note:', err);
-      // Fallback local persistence
       localStorage.setItem('nsl_user_profile', JSON.stringify({
         ...formData,
         email: user?.email,
@@ -201,7 +205,11 @@ export const ProfileOverview = () => {
             className="bg-aurora-green h-full rounded-full"
           />
         </div>
-        <p className="text-xs text-gray-500">Complete your traveler profile to receive hyper-personalized Nordic journey itineraries.</p>
+        <p className="text-xs text-gray-500">
+          {completion === 100 
+            ? 'Your traveler profile is fully complete! You have unrestricted access to all Nordic adventures and bookings.' 
+            : 'Complete all traveler information (Gender, Date of Birth, Address, Country) for instant booking access and safety alerts.'}
+        </p>
       </div>
 
       {/* Personal Info Grid */}
@@ -234,18 +242,46 @@ export const ProfileOverview = () => {
           </div>
 
           <div className="space-y-1">
-            <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">Phone Number</span>
+            <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">Gender</span>
+            <p className="text-navy-900 font-medium">{formData.gender || 'Not specified'}</p>
+          </div>
+
+          <div className="space-y-1">
+            <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">Date of Birth</span>
             <div className="flex items-center gap-2">
-              <Phone size={14} className="text-gray-400" />
-              <p className="text-navy-900 font-medium">{formData.phone || 'Not provided'}</p>
+              <Calendar size={14} className="text-gray-400" />
+              <p className="text-navy-900 font-medium">{formData.dateOfBirth || 'Not specified'}</p>
             </div>
           </div>
 
           <div className="space-y-1">
-            <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">Location / Base</span>
+            <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">Street Address</span>
             <div className="flex items-center gap-2">
               <MapPin size={14} className="text-gray-400" />
-              <p className="text-navy-900 font-medium">{formData.city || 'Oslo'}, {formData.country || 'Norway'}</p>
+              <p className="text-navy-900 font-medium">{formData.address || 'Not provided'}</p>
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">City & Postal Code</span>
+            <p className="text-navy-900 font-medium">
+              {formData.city || 'Oslo'}{formData.postalCode ? `, ${formData.postalCode}` : ''}
+            </p>
+          </div>
+
+          <div className="space-y-1">
+            <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">Country</span>
+            <div className="flex items-center gap-2">
+              <Globe size={14} className="text-gray-400" />
+              <p className="text-navy-900 font-medium">{formData.country || 'Norway'}</p>
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">Phone Number</span>
+            <div className="flex items-center gap-2">
+              <Phone size={14} className="text-gray-400" />
+              <p className="text-navy-900 font-medium">{formData.phone || 'Not provided'}</p>
             </div>
           </div>
 
@@ -353,7 +389,96 @@ export const ProfileOverview = () => {
                   />
                 </div>
 
+                {/* Gender and Date of Birth */}
                 <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+                      Gender
+                    </label>
+                    <select
+                      value={formData.gender}
+                      onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-aurora-green text-sm bg-white"
+                    >
+                      <option value="">Select gender</option>
+                      {GENDER_OPTIONS.map((g) => (
+                        <option key={g} value={g}>{g}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+                      Date of Birth
+                    </label>
+                    <input
+                      type="date"
+                      max={maxDobDate}
+                      min="1900-01-01"
+                      value={formData.dateOfBirth}
+                      onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-aurora-green text-sm"
+                    />
+                  </div>
+                </div>
+
+                {/* Street Address */}
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+                    Street Address
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-aurora-green text-sm"
+                    placeholder="Karl Johans gate 1"
+                  />
+                </div>
+
+                {/* City and Postal Code */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+                      City
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.city}
+                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-aurora-green text-sm"
+                      placeholder="Oslo"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+                      Postal Code
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.postalCode}
+                      onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-aurora-green text-sm"
+                      placeholder="0154"
+                    />
+                  </div>
+                </div>
+
+                {/* Country and Phone */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+                      Country
+                    </label>
+                    <select
+                      value={formData.country}
+                      onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-aurora-green text-sm bg-white"
+                    >
+                      {POPULAR_COUNTRIES.map((c) => (
+                        <option key={c.code} value={c.name}>{c.flag} {c.name}</option>
+                      ))}
+                    </select>
+                  </div>
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
                       Phone Number
@@ -366,31 +491,6 @@ export const ProfileOverview = () => {
                       placeholder="+47 123 45 678"
                     />
                   </div>
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
-                      Base City
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.city}
-                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-aurora-green text-sm"
-                      placeholder="Oslo / Bergen / Tromsø"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
-                    Country / Region
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.country}
-                    onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-aurora-green text-sm"
-                    placeholder="Norway"
-                  />
                 </div>
 
                 <div>

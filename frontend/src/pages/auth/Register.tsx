@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, User, ArrowRight, Eye, EyeOff, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Eye, EyeOff, MapPin, Sparkles } from 'lucide-react';
 import { authService } from '../../services/auth/authService';
 import { AuthLayout } from '../../components/layout/AuthLayout';
 import { toast } from '../../store/useToastStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { sanitizeRedirectUrl } from './Login';
+import { GENDER_OPTIONS, POPULAR_COUNTRIES } from '../../types/profile';
 
 export const Register = () => {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ export const Register = () => {
     return 'Register to continue';
   }, [urlMessage, rawRedirect, targetRedirect]);
 
+  // Section 1: Account
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -37,12 +39,26 @@ export const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isProvider, setIsProvider] = useState(false);
+
+  // Section 2: Personal Information
+  const [gender, setGender] = useState<string>('');
+  const [dateOfBirth, setDateOfBirth] = useState<string>('');
+
+  // Section 3: Location
+  const [address, setAddress] = useState<string>('');
+  const [city, setCity] = useState<string>('');
+  const [postalCode, setPostalCode] = useState<string>('');
+  const [country, setCountry] = useState<string>('Norway');
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
   const [requiresEmailConfirmation, setRequiresEmailConfirmation] = useState(false);
 
   const [passwordStrength, setPasswordStrength] = useState({ score: 0, message: '' });
+
+  // Today's date for max DOB attribute
+  const maxDobDate = new Date().toISOString().split('T')[0];
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -79,6 +95,9 @@ export const Register = () => {
     
     const trimmedName = fullName.trim();
     const trimmedEmail = email.trim();
+    const trimmedAddress = address.trim();
+    const trimmedCity = city.trim() || 'Oslo';
+    const trimmedPostalCode = postalCode.trim();
 
     if (!trimmedName || trimmedName.length < 2) {
       setError('Please enter your full name (minimum 2 characters).');
@@ -101,6 +120,34 @@ export const Register = () => {
       return;
     }
 
+    if (!gender) {
+      setError('Please select your gender.');
+      return;
+    }
+
+    if (!dateOfBirth) {
+      setError('Please provide your date of birth.');
+      return;
+    }
+
+    const birthDateObj = new Date(dateOfBirth);
+    const today = new Date();
+    const minRealisticDate = new Date('1900-01-01');
+    if (isNaN(birthDateObj.getTime()) || birthDateObj > today || birthDateObj < minRealisticDate) {
+      setError('Please enter a realistic date of birth not in the future.');
+      return;
+    }
+
+    if (!trimmedAddress) {
+      setError('Please enter your street address.');
+      return;
+    }
+
+    if (!country) {
+      setError('Please select your country.');
+      return;
+    }
+
     try {
       setLoading(true);
       setError('');
@@ -112,6 +159,12 @@ export const Register = () => {
           data: {
             full_name: trimmedName,
             role: isProvider ? 'PROVIDER' : 'USER',
+            gender,
+            date_of_birth: dateOfBirth,
+            address: trimmedAddress,
+            city: trimmedCity,
+            postal_code: trimmedPostalCode,
+            country,
           }
         }
       });
@@ -125,7 +178,7 @@ export const Register = () => {
         return;
       }
 
-      // Initialize user profile in profiles table
+      // Initialize/Update user profile in profiles table
       if (data?.user) {
         try {
           await supabase.from('profiles').upsert({
@@ -133,10 +186,14 @@ export const Register = () => {
             email: trimmedEmail,
             full_name: trimmedName,
             role: isProvider ? 'PROVIDER' : 'USER',
-            country: 'Norway',
-            city: 'Oslo',
+            gender,
+            date_of_birth: dateOfBirth,
+            address: trimmedAddress,
+            city: trimmedCity,
+            postal_code: trimmedPostalCode,
+            country,
             updated_at: new Date().toISOString()
-          }, { onConflict: 'id', ignoreDuplicates: true });
+          }, { onConflict: 'id', ignoreDuplicates: false });
         } catch (profileErr) {
           console.warn('Profile initialization note:', profileErr);
         }
@@ -145,8 +202,12 @@ export const Register = () => {
         localStorage.setItem('nsl_user_profile', JSON.stringify({
           fullName: trimmedName,
           email: trimmedEmail,
-          country: 'Norway',
-          city: 'Oslo',
+          gender,
+          dateOfBirth,
+          address: trimmedAddress,
+          city: trimmedCity,
+          postalCode: trimmedPostalCode,
+          country,
           role: isProvider ? 'PROVIDER' : 'USER',
           updatedAt: new Date().toISOString()
         }));
@@ -188,65 +249,41 @@ export const Register = () => {
     }
   };
 
-  const handleDemoGoogleLogin = async () => {
-    try {
-      setLoading(true);
-      setError('');
-      const { user } = await authService.loginWithDemoGoogle();
-      useAuthStore.getState().setUser(user);
-      toast.success('Signed in with Google Traveler profile!');
-      navigate(targetRedirect, { replace: true });
-    } catch (e: any) {
-      setError(e.message || 'Failed to sign in with demo Google account.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <AuthLayout 
-      title="Create an Account" 
-      subtitle="Join Norway SmartLife to unlock your journey"
+      title="Create Your Account" 
+      subtitle="Join Norway SmartLife to unlock tailored Nordic experiences"
       bgImage="/images/fjords.jpg"
     >
       {/* Contextual Action Prompt Banner */}
       {contextualMessage && (
-        <motion.div
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-5 p-3.5 bg-aurora-green/10 border border-aurora-green/30 rounded-xl flex items-center gap-3 text-snow text-xs font-semibold shadow-[0_0_15px_rgba(0,255,135,0.1)]"
-        >
-          <div className="w-8 h-8 rounded-lg bg-aurora-green/20 text-aurora-green flex items-center justify-center shrink-0">
-            <ShieldCheck className="w-4 h-4" />
-          </div>
-          <div className="flex-1">
-            <p className="text-white font-bold">{contextualMessage}</p>
-            <p className="text-snow/60 text-[11px] font-normal">Your progress and destination will be preserved after account setup.</p>
-          </div>
-        </motion.div>
+        <div className="mb-6 p-3.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-200 text-xs flex items-center gap-2.5">
+          <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+          <span>{contextualMessage}</span>
+        </div>
       )}
 
       {requiresEmailConfirmation ? (
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-center space-y-6 py-4"
+          className="space-y-6 text-center"
         >
-          <div className="w-16 h-16 bg-aurora-green/10 border border-aurora-green/30 rounded-2xl flex items-center justify-center mx-auto text-aurora-green shadow-[0_0_25px_rgba(0,255,135,0.2)]">
-            <Mail className="w-8 h-8" />
+          <div className="mx-auto w-14 h-14 rounded-2xl bg-aurora-green/20 border border-aurora-green/40 flex items-center justify-center">
+            <Mail className="w-7 h-7 text-aurora-green animate-bounce" />
           </div>
 
           <div className="space-y-2">
-            <h3 className="text-xl font-bold text-snow">Check your email</h3>
-            <p className="text-sm text-snow/70 max-w-sm mx-auto leading-relaxed">
-              We have sent a verification link to <span className="font-semibold text-snow">{registeredEmail}</span>. Please click the link to confirm your account.
+            <h3 className="text-xl font-bold text-snow">Check Your Email</h3>
+            <p className="text-sm text-snow/70">
+              We have sent a verification link to <span className="font-semibold text-aurora-green">{registeredEmail}</span>.
             </p>
           </div>
 
-          <div className="bg-deep-night/50 border border-white/10 rounded-xl p-4 text-xs text-snow/60 text-left space-y-2">
-            <div className="flex items-center gap-2 text-snow font-semibold">
-              <ShieldCheck className="w-4 h-4 text-aurora-green" />
-              <span>Next Steps</span>
+          <div className="p-4 rounded-xl bg-deep-night/40 border border-white/10 text-xs text-snow/60 text-left space-y-2">
+            <div className="font-semibold text-snow/80 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-aurora-green"></span>
+              Next Steps
             </div>
             <p>1. Open your inbox and look for an email from Norway SmartLife.</p>
             <p>2. Click the confirmation link to activate your traveler credentials.</p>
@@ -255,8 +292,8 @@ export const Register = () => {
 
           <div className="pt-2">
             <Link 
-              to="/login" 
-              state={{ from: location.state?.from }}
+              to={`/login${rawRedirect ? `?returnTo=${encodeURIComponent(rawRedirect)}` : ''}`}
+              state={{ returnTo: rawRedirect }}
               className="inline-flex items-center justify-center gap-2 w-full py-3.5 px-4 rounded-xl text-sm font-bold text-navy-900 bg-aurora-green hover:bg-green-400 transition-all shadow-[0_0_20px_rgba(0,255,135,0.3)] cursor-pointer"
             >
               Return to Login
@@ -265,14 +302,14 @@ export const Register = () => {
           </div>
         </motion.div>
       ) : (
-        <form className="space-y-5" onSubmit={handleRegister}>
+        <form className="space-y-6" onSubmit={handleRegister}>
           <AnimatePresence>
             {error && (
               <motion.div 
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="bg-red-500/10 border border-red-500/30 text-red-400 p-3.5 rounded-xl text-sm text-center mb-6 overflow-hidden"
+                className="bg-red-500/10 border border-red-500/30 text-red-400 p-3.5 rounded-xl text-sm text-center overflow-hidden"
                 role="alert"
                 aria-live="polite"
               >
@@ -281,7 +318,12 @@ export const Register = () => {
             )}
           </AnimatePresence>
           
+          {/* SECTION 1: ACCOUNT */}
           <div className="space-y-4">
+            <div className="flex items-center gap-2 pb-1 border-b border-white/10">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-snow/70">1. Account Details</span>
+            </div>
+
             <div className="relative group">
               <label htmlFor="register-name" className="sr-only">Full Name</label>
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -293,12 +335,12 @@ export const Register = () => {
                 type="text" 
                 autoComplete="name"
                 required 
-                className="block w-full pl-11 pr-3 py-3.5 border border-white/10 rounded-xl bg-deep-night/40 text-snow placeholder-snow/40 focus:outline-none focus:ring-2 focus:ring-aurora-green/50 focus:border-transparent focus:bg-deep-night/60 transition-all sm:text-sm" 
+                className="block w-full pl-11 pr-3 py-3 border border-white/10 rounded-xl bg-deep-night/40 text-snow placeholder-snow/40 focus:outline-none focus:ring-2 focus:ring-aurora-green/50 focus:border-transparent focus:bg-deep-night/60 transition-all sm:text-sm" 
                 placeholder="Full Name" 
                 value={fullName} 
                 onChange={(e) => setFullName(e.target.value)} 
                 minLength={2}
-                maxLength={50}
+                maxLength={60}
               />
             </div>
 
@@ -313,86 +355,207 @@ export const Register = () => {
                 type="email" 
                 autoComplete="email" 
                 required 
-                className="block w-full pl-11 pr-3 py-3.5 border border-white/10 rounded-xl bg-deep-night/40 text-snow placeholder-snow/40 focus:outline-none focus:ring-2 focus:ring-aurora-green/50 focus:border-transparent focus:bg-deep-night/60 transition-all sm:text-sm" 
+                className="block w-full pl-11 pr-3 py-3 border border-white/10 rounded-xl bg-deep-night/40 text-snow placeholder-snow/40 focus:outline-none focus:ring-2 focus:ring-aurora-green/50 focus:border-transparent focus:bg-deep-night/60 transition-all sm:text-sm" 
                 placeholder="Email address" 
                 value={email} 
                 onChange={(e) => setEmail(e.target.value)} 
               />
             </div>
 
-            <div className="relative group">
-              <label htmlFor="register-password" className="sr-only">Password</label>
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-snow/40 group-focus-within:text-aurora-green transition-colors" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="relative group">
+                <label htmlFor="register-password" className="sr-only">Password</label>
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                  <Lock className="h-4 w-4 text-snow/40 group-focus-within:text-aurora-green transition-colors" />
+                </div>
+                <input 
+                  id="register-password"
+                  name="password" 
+                  type={showPassword ? "text" : "password"} 
+                  autoComplete="new-password" 
+                  required 
+                  className="block w-full pl-10 pr-10 py-3 border border-white/10 rounded-xl bg-deep-night/40 text-snow placeholder-snow/40 focus:outline-none focus:ring-2 focus:ring-aurora-green/50 focus:border-transparent focus:bg-deep-night/60 transition-all text-xs sm:text-sm" 
+                  placeholder="Password" 
+                  value={password} 
+                  onChange={handlePasswordChange} 
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-snow/40 hover:text-snow transition-colors cursor-pointer outline-none"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
-              <input 
-                id="register-password"
-                name="password" 
-                type={showPassword ? "text" : "password"} 
-                autoComplete="new-password" 
-                required 
-                className="block w-full pl-11 pr-11 py-3.5 border border-white/10 rounded-xl bg-deep-night/40 text-snow placeholder-snow/40 focus:outline-none focus:ring-2 focus:ring-aurora-green/50 focus:border-transparent focus:bg-deep-night/60 transition-all sm:text-sm" 
-                placeholder="Password" 
-                value={password} 
-                onChange={handlePasswordChange} 
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-snow/40 hover:text-snow transition-colors cursor-pointer outline-none focus:text-aurora-green"
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
+
+              <div className="relative group">
+                <label htmlFor="register-confirm-password" className="sr-only">Confirm Password</label>
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                  <Lock className="h-4 w-4 text-snow/40 group-focus-within:text-aurora-green transition-colors" />
+                </div>
+                <input 
+                  id="register-confirm-password"
+                  name="confirmPassword" 
+                  type={showConfirmPassword ? "text" : "password"} 
+                  autoComplete="new-password" 
+                  required 
+                  className="block w-full pl-10 pr-10 py-3 border border-white/10 rounded-xl bg-deep-night/40 text-snow placeholder-snow/40 focus:outline-none focus:ring-2 focus:ring-aurora-green/50 focus:border-transparent focus:bg-deep-night/60 transition-all text-xs sm:text-sm" 
+                  placeholder="Confirm Password" 
+                  value={confirmPassword} 
+                  onChange={(e) => setConfirmPassword(e.target.value)} 
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-snow/40 hover:text-snow transition-colors cursor-pointer outline-none"
+                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                >
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
 
             {password.length > 0 && (
-              <div className="pt-1">
-                <div className="flex justify-between items-center mb-1.5 px-1">
-                  <span className="text-xs text-snow/60 font-medium tracking-wide">Strength</span>
-                  <span className={`text-[11px] uppercase tracking-wider font-bold ${
+              <div className="pt-0.5">
+                <div className="flex justify-between items-center mb-1 px-1">
+                  <span className="text-[11px] text-snow/60">Strength</span>
+                  <span className={`text-[10px] uppercase tracking-wider font-bold ${
                     passwordStrength.message === 'Weak' ? 'text-red-400' : 
                     passwordStrength.message === 'Medium' ? 'text-amber-400' : 'text-aurora-green'
                   }`}>
                     {passwordStrength.message}
                   </span>
                 </div>
-                <div className="w-full bg-deep-night/60 rounded-full h-1.5 flex gap-1 overflow-hidden">
-                  <div className={`h-1.5 rounded-full ${passwordStrength.score >= 1 ? (passwordStrength.message === 'Weak' ? 'bg-red-400' : passwordStrength.message === 'Medium' ? 'bg-amber-400' : 'bg-aurora-green') : 'bg-transparent'} w-1/3 transition-all duration-300`}></div>
-                  <div className={`h-1.5 rounded-full ${passwordStrength.score >= 3 ? (passwordStrength.message === 'Medium' ? 'bg-amber-400' : 'bg-aurora-green') : 'bg-transparent'} w-1/3 transition-all duration-300`}></div>
-                  <div className={`h-1.5 rounded-full ${passwordStrength.score >= 4 ? 'bg-aurora-green' : 'bg-transparent'} w-1/3 transition-all duration-300`}></div>
+                <div className="w-full bg-deep-night/60 rounded-full h-1 flex gap-1 overflow-hidden">
+                  <div className={`h-1 rounded-full ${passwordStrength.score >= 1 ? (passwordStrength.message === 'Weak' ? 'bg-red-400' : passwordStrength.message === 'Medium' ? 'bg-amber-400' : 'bg-aurora-green') : 'bg-transparent'} w-1/3 transition-all duration-300`}></div>
+                  <div className={`h-1 rounded-full ${passwordStrength.score >= 3 ? (passwordStrength.message === 'Medium' ? 'bg-amber-400' : 'bg-aurora-green') : 'bg-transparent'} w-1/3 transition-all duration-300`}></div>
+                  <div className={`h-1 rounded-full ${passwordStrength.score >= 4 ? 'bg-aurora-green' : 'bg-transparent'} w-1/3 transition-all duration-300`}></div>
                 </div>
               </div>
             )}
+          </div>
 
-            <div className="relative group mt-4">
-              <label htmlFor="register-confirm-password" className="sr-only">Confirm Password</label>
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-snow/40 group-focus-within:text-aurora-green transition-colors" />
+          {/* SECTION 2: PERSONAL INFORMATION */}
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center gap-2 pb-1 border-b border-white/10">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-snow/70">2. Personal Information</span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Gender Selector */}
+              <div>
+                <label htmlFor="register-gender" className="block text-[11px] font-semibold text-snow/70 mb-1">
+                  Gender
+                </label>
+                <select
+                  id="register-gender"
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value)}
+                  required
+                  className="block w-full px-3 py-2.5 border border-white/10 rounded-xl bg-deep-night/40 text-snow focus:outline-none focus:ring-2 focus:ring-aurora-green/50 focus:border-transparent transition-all text-xs sm:text-sm"
+                >
+                  <option value="" disabled className="bg-slate-900 text-snow/50">Select gender</option>
+                  {GENDER_OPTIONS.map((g) => (
+                    <option key={g} value={g} className="bg-slate-900 text-snow">
+                      {g}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Date of Birth */}
+              <div>
+                <label htmlFor="register-dob" className="block text-[11px] font-semibold text-snow/70 mb-1">
+                  Date of Birth
+                </label>
+                <div className="relative">
+                  <input
+                    id="register-dob"
+                    type="date"
+                    max={maxDobDate}
+                    min="1900-01-01"
+                    value={dateOfBirth}
+                    onChange={(e) => setDateOfBirth(e.target.value)}
+                    required
+                    className="block w-full px-3 py-2.5 border border-white/10 rounded-xl bg-deep-night/40 text-snow focus:outline-none focus:ring-2 focus:ring-aurora-green/50 focus:border-transparent transition-all text-xs sm:text-sm [color-scheme:dark]"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* SECTION 3: LOCATION */}
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center gap-2 pb-1 border-b border-white/10">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-snow/70">3. Location Details</span>
+            </div>
+
+            {/* Street Address */}
+            <div className="relative group">
+              <label htmlFor="register-address" className="sr-only">Street Address</label>
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                <MapPin className="h-4 w-4 text-snow/40 group-focus-within:text-aurora-green transition-colors" />
               </div>
               <input 
-                id="register-confirm-password"
-                name="confirmPassword" 
-                type={showConfirmPassword ? "text" : "password"} 
-                autoComplete="new-password" 
+                id="register-address"
+                name="address" 
+                type="text" 
+                autoComplete="street-address"
                 required 
-                className="block w-full pl-11 pr-11 py-3.5 border border-white/10 rounded-xl bg-deep-night/40 text-snow placeholder-snow/40 focus:outline-none focus:ring-2 focus:ring-aurora-green/50 focus:border-transparent focus:bg-deep-night/60 transition-all sm:text-sm" 
-                placeholder="Confirm Password" 
-                value={confirmPassword} 
-                onChange={(e) => setConfirmPassword(e.target.value)} 
+                className="block w-full pl-10 pr-3 py-2.5 border border-white/10 rounded-xl bg-deep-night/40 text-snow placeholder-snow/40 focus:outline-none focus:ring-2 focus:ring-aurora-green/50 focus:border-transparent focus:bg-deep-night/60 transition-all text-xs sm:text-sm" 
+                placeholder="Street Address (e.g., Karl Johans gate 1)" 
+                value={address} 
+                onChange={(e) => setAddress(e.target.value)} 
+                maxLength={100}
               />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-snow/40 hover:text-snow transition-colors cursor-pointer outline-none focus:text-aurora-green"
-                aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-              >
-                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* City / Postal Code */}
+              <div className="grid grid-cols-2 gap-2">
+                <input 
+                  id="register-city"
+                  name="city" 
+                  type="text" 
+                  autoComplete="address-level2"
+                  className="block w-full px-3 py-2.5 border border-white/10 rounded-xl bg-deep-night/40 text-snow placeholder-snow/40 focus:outline-none focus:ring-2 focus:ring-aurora-green/50 focus:border-transparent transition-all text-xs sm:text-sm" 
+                  placeholder="City" 
+                  value={city} 
+                  onChange={(e) => setCity(e.target.value)} 
+                />
+                <input 
+                  id="register-postal"
+                  name="postalCode" 
+                  type="text" 
+                  autoComplete="postal-code"
+                  className="block w-full px-3 py-2.5 border border-white/10 rounded-xl bg-deep-night/40 text-snow placeholder-snow/40 focus:outline-none focus:ring-2 focus:ring-aurora-green/50 focus:border-transparent transition-all text-xs sm:text-sm" 
+                  placeholder="Postal Code" 
+                  value={postalCode} 
+                  onChange={(e) => setPostalCode(e.target.value)} 
+                />
+              </div>
+
+              {/* Country Selector */}
+              <div>
+                <select
+                  id="register-country"
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  required
+                  className="block w-full px-3 py-2.5 border border-white/10 rounded-xl bg-deep-night/40 text-snow focus:outline-none focus:ring-2 focus:ring-aurora-green/50 focus:border-transparent transition-all text-xs sm:text-sm"
+                >
+                  {POPULAR_COUNTRIES.map((c) => (
+                    <option key={c.code} value={c.name} className="bg-slate-900 text-snow">
+                      {c.flag} {c.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
           
-          <div className="flex items-center mt-3 mb-2 px-1">
+          <div className="flex items-center pt-2">
             <input
               type="checkbox"
               id="isProvider"
@@ -410,7 +573,7 @@ export const Register = () => {
             disabled={loading} 
             className="group relative w-full flex justify-center items-center gap-2 py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-navy-900 bg-aurora-green hover:bg-green-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-navy-900 focus:ring-aurora-green transition-all disabled:opacity-70 shadow-[0_0_20px_rgba(0,255,135,0.3)] hover:shadow-[0_0_30px_rgba(0,255,135,0.5)] mt-4 cursor-pointer"
           >
-            {loading ? 'Creating Account...' : 'Create Account'}
+            {loading ? 'Creating Account...' : 'Complete Registration'}
             {!loading && <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
           </button>
 
@@ -424,12 +587,12 @@ export const Register = () => {
               </div>
             </div>
 
-            <div className="mt-5 grid grid-cols-2 gap-3">
+            <div className="mt-4">
               <button
                 type="button"
                 onClick={handleGoogleLogin}
                 disabled={loading || googleLoading}
-                className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-white/10 rounded-xl text-snow bg-deep-night/40 hover:bg-deep-night/80 hover:border-white/20 transition-all group cursor-pointer disabled:opacity-60"
+                className="w-full flex justify-center items-center gap-2.5 py-3 px-4 border border-white/10 rounded-xl text-snow bg-deep-night/40 hover:bg-deep-night/80 hover:border-white/20 transition-all group cursor-pointer disabled:opacity-60"
               >
                 {googleLoading ? (
                   <div className="h-4 w-4 border-2 border-aurora-green border-t-transparent rounded-full animate-spin" />
@@ -442,34 +605,26 @@ export const Register = () => {
                   </svg>
                 )}
                 <span className="text-xs font-semibold group-hover:text-white transition-colors">
-                  {googleLoading ? 'Connecting...' : 'Google'}
+                  {googleLoading ? 'Connecting...' : 'Continue with Google'}
                 </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate('/login', { state: { from: location.state?.from } })}
-                className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-white/10 rounded-xl text-snow bg-deep-night/40 hover:bg-deep-night/80 hover:border-white/20 transition-all group cursor-pointer"
-              >
-                <svg className="h-4 w-4 text-snow/60 group-hover:text-aurora-green transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg>
-                <span className="text-xs font-semibold group-hover:text-white transition-colors">Phone OTP</span>
               </button>
             </div>
           </div>
+
+          <div className="text-center pt-2">
+            <p className="text-xs text-snow/60">
+              Already have a Norway SmartLife account?{' '}
+              <Link 
+                to={`/login${rawRedirect ? `?returnTo=${encodeURIComponent(rawRedirect)}` : ''}`}
+                state={{ returnTo: rawRedirect }}
+                className="font-bold text-aurora-green hover:underline cursor-pointer"
+              >
+                Sign In
+              </Link>
+            </p>
+          </div>
         </form>
       )}
-      
-      <div className="mt-8 text-center text-sm text-snow/60 border-t border-white/10 pt-6">
-        Already have an account?{' '}
-        <Link 
-          to={`/login?returnTo=${encodeURIComponent(targetRedirect)}`} 
-          state={{ from: location.state?.from, returnTo: targetRedirect }} 
-          className="font-bold text-aurora-green hover:text-green-300 transition-colors"
-        >
-          Sign in
-        </Link>
-      </div>
     </AuthLayout>
   );
 };
