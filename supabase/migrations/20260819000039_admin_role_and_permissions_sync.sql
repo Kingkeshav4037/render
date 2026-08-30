@@ -1,5 +1,5 @@
--- Migration: Synchronize Admin & Super Admin Roles, Permissions, and RLS
--- Allows users set as SUPER_ADMIN or ADMIN in public.profiles to be recognized everywhere
+-- Migration: Synchronize Admin & Super Admin Roles, Permissions, and Non-Recursive RLS
+-- Fixes "infinite recursion detected in policy for relation profiles"
 
 -- 0. Ensure SUPER_ADMIN and other roles exist in the user_role enum if it is an enum type
 DO $$ BEGIN
@@ -13,23 +13,35 @@ EXCEPTION WHEN duplicate_object THEN NULL;
           WHEN undefined_object THEN NULL;
 END $$;
 
--- 1. Upgrade public.has_permission function to recognize profiles.role directly (using ::text cast)
+-- 1. Create a SECURITY DEFINER helper function to check admin status
+-- NOTE: SECURITY DEFINER functions bypass table RLS, preventing infinite recursion!
+CREATE OR REPLACE FUNCTION public.is_admin(p_user_id uuid)
+RETURNS boolean AS $$
+BEGIN
+    IF p_user_id IS NULL THEN
+        RETURN false;
+    END IF;
+    
+    RETURN EXISTS (
+        SELECT 1 FROM public.profiles
+        WHERE id = p_user_id
+        AND UPPER(REPLACE(COALESCE(role::text, ''), ' ', '_')) IN ('ADMIN', 'SUPER_ADMIN')
+    );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
+-- 2. Upgrade public.has_permission function to recognize admin roles directly
 CREATE OR REPLACE FUNCTION public.has_permission(p_user_id uuid, p_permission_name text)
 RETURNS boolean AS $$
 DECLARE
     v_has boolean;
-    v_role text;
 BEGIN
     IF p_user_id IS NULL THEN
         RETURN false;
     END IF;
 
-    -- Check if user is directly SUPER_ADMIN or ADMIN in public.profiles using role::text
-    SELECT UPPER(REPLACE(COALESCE(role::text, ''), ' ', '_')) INTO v_role
-    FROM public.profiles
-    WHERE id = p_user_id;
-
-    IF v_role IN ('SUPER_ADMIN', 'ADMIN') THEN
+    -- Admins and Super Admins have all permissions
+    IF public.is_admin(p_user_id) THEN
         RETURN true;
     END IF;
 
@@ -48,9 +60,9 @@ BEGIN
     
     RETURN COALESCE(v_has, false);
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
--- 2. Trigger function to auto-sync profiles.role into app_user_roles table
+-- 3. Trigger function to auto-sync profiles.role into app_user_roles table
 CREATE OR REPLACE FUNCTION public.sync_profile_role_to_app_roles()
 RETURNS trigger AS $$
 DECLARE
@@ -76,7 +88,7 @@ BEGIN
 
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 DROP TRIGGER IF EXISTS trg_sync_profile_role ON public.profiles;
 CREATE TRIGGER trg_sync_profile_role
@@ -84,28 +96,36 @@ CREATE TRIGGER trg_sync_profile_role
     FOR EACH ROW
     EXECUTE FUNCTION public.sync_profile_role_to_app_roles();
 
--- 3. Ensure RLS policies on public.profiles allow admins to view and manage all profiles
+-- 4. Clean up existing recursive/conflicting policies on public.profiles and replace with clean SECURITY DEFINER policies
 DO $$ BEGIN
+    -- Drop old recursive policies
     DROP POLICY IF EXISTS "Authorized admins can view all profiles" ON public.profiles;
-    CREATE POLICY "Authorized admins can view all profiles" ON public.profiles
+    DROP POLICY IF EXISTS "Authorized admins can update all profiles" ON public.profiles;
+    DROP POLICY IF EXISTS "Authorized users can view all profiles" ON public.profiles;
+    DROP POLICY IF EXISTS "Authorized users can manage all profiles" ON public.profiles;
+    DROP POLICY IF EXISTS "Admins can update all profiles" ON public.profiles;
+    DROP POLICY IF EXISTS "Users can view all profiles" ON public.profiles;
+    DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
+    DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
+    DROP POLICY IF EXISTS "Users can view own profile or admins view all" ON public.profiles;
+    DROP POLICY IF EXISTS "Users can update own profile or admins update all" ON public.profiles;
+    DROP POLICY IF EXISTS "Users can insert own profile" ON public.profiles;
+    DROP POLICY IF EXISTS "Users can insert own profile." ON public.profiles;
+
+    -- Create non-recursive policies using public.is_admin()
+    CREATE POLICY "Users can view own profile or admins view all" ON public.profiles
         FOR SELECT USING (
-            auth.uid() = id OR
-            EXISTS (
-                SELECT 1 FROM public.profiles p 
-                WHERE p.id = auth.uid() 
-                AND p.role::text IN ('ADMIN', 'SUPER_ADMIN')
-            )
+            auth.uid() = id OR public.is_admin(auth.uid())
         );
 
-    DROP POLICY IF EXISTS "Authorized admins can update all profiles" ON public.profiles;
-    CREATE POLICY "Authorized admins can update all profiles" ON public.profiles
+    CREATE POLICY "Users can update own profile or admins update all" ON public.profiles
         FOR UPDATE USING (
-            auth.uid() = id OR
-            EXISTS (
-                SELECT 1 FROM public.profiles p 
-                WHERE p.id = auth.uid() 
-                AND p.role::text IN ('ADMIN', 'SUPER_ADMIN')
-            )
+            auth.uid() = id OR public.is_admin(auth.uid())
+        );
+
+    CREATE POLICY "Users can insert own profile" ON public.profiles
+        FOR INSERT WITH CHECK (
+            auth.uid() = id
         );
 EXCEPTION WHEN undefined_table THEN NULL;
 END $$;
