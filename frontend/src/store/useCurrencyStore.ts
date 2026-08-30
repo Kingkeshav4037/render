@@ -27,10 +27,13 @@ const symbols: Record<Currency, string> = {
 export const useCurrencyStore = create<CurrencyState>((set, get) => ({
   currency: 'NOK',
   setCurrency: (currency) => set({ currency }),
-  formatPrice: (amountNOK: number) => {
+  formatPrice: (amountNOK: number = 0) => {
     const { currency } = get();
-    const rate = rates[currency];
-    const converted = amountNOK * rate;
-    return `${symbols[currency]}${converted.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+    const validCurrency = rates[currency] ? currency : 'NOK';
+    const rate = rates[validCurrency] ?? 1;
+    const safeAmount = typeof amountNOK === 'number' && !isNaN(amountNOK) ? amountNOK : 0;
+    const converted = safeAmount * rate;
+    const symbol = symbols[validCurrency] ?? 'kr ';
+    return `${symbol}${converted.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
   }
 }));

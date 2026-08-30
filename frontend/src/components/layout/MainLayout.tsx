@@ -5,7 +5,7 @@ import { CartDrawer } from '../commerce/CartDrawer';
 
 export const MainLayout = () => {
   return (
-    <div className="flex flex-col min-h-screen bg-snow selection:bg-arctic-gold/30">
+    <div className="flex flex-col min-h-screen bg-deep-night text-snow selection:bg-arctic-gold/30">
       <a href="#main-content" className="skip-to-content">
         Skip to main content
       </a>

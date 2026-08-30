@@ -76,24 +76,26 @@ export const Checkout = () => {
   };
 
 
-  if (items.length === 0) {
+  const safeItems = items || [];
+
+  if (safeItems.length === 0) {
     return (
-      <div className="min-h-screen bg-deep-night flex items-center justify-center p-6 text-center">
-        <div className="max-w-md w-full bg-midnight border border-white/10 p-10 rounded-3xl shadow-2xl">
-          <div className="w-20 h-20 rounded-full bg-white/5 text-arctic-gold border border-white/10 flex items-center justify-center mx-auto mb-6">
+      <div className="min-h-screen bg-slate-950 text-white pt-32 pb-24 flex items-center justify-center p-6 text-center font-sans">
+        <div className="max-w-md w-full bg-slate-900 border border-slate-800 p-10 rounded-3xl shadow-2xl">
+          <div className="w-20 h-20 rounded-full bg-amber-400/10 text-amber-400 border border-amber-400/20 flex items-center justify-center mx-auto mb-6">
             <ShoppingBag size={36} />
           </div>
           
-          <h2 className="text-2xl font-display font-bold text-snow mb-3">
+          <h2 className="text-2xl font-display font-bold text-white mb-3">
             Your Cart is Empty
           </h2>
-          <p className="text-sm font-sans text-snow/70 leading-relaxed mb-8">
+          <p className="text-sm font-sans text-slate-400 leading-relaxed mb-8">
             You don't have any items or reservations in your cart to checkout yet. Explore our curated stays and experiences to get started!
           </p>
 
           <button
             onClick={() => navigate('/explore')}
-            className="w-full py-4 px-6 bg-arctic-gold text-deep-night font-bold uppercase tracking-wider text-xs rounded-xl hover:bg-snow transition-all shadow-lg cursor-pointer"
+            className="w-full py-4 px-6 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold uppercase tracking-wider text-xs rounded-xl transition-all shadow-lg cursor-pointer"
           >
             Explore Norway Experiences
           </button>
@@ -102,9 +104,9 @@ export const Checkout = () => {
     );
   }
 
-  const subtotal = getCartTotal();
+  const subtotal = typeof getCartTotal === 'function' ? (getCartTotal() || 0) : 0;
   const tax = subtotal * 0.25; // 25% VAT
-  const serviceFee = 450;
+  const serviceFee = subtotal > 0 ? 450 : 0;
   
   let addonsTotal = 0;
   if (addInsurance) addonsTotal += 350;
@@ -129,7 +131,7 @@ export const Checkout = () => {
       return;
     }
 
-    // ISSUE-011: Validate Razorpay key before doing anything
+    // Validate Razorpay key before doing anything
     const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
     if (!razorpayKey) {
       toast.error('Payment is not configured. Please contact support.');
@@ -143,8 +145,6 @@ export const Checkout = () => {
     isSubmittingRef.current = true;
     setProcessing(true);
 
-    // ISSUE-020: Load Razorpay SDK *before* creating the order
-    // — prevents phantom orders if the SDK fails to load
     const sdkLoaded = await loadRazorpayScript();
     if (!sdkLoaded) {
       isSubmittingRef.current = false;
@@ -158,7 +158,7 @@ export const Checkout = () => {
     try {
       // 1. Create or Reuse Pending Order
       if (!orderId) {
-        orderId = await checkoutService.processCheckout(user.id, items, 'NOK');
+        orderId = await checkoutService.processCheckout(user.id, safeItems, 'NOK');
         setPendingOrderId(orderId);
       }
       
@@ -170,7 +170,6 @@ export const Checkout = () => {
           gatewayOrderId = paymentIntent.clientSecret || paymentIntent.paymentOrder.gateway_order_id;
         }
       } catch (err) {
-        // Edge function may not be deployed yet — continue with client-only flow
         console.warn('Edge Function create-payment notice:', err);
       }
 
@@ -195,7 +194,6 @@ export const Checkout = () => {
             setProcessing(true);
             toast.loading('Verifying payment signature with secure server...', { id: 'payment-verifying' });
             
-            // Step 6: Server-side verification of payment signature
             if (response.razorpay_signature && response.razorpay_payment_id) {
               const verifyRes = await checkoutService.verifyPayment({
                 orderId: orderId,
@@ -210,7 +208,6 @@ export const Checkout = () => {
             }
 
             toast.success('Payment completed and verified successfully!', { id: 'payment-verifying' });
-            // Step 8: Only clear cart on verified success
             clearCart();
             isSubmittingRef.current = false;
             setProcessing(false);
@@ -229,7 +226,7 @@ export const Checkout = () => {
           email: user?.email || '',
         },
         theme: {
-          color: '#0F172A' // midnight navy
+          color: '#0F172A'
         }
       };
 
@@ -257,21 +254,6 @@ export const Checkout = () => {
       }
     }
   };
-
-
-  if (items.length === 0) {
-    return (
-      <div className="min-h-screen bg-deep-night text-snow pt-32 pb-24 flex items-center justify-center p-4 font-sans">
-        <div className="bg-midnight p-12 text-center max-w-md w-full border border-white/10 shadow-xl">
-          <h2 className="text-3xl font-display font-black text-snow mb-4">Cart is Empty</h2>
-          <p className="text-snow/60 mb-8 font-medium">You need items in your itinerary to checkout.</p>
-          <button onClick={() => navigate('/explore')} className="w-full py-4 bg-arctic-gold text-deep-night font-bold uppercase tracking-widest text-sm hover:bg-snow transition-colors">
-            Return to Shop
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-deep-night text-snow pt-32 pb-24 px-4 sm:px-6 lg:px-8 font-sans selection:bg-arctic-gold/20">
@@ -313,49 +295,49 @@ export const Checkout = () => {
                     </div>
                   )}
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label htmlFor="checkout-first-name" className="block text-[10px] font-bold text-snow/50 uppercase tracking-widest mb-2">First Name *</label>
+                      <label htmlFor="checkout-first-name" className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">First Name *</label>
                       <input 
                         id="checkout-first-name" 
                         type="text" 
                         value={firstName} 
                         onChange={(e) => setFirstName(e.target.value)} 
                         placeholder="First name"
-                        className="w-full p-4 border border-white/10 bg-white/5 focus:bg-white/10 focus:border-arctic-gold outline-none transition-colors font-medium text-snow placeholder:text-snow/30" 
+                        className="w-full p-4 border border-slate-700 bg-slate-900/90 rounded-xl focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-colors font-medium text-white placeholder:text-slate-500" 
                       />
                     </div>
                     <div>
-                      <label htmlFor="checkout-last-name" className="block text-[10px] font-bold text-snow/50 uppercase tracking-widest mb-2">Last Name</label>
+                      <label htmlFor="checkout-last-name" className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Last Name</label>
                       <input 
                         id="checkout-last-name" 
                         type="text" 
                         value={lastName} 
                         onChange={(e) => setLastName(e.target.value)} 
                         placeholder="Last name"
-                        className="w-full p-4 border border-white/10 bg-white/5 focus:bg-white/10 focus:border-arctic-gold outline-none transition-colors font-medium text-snow placeholder:text-snow/30" 
+                        className="w-full p-4 border border-slate-700 bg-slate-900/90 rounded-xl focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-colors font-medium text-white placeholder:text-slate-500" 
                       />
                     </div>
                     <div>
-                      <label htmlFor="checkout-email" className="block text-[10px] font-bold text-snow/50 uppercase tracking-widest mb-2">Email Address *</label>
+                      <label htmlFor="checkout-email" className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Email Address *</label>
                       <input 
                         id="checkout-email" 
                         type="email" 
                         value={email} 
                         onChange={(e) => setEmail(e.target.value)} 
                         placeholder="name@example.com"
-                        className="w-full p-4 border border-white/10 bg-white/5 focus:bg-white/10 focus:border-arctic-gold outline-none transition-colors font-medium text-snow placeholder:text-snow/30" 
+                        className="w-full p-4 border border-slate-700 bg-slate-900/90 rounded-xl focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-colors font-medium text-white placeholder:text-slate-500" 
                       />
                     </div>
                     <div>
-                      <label htmlFor="checkout-phone" className="block text-[10px] font-bold text-snow/50 uppercase tracking-widest mb-2">Phone Number</label>
+                      <label htmlFor="checkout-phone" className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Phone Number</label>
                       <input 
                         id="checkout-phone" 
                         type="tel" 
                         value={phone} 
                         onChange={(e) => setPhone(e.target.value)} 
                         placeholder="+47 000 00 000"
-                        className="w-full p-4 border border-white/10 bg-white/5 focus:bg-white/10 focus:border-arctic-gold outline-none transition-colors font-medium text-snow placeholder:text-snow/30" 
+                        className="w-full p-4 border border-slate-700 bg-slate-900/90 rounded-xl focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-colors font-medium text-white placeholder:text-slate-500" 
                       />
                     </div>
                   </div>
