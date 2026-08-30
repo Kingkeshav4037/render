@@ -1,7 +1,7 @@
 # Norway SmartLife - Production QA & Test Results
 
 | Test Suite | Type | Status | Notes |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Static Analysis | TypeScript (`tsc -b`) | ✅ Passed | 0 type errors across all modules |
 | Runtime Verification | ESM Import Fix | ✅ Fixed | `App.tsx` NotFound component updated from CJS require to ESM `Link` |
 | Environment Hardening | ML API Configuration | ✅ Hardened | `services/api.ts` gracefully handles omitted `VITE_API_URL` without crashing initial app bundle |
