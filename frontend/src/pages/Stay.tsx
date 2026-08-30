@@ -113,6 +113,7 @@ export const Stay = () => {
         title="Stays & Accommodations"
         description="Find the perfect place to stay in Norway, from cozy fjord cabins to luxury eco-lodges."
         breadcrumb="Hospitality"
+        backgroundImage="/images/hotel_juvet_1787013813000.jpg"
       />
       
       {/* Search Bar */}

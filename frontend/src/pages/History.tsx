@@ -43,16 +43,20 @@ const TIMELINE_ERAS = [
 ];
 
 const getPlaceholderImage = (name: string) => {
-  const genericImages = [
-    '/images/fjords_1786935800026.jpg', '/images/trolltunga_1786936111320.jpg', 
-    '/images/ryten_1786936427556.jpg', '/images/besseggen_1786936349992.jpg',
-  ];
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  const n = name.toLowerCase();
+  if (n.includes('stave') || n.includes('church') || n.includes('kirke')) {
+    return 'https://images.unsplash.com/photo-1548625361-195feee1361c?q=stave+church+norway&w=1200';
   }
-  const index = Math.abs(hash) % genericImages.length;
-  return genericImages[index];
+  if (n.includes('viking') || n.includes('ship') || n.includes('kaupang')) {
+    return 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=viking+heritage+norway&w=1200';
+  }
+  if (n.includes('bryggen') || n.includes('hanseatic') || n.includes('bergen')) {
+    return 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=bryggen+bergen+norway&w=1200';
+  }
+  if (n.includes('polar') || n.includes('fram') || n.includes('amundsen') || n.includes('tromsø')) {
+    return 'https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?q=polar+exploration+norway&w=1200';
+  }
+  return 'https://images.unsplash.com/photo-1548625361-195feee1361c?q=norway+heritage+museum&w=1200';
 };
 
 export const History = () => {
@@ -76,7 +80,7 @@ export const History = () => {
         title="Norwegian History & Heritage"
         description="Step back in time to the era of Vikings, explore medieval stave churches, and uncover the rich cultural tapestry of Norway."
         breadcrumb="History"
-        backgroundImage="/images/besseggen_1786936349992.jpg"
+        backgroundImage="https://images.unsplash.com/photo-1548625361-195feee1361c?q=stave+church+norway+history&w=1600"
       >
         <div className="flex flex-wrap items-center gap-6 mt-8">
           <div className="flex items-center gap-2 text-snow/70">

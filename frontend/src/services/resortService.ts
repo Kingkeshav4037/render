@@ -55,7 +55,7 @@ export const resortService = {
       snow_depth_cm: estimatedSnowDepth,
       status: resortStatus,
       current_temp: estimatedTemp,
-      image: heroImage || firstImage || '/images/placeholder.jpg'
+      image: heroImage || firstImage || '/images/galdhopiggen_1786936412055.jpg'
     };
   }
 };

@@ -25,7 +25,7 @@ const FJORD_HIGHLIGHTS = [
     badge: "UNESCO World Heritage",
     region: "Sogn / Western Norway",
     description: "The narrowest branch of the Sognefjord, with towering 1,700m peaks pressing right against the tranquil shoreline.",
-    image: "/images/besseggen_1786936349992.jpg",
+    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=naeroyfjord+norway&w=1200",
     slug: "flam",
     tags: ["Electric Catamaran", "Flåm Railway", "Scenic Inlets"]
   },
@@ -34,7 +34,7 @@ const FJORD_HIGHLIGHTS = [
     badge: "Orchard & Glacier Fjord",
     region: "Vestland",
     description: "Norway's second longest fjord, famed for spring fruit blossoms, Folgefonna glacier, and the Vøringsfossen waterfall.",
-    image: "/images/trolltunga_1786936111320.jpg",
+    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=hardangerfjord+norway&w=1200",
     slug: "hardangerfjord",
     tags: ["Cider Route", "Glaciers", "Trolltunga Access"]
   },

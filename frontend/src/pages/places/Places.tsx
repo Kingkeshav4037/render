@@ -25,7 +25,7 @@ const FEATURED_PLACES = [
     category: "UNESCO Stave Church",
     region: "Telemark / Eastern Norway",
     description: "Norway's largest triple-nave wooden stave church, built in the early 13th century and steeped in medieval legend.",
-    image: "/images/besseggen_1786936349992.jpg",
+    image: "https://images.unsplash.com/photo-1548625361-195feee1361c?q=heddal+stave+church+norway&w=1200",
     slug: "heddal-stave-church",
     tags: ["Medieval", "Architecture", "13th Century"]
   },
@@ -43,24 +43,27 @@ const FEATURED_PLACES = [
     category: "Architectural Landmark",
     region: "Tromsø / Northern Norway",
     description: "Ishavskatedralen's striking triangular glacier-inspired modernist structure illuminated under polar nights.",
-    image: "/images/ryten_1786936427556.jpg",
+    image: "https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?q=arctic+cathedral+tromso&w=1200",
     slug: "tromso",
     tags: ["Modernist", "Arctic", "Midnight Sun"]
   }
 ];
 
 const getPlaceholderImage = (name: string) => {
-  const genericImages = [
-    '/images/besseggen_1786936349992.jpg', '/images/kjeragbolten_1786936275605.jpg',
-    '/images/trolltunga_1786936111320.jpg', '/images/ryten_1786936427556.jpg',
-    '/images/fjords_1786935800026.jpg'
-  ];
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  const n = name.toLowerCase();
+  if (n.includes('church') || n.includes('stave') || n.includes('kirke')) {
+    return 'https://images.unsplash.com/photo-1548625361-195feee1361c?q=stave+church+norway&w=1200';
   }
-  const index = Math.abs(hash) % genericImages.length;
-  return genericImages[index];
+  if (n.includes('cathedral') || n.includes('ishavskatedralen') || n.includes('nidaros')) {
+    return 'https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?q=arctic+cathedral+tromso&w=1200';
+  }
+  if (n.includes('viewpoint') || n.includes('stegastein') || n.includes('flydalsjuvet') || n.includes('fjord')) {
+    return '/images/fjords_1786935800026.jpg';
+  }
+  if (n.includes('museum') || n.includes('munch') || n.includes('opera') || n.includes('oslo')) {
+    return '/images/login_background_1786937688053.jpg';
+  }
+  return '/images/preikestolen_1786936002797.jpg';
 };
 
 export const Places = () => {

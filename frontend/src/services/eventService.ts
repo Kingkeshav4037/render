@@ -27,7 +27,7 @@ export const FALLBACK_EVENTS: Event[] = [
     end_date: '2026-06-21T02:00:00Z',
     ticket_price: 850,
     currency: 'NOK',
-    image_url: '/images/northern_lights_1786935879330.jpg',
+    image_url: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?q=80&w=1200',
     featured: true,
     lat: 69.6492,
     lng: 18.9553
@@ -42,7 +42,7 @@ export const FALLBACK_EVENTS: Event[] = [
     end_date: '2026-06-10T22:00:00Z',
     ticket_price: 650,
     currency: 'NOK',
-    image_url: '/images/trolltunga_1786936111320.jpg',
+    image_url: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=1200',
     featured: true,
     lat: 60.3913,
     lng: 5.3221
@@ -57,7 +57,7 @@ export const FALLBACK_EVENTS: Event[] = [
     end_date: '2027-01-24T23:00:00Z',
     ticket_price: 350,
     currency: 'NOK',
-    image_url: '/images/aurora_1786935879330.jpg',
+    image_url: 'https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?q=tromso+winter+arctic&w=1200',
     featured: true,
     lat: 69.6492,
     lng: 18.9553
@@ -72,7 +72,7 @@ export const FALLBACK_EVENTS: Event[] = [
     end_date: '2027-03-08T18:00:00Z',
     ticket_price: 490,
     currency: 'NOK',
-    image_url: '/images/besseggen_1786936349992.jpg',
+    image_url: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=holmenkollen+ski+jumping+oslo&w=1200',
     featured: true,
     lat: 59.9639,
     lng: 10.6672

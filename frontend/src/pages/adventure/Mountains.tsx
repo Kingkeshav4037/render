@@ -22,7 +22,7 @@ const MOUNTAIN_RANGES = [
     elevation: "1,700 m max",
     peaks: "Jagged Alpine Needles",
     description: "Dramatic pinnacles rising straight out of the Hjørundfjord, world-famous for mountaineering and summit ski-touring.",
-    image: "/images/besseggen_1786936349992.jpg",
+    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=sunnmore+alps+norway&w=1200",
     trailLink: "/trails"
   },
   {
@@ -40,7 +40,7 @@ const MOUNTAIN_RANGES = [
     elevation: "2,178 m max",
     peaks: "10 peaks over 2,000m",
     description: "Ancient rounded alpine massifs, vast lichen-covered valleys, and home to Norway's last wild reindeer herds.",
-    image: "/images/kjeragbolten_1786936275605.jpg",
+    image: "https://images.unsplash.com/photo-1519451241324-20b4ea2c4220?q=rondane+national+park+norway&w=1200",
     trailLink: "/trails"
   }
 ];
@@ -87,7 +87,7 @@ const TOP_SUMMITS = [
     elevation: "448 m",
     range: "Lofoten",
     difficulty: "Steep Stairs (1,560 Steps)",
-    image: "/images/ryten_1786936427556.jpg",
+    image: "/images/lofoten_1787013505867.jpg",
     description: "A steep stone staircase hike rewarding climbers with the most iconic 360-degree panorama of the Lofoten Wall.",
     trailId: "tr-006"
   },

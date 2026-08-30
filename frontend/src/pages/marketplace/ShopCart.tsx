@@ -128,7 +128,7 @@ export const ShopCart: React.FC = () => {
                   {/* Thumbnail */}
                   <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden bg-black shrink-0 border border-white/10">
                     <OptimizedImage
-                      src={item.image || '/images/placeholder.jpg'}
+                      src={item.image || '/images/product_charger_1786938528191.jpg'}
                       alt={item.name}
                       category="product"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

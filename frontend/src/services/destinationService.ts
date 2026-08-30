@@ -64,7 +64,7 @@ export const FALLBACK_DESTINATIONS: LocationDestination[] = [
     lng: 13.9312,
     source_type: 'SYSTEM',
     seo_title: 'Lofoten Islands — Majestic Arctic Archipelago | Norway SmartLife',
-    hero_image_url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=lofoten+islands+norway&w=1440'
+    hero_image_url: '/images/lofoten_1787013505867.jpg'
   },
   {
     id: 'loc-bergen',

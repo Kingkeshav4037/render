@@ -12,8 +12,8 @@ const WINTER_CATEGORIES = [
   { id: 'cross-country', title: 'Cross-Country', desc: 'Endless miles of prepared pine forest tracks', img: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&q=80&w=800' },
   { id: 'snowboarding', title: 'Snowboarding', desc: 'Terrain parks and backcountry powder', img: 'https://images.unsplash.com/photo-1528722828814-77b9b83aafb2?auto=format&fit=crop&q=80&w=800' },
   { id: 'snowshoeing', title: 'Snowshoeing', desc: 'Quiet walks through winter taiga forests', img: 'https://images.unsplash.com/photo-1516715094483-75da7dee9758?auto=format&fit=crop&q=80&w=800' },
-  { id: 'dog-sledding', title: 'Dog Sledding', desc: 'Husky teams racing across the Arctic tundra', img: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&q=80&w=800' },
-  { id: 'snowmobiling', title: 'Snowmobiling', desc: 'High-speed Arctic wilderness exploration', img: 'https://images.unsplash.com/photo-1543852786-1cf6624b9987?auto=format&fit=crop&q=80&w=800' },
+  { id: 'dog-sledding', title: 'Dog Sledding', desc: 'Husky teams racing across the Arctic tundra', img: 'https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?q=husky+sledding+arctic+norway&w=800' },
+  { id: 'snowmobiling', title: 'Snowmobiling', desc: 'High-speed Arctic wilderness exploration', img: 'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?q=snowmobile+arctic+norway&w=800' },
   { id: 'ice-fishing', title: 'Ice Fishing', desc: 'Patience and tranquility on frozen mountain lakes', img: 'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&q=80&w=800' },
 ];
 

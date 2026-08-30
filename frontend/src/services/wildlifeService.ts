@@ -142,10 +142,12 @@ export const wildlifeService = {
           related_locations = locs || [];
         }
 
-        let primary_image = '/images/placeholder.jpg';
+        let primary_image = getWildlifeImage(wildlife.slug, wildlife.common_name);
         if (media && media.length > 0) {
           const primary = media.find(m => m.sort_order === 0 || m.sort_order === 1) || media[0];
-          primary_image = primary.media_url;
+          if (primary.media_url && !primary.media_url.includes('placeholder')) {
+            primary_image = primary.media_url;
+          }
         }
 
         return formatSpecies({ 

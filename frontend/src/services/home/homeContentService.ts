@@ -17,11 +17,11 @@ export const ACTIVITY_CATEGORY_IMAGES: Record<string, string> = {
   HIKING:    '/images/preikestolen_1786936002797.jpg',
   AURORA:    '/images/northern_lights_1786935879330.jpg',
   KAYAK:     '/images/fjords_1786935800026.jpg',
-  WILDLIFE:  '/images/lofoten_1787013505867.jpg',
-  CRUISE:    '/images/besseggen_1786936349992.jpg',
+  WILDLIFE:  '/images/wildlife_reindeer_1787013667019.jpg',
+  CRUISE:    '/images/fjords_1786935800026.jpg',
   CLIMBING:  '/images/kjeragbolten_1786936275605.jpg',
   MOUNTAIN:  '/images/galdhopiggen_1786936412055.jpg',
-  SKIING:    '/images/trolltunga_1786936111320.jpg',
+  SKIING:    '/images/galdhopiggen_1786936412055.jpg',
   DEFAULT:   '/images/fjords_1786935800026.jpg',
 };
 

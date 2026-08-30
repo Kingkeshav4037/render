@@ -18,7 +18,7 @@ export type ImageCategory =
 const CATEGORY_FALLBACKS: Record<ImageCategory, string> = {
   landscape: '/images/fjords.jpg',
   wildlife: '/images/reindeer.jpg',
-  flora: '/images/placeholder.jpg',
+  flora: 'https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?q=cloudberries+flora+norway&w=800',
   food: '/images/salmon.jpg',
   stay: '/images/juvet.jpg',
   trail: '/images/besseggen.jpg',
@@ -26,7 +26,7 @@ const CATEGORY_FALLBACKS: Record<ImageCategory, string> = {
   aurora: '/images/northern_lights.jpg',
   product: '/images/product_charger.jpg',
   infra: '/images/infra_windfarm.jpg',
-  activity: '/images/besseggen.jpg',
+  activity: '/images/preikestolen.jpg',
   default: '/images/fjords.jpg'
 };
 
