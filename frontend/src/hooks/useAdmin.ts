@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '../store/useAuthStore';
 import { useProfile } from './useProfile';
 import { adminService, AdminPermissions } from '../services/admin/adminService';
+import { normalizeRole } from '../types/profile';
 
 // Determine if the base application role is considered staff/admin
 const STAFF_ROLES = ['SUPER_ADMIN', 'ADMIN', 'MODERATOR', 'DATA_MANAGER'];
@@ -10,7 +11,7 @@ export const useAdmin = () => {
   const { user } = useAuthStore();
   const { data: profile } = useProfile(user?.id);
 
-  const appRole = profile?.role || 'USER';
+  const appRole = normalizeRole(profile?.role);
   const isStaff = STAFF_ROLES.includes(appRole);
 
   const { data: permissions, isLoading } = useQuery({

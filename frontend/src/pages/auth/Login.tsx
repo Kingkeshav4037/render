@@ -277,6 +277,7 @@ export const Login = () => {
       toast.success('Signed in successfully. Welcome back!');
 
       if (loggedInUser) {
+        await useAuthStore.getState().refreshProfile();
         const profile = await profileService.getProfile(loggedInUser.id);
         if (!isProfileComplete(profile)) {
           navigate(`/complete-profile?returnTo=${encodeURIComponent(targetRedirect)}`, { replace: true });

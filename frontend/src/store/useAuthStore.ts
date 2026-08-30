@@ -1,9 +1,12 @@
 import { create } from 'zustand';
-import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { profileService, type UserProfileWithPermissions, type AppRole } from '../services/profile/profileService';
+import type { User } from '@supabase/supabase-js';
+import { profileService, type UserProfileWithPermissions } from '../services/profile/profileService';
+import type { AppRole } from '../types/profile';
+import { normalizeRole } from '../types/profile';
 
-export type { AppRole } from '../services/profile/profileService';
+export type { AppRole };
+
 interface AuthState {
   user: User | null;
   profile: UserProfileWithPermissions | null;
@@ -34,8 +37,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   setUser: (user) => set({ user, loading: false }),
   hasPermission: (permission) => {
     const state = get();
+    const role = normalizeRole(state.profile?.role);
     // Super admins and admins have global admin permissions in frontend checks
-    if (state.profile?.role === 'SUPER_ADMIN' || state.profile?.role === 'ADMIN') return true;
+    if (state.isAdmin || role === 'SUPER_ADMIN' || role === 'ADMIN') return true;
     return state.permissions.includes(permission);
   },
   signOut: async () => {
@@ -47,7 +51,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (!currentUser) return null;
     const profile = await profileService.getProfile(currentUser.id);
     if (profile) {
-      const role = profile.role as AppRole | undefined;
+      const role = normalizeRole(profile.role);
+      profile.role = role;
       const isAdmin = role === 'SUPER_ADMIN' || role === 'ADMIN';
       const isProvider = role === 'PROVIDER';
       const isAnalyst = role === 'ANALYST';
@@ -67,6 +72,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       let profile = await profileService.getProfile(user.id);
       
       if (!profile) {
+        const metadataRole = normalizeRole(user.user_metadata?.role);
         profile = {
           id: user.id,
           email: email,
@@ -74,7 +80,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           avatarUrl: user.user_metadata?.avatar_url || user.user_metadata?.picture,
           phone: user.phone || undefined,
           phoneVerified: !!user.phone || !!user.phone_confirmed_at,
-          role: (user.user_metadata?.role as AppRole) || 'USER',
+          role: metadataRole,
           country: user.user_metadata?.country || 'Norway',
           city: user.user_metadata?.city || 'Oslo',
           address: user.user_metadata?.address || undefined,
@@ -96,7 +102,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         }
       }
       
-      const role = profile?.role as AppRole | undefined;
+      const role = normalizeRole(profile?.role);
+      if (profile) profile.role = role;
       const isAdmin = role === 'SUPER_ADMIN' || role === 'ADMIN';
       const isProvider = role === 'PROVIDER';
       const isAnalyst = role === 'ANALYST';

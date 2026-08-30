@@ -1,10 +1,9 @@
 import React from 'react';
-import { Navigate, Outlet, useLocation, Link } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
-import type { AppRole } from '../../store/useAuthStore';
+import type { AppRole } from '../../types/profile';
+import { normalizeRole } from '../../types/profile';
 import { LoadingState } from '../ui/LoadingState';
-import { ShieldAlert, Home, LogIn } from 'lucide-react';
-import { Button } from '../ui/Button';
 
 interface RoleGuardProps {
   allowedRoles: AppRole[];
@@ -17,7 +16,7 @@ export const RoleGuard: React.FC<RoleGuardProps> = ({
   redirectPath = '/home',
   children
 }) => {
-  const { profile, loading, user } = useAuthStore();
+  const { profile, loading, user, isAdmin } = useAuthStore();
   const location = useLocation();
 
   if (loading) {
@@ -31,11 +30,16 @@ export const RoleGuard: React.FC<RoleGuardProps> = ({
   }
 
   if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    const loginTarget = redirectPath.includes('admin') ? '/admin/login' : '/login';
+    return <Navigate to={loginTarget} state={{ from: location, returnTo: location.pathname }} replace />;
   }
 
-  if (!profile || !allowedRoles.includes(profile.role as AppRole)) {
-    return <Navigate to={redirectPath} state={{ from: location }} replace />;
+  const userRole = normalizeRole(profile?.role);
+  const isAllowedAdmin = (allowedRoles.includes('ADMIN') || allowedRoles.includes('SUPER_ADMIN')) && (userRole === 'SUPER_ADMIN' || userRole === 'ADMIN' || isAdmin);
+  const isAllowedRole = allowedRoles.includes(userRole) || isAllowedAdmin;
+
+  if (!profile || !isAllowedRole) {
+    return <Navigate to={redirectPath} state={{ from: location, unauthorized: true }} replace />;
   }
 
   return children ? <>{children}</> : <Outlet />;

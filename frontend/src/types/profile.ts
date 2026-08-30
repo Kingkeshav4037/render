@@ -4,6 +4,24 @@
 // in the service layer.
 // ─────────────────────────────────────────────────────────────────────
 
+export type AppRole = 'SUPER_ADMIN' | 'ADMIN' | 'MODERATOR' | 'PROVIDER' | 'USER' | 'DATA_MANAGER' | 'ANALYST';
+
+/**
+ * Normalizes raw role strings from Supabase (e.g. 'super admin', 'Super Admin', 'super_admin', 'ADMIN')
+ * to standard canonical AppRole values.
+ */
+export function normalizeRole(rawRole?: string | null): AppRole {
+  if (!rawRole) return 'USER';
+  const clean = String(rawRole).trim().toUpperCase().replace(/[\s-]+/g, '_');
+  if (clean === 'SUPER_ADMIN' || clean === 'SUPERADMIN' || clean === 'SUPER_ADMINISTRATOR') return 'SUPER_ADMIN';
+  if (clean === 'ADMIN' || clean === 'ADMINISTRATOR') return 'ADMIN';
+  if (clean === 'MODERATOR') return 'MODERATOR';
+  if (clean === 'PROVIDER') return 'PROVIDER';
+  if (clean === 'ANALYST') return 'ANALYST';
+  if (clean === 'DATA_MANAGER' || clean === 'DATAMANAGER') return 'DATA_MANAGER';
+  return 'USER';
+}
+
 export interface UserProfile {
   id: string;
   email: string;

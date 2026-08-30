@@ -1,9 +1,9 @@
 // @ts-nocheck
 import { supabase } from '../../lib/supabase';
-import type { UserProfile } from '../../types/profile';
-import { PROFILE_COMPLETION_WEIGHTS } from '../../types/profile';
+import type { UserProfile, AppRole } from '../../types/profile';
+import { normalizeRole, PROFILE_COMPLETION_WEIGHTS } from '../../types/profile';
 
-export type AppRole = 'SUPER_ADMIN' | 'ADMIN' | 'MODERATOR' | 'PROVIDER' | 'USER' | 'DATA_MANAGER' | 'ANALYST';
+export type { AppRole };
 
 export interface UserProfileWithPermissions extends UserProfile {
   permissions?: string[];
@@ -24,6 +24,8 @@ export const profileService = {
         return null;
       }
 
+      const normalizedRole = normalizeRole(data.role);
+
       // Fetch profile
       const profileData: UserProfileWithPermissions = {
         id: data.id,
@@ -39,15 +41,27 @@ export const profileService = {
         dateOfBirth: data.date_of_birth || undefined,
         gender: data.gender || undefined,
         preferredLanguage: data.preferred_language || 'en',
-        role: data.role || 'USER',
+        role: normalizedRole,
         permissions: [] as string[]
       };
+
+      // If user is SUPER_ADMIN or ADMIN, grant global permissions automatically
+      if (normalizedRole === 'SUPER_ADMIN' || normalizedRole === 'ADMIN') {
+        profileData.permissions = [
+          'users.read', 'users.manage',
+          'orders.read', 'orders.manage',
+          'bookings.read', 'bookings.manage',
+          'cms.read', 'cms.manage',
+          'system.manage', 'analytics.read'
+        ];
+      }
 
       // Attempt to fetch granular permissions from Phase 10 RBAC tables
       try {
         const { data: perms } = await supabase.rpc('get_user_permissions', { p_user_id: userId });
         if (perms && Array.isArray(perms)) {
-          profileData.permissions = perms.map((p: any) => p.name);
+          const rbacPerms = perms.map((p: any) => p.name);
+          profileData.permissions = Array.from(new Set([...(profileData.permissions || []), ...rbacPerms]));
         }
       } catch {
         // RBAC permissions optional or gracefully omitted
