@@ -42,21 +42,53 @@ const TIMELINE_ERAS = [
   }
 ];
 
-const getPlaceholderImage = (name: string) => {
-  const n = name.toLowerCase();
-  if (n.includes('stave') || n.includes('church') || n.includes('kirke')) {
-    return 'https://images.unsplash.com/photo-1548625361-195feee1361c?q=stave+church+norway&w=1200';
+const getHistoricalImage = (name: string, currentUrl?: string | null) => {
+  const n = (name || '').toLowerCase();
+  if (n.includes('viking') || n.includes('oseberg') || n.includes('gokstad') || n.includes('ship museum')) {
+    return 'https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1200';
   }
-  if (n.includes('viking') || n.includes('ship') || n.includes('kaupang')) {
-    return 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=viking+heritage+norway&w=1200';
+  if (n.includes('munch')) {
+    return 'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?q=80&w=1200';
+  }
+  if (n.includes('fram') || n.includes('polar') || n.includes('amundsen') || n.includes('nansen')) {
+    return 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=1200';
+  }
+  if (n.includes('stave') || n.includes('heddal') || n.includes('borgund') || n.includes('kirke')) {
+    return 'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?q=80&w=1200';
   }
   if (n.includes('bryggen') || n.includes('hanseatic') || n.includes('bergen')) {
-    return 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=bryggen+bergen+norway&w=1200';
+    return 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1200';
   }
-  if (n.includes('polar') || n.includes('fram') || n.includes('amundsen') || n.includes('tromsø')) {
-    return 'https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?q=polar+exploration+norway&w=1200';
+  if (n.includes('nidaros') || n.includes('cathedral') || n.includes('trondheim')) {
+    return 'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?q=80&w=1200';
   }
-  return 'https://images.unsplash.com/photo-1548625361-195feee1361c?q=norway+heritage+museum&w=1200';
+  if (currentUrl && !currentUrl.includes('placeholder') && !currentUrl.includes('fjords_')) {
+    return currentUrl;
+  }
+  return 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1200';
+};
+
+const getHistoricalDescription = (name: string, description?: string | null) => {
+  const n = (name || '').toLowerCase();
+  if (n.includes('viking ship')) {
+    return 'Home to remarkably preserved 9th-century Viking longships (Oseberg, Gokstad, and Tune) unearthed from royal burial mounds, showcasing master woodcarvings and Nordic seafaring dominance.';
+  }
+  if (n.includes('munch')) {
+    return 'Oslo’s landmark 13-story waterfront museum housing over 28,000 works by Edvard Munch, including legendary versions of The Scream, Madonna, and monumental Nordic expressionist paintings.';
+  }
+  if (n.includes('fram')) {
+    return 'Celebrates Norway’s heroic polar exploration history, allowing visitors to step aboard the legendary wooden polar exploration ship Fram used by Fridtjof Nansen and Roald Amundsen.';
+  }
+  if (n.includes('stave') || n.includes('heddal')) {
+    return 'Norway’s magnificent medieval wooden architectural treasure, built entirely from pine timber with triple-tiered roofs, intricate dragon carvings, and centuries-old runic inscriptions.';
+  }
+  if (n.includes('bryggen')) {
+    return 'UNESCO World Heritage Hanseatic commercial wharf in Bergen, with iconic leaning colorful timber merchant houses dating back to the 14th century.';
+  }
+  if (description && !description.startsWith('Experience the unique beauty')) {
+    return description;
+  }
+  return `Explore Norway’s deep cultural heritage, archaeology, and historical treasures at ${name}.`;
 };
 
 export const History = () => {
@@ -80,7 +112,7 @@ export const History = () => {
         title="Norwegian History & Heritage"
         description="Step back in time to the era of Vikings, explore medieval stave churches, and uncover the rich cultural tapestry of Norway."
         breadcrumb="History"
-        backgroundImage="https://images.unsplash.com/photo-1548625361-195feee1361c?q=stave+church+norway+history&w=1600"
+        backgroundImage="https://images.unsplash.com/photo-1516483638261-f4dbaf036963?q=80&w=1600"
       >
         <div className="flex flex-wrap items-center gap-6 mt-8">
           <div className="flex items-center gap-2 text-snow/70">
@@ -164,7 +196,7 @@ export const History = () => {
             </div>
           }
         >
-          {(data) => (
+          {() => (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
             {destinations.map((dest: any, idx: number) => (
               <motion.div 
@@ -172,20 +204,21 @@ export const History = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
                 key={dest.id} 
-                className="bg-midnight border border-white/5 hover:border-white/20 transition-all duration-500 flex flex-col group cursor-pointer relative h-[500px]"
+                className="bg-midnight border border-white/5 hover:border-white/20 transition-all duration-500 flex flex-col group cursor-pointer relative h-[500px] rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl"
               >
                 <Link to={`/explore/${dest.slug}`} className="absolute inset-0 z-10" />
                 
                 <div className="h-2/3 overflow-hidden relative bg-black">
                   <OptimizedImage
-                    src={dest.hero_image_url || getPlaceholderImage(dest.name)}
+                    src={getHistoricalImage(dest.name, dest.hero_image_url)}
                     alt={dest.name}
-                    fallbackSrc="/images/fjords_1786935800026.jpg"
+                    category="culture"
+                    fallbackSrc="https://images.unsplash.com/photo-1516483638261-f4dbaf036963?q=80&w=800"
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-85 group-hover:opacity-100"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-midnight via-transparent to-transparent opacity-80" />
                   
-                  <div className="absolute top-6 left-6 bg-deep-night/80 backdrop-blur-md px-4 py-1.5 text-[10px] font-sans font-bold uppercase tracking-widest text-arctic-gold border border-white/10">
+                  <div className="absolute top-6 left-6 bg-deep-night/80 backdrop-blur-md px-4 py-1.5 text-[10px] font-sans font-bold uppercase tracking-widest text-arctic-gold border border-white/10 rounded-md">
                     {dest.type?.replace(/_/g, ' ') || 'HISTORY'}
                   </div>
                   <FavoriteButton 
@@ -197,9 +230,9 @@ export const History = () => {
 
                 <div className="p-8 flex flex-col flex-grow relative z-20">
                   <h4 className="font-display font-semibold text-2xl text-snow mb-3">{dest.name}</h4>
-                  <p className="font-sans text-sm text-snow/60 line-clamp-2 leading-relaxed flex-grow">{dest.description}</p>
+                  <p className="font-sans text-sm text-snow/70 line-clamp-3 leading-relaxed flex-grow">{getHistoricalDescription(dest.name, dest.description)}</p>
                   
-                  <div className="flex items-center gap-3 font-sans text-xs font-bold uppercase tracking-widest text-arctic-gold group/btn mt-auto">
+                  <div className="flex items-center gap-3 font-sans text-xs font-bold uppercase tracking-widest text-arctic-gold group/btn mt-auto pt-4 border-t border-white/5">
                     Explore History
                     <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-2 transition-transform" />
                   </div>

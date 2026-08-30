@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Utensils, MapPin, Calendar, Clock, Users, Search, Filter, ArrowRight, Award, Fish, Carrot, Flame, ChevronLeft, ChevronRight, ShoppingCart, Plus, Minus, Sparkles, Info, Check, RotateCcw, AlertCircle, ShoppingBag, X } from 'lucide-react';
-import { foodService, getFoodImage, getFoodPrice, Food as FoodType } from '../services/foodService';
+import { foodService, getFoodImage, getRestaurantImage, getFoodPrice, Food as FoodType } from '../services/foodService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AsyncStateWrapper } from '../components/shared/AsyncStateWrapper';
 import { useQuery } from '@tanstack/react-query';
@@ -501,10 +501,10 @@ export const Food = () => {
                         
                         <div className="h-48 overflow-hidden relative bg-black">
                           <OptimizedImage 
-                            src={restaurant.image_url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=800'} 
+                            src={restaurant.image_url || getRestaurantImage(restaurant.name)} 
                             alt={restaurant.name}
                             category="food"
-                            fallbackSrc="/images/food_salmon_1787013684123.jpg"
+                            fallbackSrc="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800"
                             className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-90 group-hover:opacity-100"
                           />
                           <div className="absolute top-4 left-4 flex gap-2 flex-col z-20">

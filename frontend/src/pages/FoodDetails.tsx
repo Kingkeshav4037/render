@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Clock, MapPin, Phone, Globe, Star, Users, Calendar as CalendarIcon, CheckCircle2, ChevronRight, Heart, Share2, Info, ShoppingCart, Plus, Minus, Check, ArrowRight, ShieldCheck, Sparkles, Utensils } from 'lucide-react';
-import { foodService, Restaurant, Food, getFoodImage, getFoodPrice } from '../services/foodService';
+import { foodService, Restaurant, Food, getFoodImage, getRestaurantImage, getFoodPrice } from '../services/foodService';
 import { OptimizedImage } from '../components/shared/OptimizedImage';
 import { useCartStore } from '../store/useCartStore';
 import { useCurrencyStore } from '../store/useCurrencyStore';
@@ -430,7 +430,8 @@ export const FoodDetails = () => {
   const contact = (restaurant.contact_info || {}) as any;
   const hours = (restaurant.opening_hours || {}) as any;
   const menu = (restaurant.menu || []) as any[];
-  const photos = (restaurant.photos || [restaurant.image_url, '/images/food_salmon_1787013684123.jpg']) as string[];
+  const restaurantMainImage = restaurant.image_url || getRestaurantImage(restaurant.name);
+  const photos = (restaurant.photos && restaurant.photos.length > 0 ? restaurant.photos : [restaurantMainImage]) as string[];
 
   const parsePrice = (priceStr: any): number => {
     if (typeof priceStr === 'number') return priceStr;
@@ -447,7 +448,7 @@ export const FoodDetails = () => {
       description: `${categoryName ? categoryName + ' • ' : ''}${item.description || ''}`,
       unit_price: unitPrice,
       quantity: 1,
-      image: photos[0] || '/images/food_salmon_1787013684123.jpg',
+      image: photos[0] || restaurantMainImage,
     });
     setAddedItemName(item.name);
     setTimeout(() => setAddedItemName(null), 1500);

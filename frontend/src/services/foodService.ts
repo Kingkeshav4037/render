@@ -23,38 +23,53 @@ export interface PaginatedResult<T> {
   count: number;
 }
 
-// Unique, contextually-correct Unsplash images for each Norwegian dish
+// Unique, contextually-correct images for each Norwegian dish
 const FOOD_IMAGES: Record<string, string> = {
-  'fårikål':         'https://images.unsplash.com/photo-1534482421-64566f976cfa?q=80&w=1200',
-  'farikal':         'https://images.unsplash.com/photo-1534482421-64566f976cfa?q=80&w=1200',
+  'fårikål':         'https://images.unsplash.com/photo-1547592166-23ac45744acd?q=80&w=1200',
+  'farikal':         'https://images.unsplash.com/photo-1547592166-23ac45744acd?q=80&w=1200',
   'brunost':         'https://images.unsplash.com/photo-1452195100486-9cc805987862?q=80&w=1200',
   'kjøttkaker':      'https://images.unsplash.com/photo-1529042410759-befb1204b468?q=80&w=1200',
   'kjottkaker':      'https://images.unsplash.com/photo-1529042410759-befb1204b468?q=80&w=1200',
   'pinnekjøtt':      'https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1200',
   'pinnekjott':      'https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1200',
-  'ribbe':           'https://images.unsplash.com/photo-1604908177522-8b8d8b0a0c6c?q=80&w=1200',
+  'ribbe':           'https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1200',
+  'sodd':            'https://images.unsplash.com/photo-1547592166-23ac45744acd?q=80&w=1200',
   'lutefisk':        'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=1200',
-  'raspeballer':     'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?q=80&w=1200',
+  'raspeballer':     'https://images.unsplash.com/photo-1529042410759-befb1204b468?q=80&w=1200',
   'lapskaus':        'https://images.unsplash.com/photo-1547592166-23ac45744acd?q=80&w=1200',
-  'rakfisk':         'https://images.unsplash.com/photo-1559847844-5315695dadae?q=80&w=1200',
+  'rakfisk':         'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=1200',
   'gravlaks':        'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=1200',
   'gravlax':         'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=1200',
   'salmon':          '/images/food_salmon_1787013684123.jpg',
   'laks':            '/images/food_salmon_1787013684123.jpg',
-  'klippfisk':       'https://images.unsplash.com/photo-1559847844-5315695dadae?q=80&w=1200',
-  'stockfish':       'https://images.unsplash.com/photo-1559847844-5315695dadae?q=80&w=1200',
+  'klippfisk':       'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=1200',
+  'stockfish':       'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=1200',
   'rømmegrøt':       'https://images.unsplash.com/photo-1490474504059-bf2db5ab2348?q=80&w=1200',
   'rommegrot':       'https://images.unsplash.com/photo-1490474504059-bf2db5ab2348?q=80&w=1200',
-  'lefse':           'https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=1200',
-  'krumkake':        'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?q=80&w=1200',
-  'cloudberry':      'https://images.unsplash.com/photo-1528821154031-2b0b45f9e47e?q=80&w=1200',
-  'multekrem':       'https://images.unsplash.com/photo-1528821154031-2b0b45f9e47e?q=80&w=1200',
+  'lefse':           'https://images.unsplash.com/photo-1562376552-0d160a2f238d?q=80&w=1200',
+  'krumkake':        'https://images.unsplash.com/photo-1562376552-0d160a2f238d?q=80&w=1200',
+  'cloudberry':      'https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?q=80&w=1200',
+  'multekrem':       'https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?q=80&w=1200',
   'smalahove':       'https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1200',
-  'whale':           'https://images.unsplash.com/photo-1559847844-5315695dadae?q=80&w=1200',
-  'hvalbiff':        'https://images.unsplash.com/photo-1529042410759-befb1204b468?q=80&w=1200',
-  'svele':           'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?q=80&w=1200',
-  'waffle':          'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?q=80&w=1200',
-  'vaffel':          'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?q=80&w=1200',
+  'whale':           'https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1200',
+  'hvalbiff':        'https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1200',
+  'svele':           'https://images.unsplash.com/photo-1562376552-0d160a2f238d?q=80&w=1200',
+  'waffle':          'https://images.unsplash.com/photo-1562376552-0d160a2f238d?q=80&w=1200',
+  'vaffel':          'https://images.unsplash.com/photo-1562376552-0d160a2f238d?q=80&w=1200',
+};
+
+// Unique images for Norwegian restaurants and cafes
+const RESTAURANT_IMAGES: Record<string, string> = {
+  'einer':                'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1200',
+  'kontrast':             'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=1200',
+  'smalhans':             'https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=1200',
+  'bryggeloftet & stuene': 'https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?q=80&w=1200',
+  'bryggeloftet':         'https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?q=80&w=1200',
+  'kaffemisjonen':        'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?q=80&w=1200',
+  'vippa':                'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1200',
+  'speilsalen':           'https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1200',
+  'enhjørningen':         'https://images.unsplash.com/photo-1534482421-64566f976cfa?q=80&w=1200',
+  'enhjorningen':         'https://images.unsplash.com/photo-1534482421-64566f976cfa?q=80&w=1200',
 };
 
 // Category → representative image
@@ -62,8 +77,8 @@ const CATEGORY_IMAGES: Record<string, string> = {
   'seafood':      '/images/food_salmon_1787013684123.jpg',
   'meat':         'https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1200',
   'dairy':        'https://images.unsplash.com/photo-1452195100486-9cc805987862?q=80&w=1200',
-  'dessert':      'https://images.unsplash.com/photo-1528821154031-2b0b45f9e47e?q=80&w=1200',
-  'bread':        'https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=1200',
+  'dessert':      'https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?q=80&w=1200',
+  'bread':        'https://images.unsplash.com/photo-1562376552-0d160a2f238d?q=80&w=1200',
   'soup':         'https://images.unsplash.com/photo-1547592166-23ac45744acd?q=80&w=1200',
   'christmas':    'https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1200',
 };
@@ -95,22 +110,37 @@ const FOOD_PRICES: Record<string, number> = {
 };
 
 export function getFoodImage(name: string, imageUrl?: string | null): string {
-  if (imageUrl && !imageUrl.includes('placeholder') && !imageUrl.includes('food_salmon')) {
-    return imageUrl;
-  }
-
   const key = name.toLowerCase().trim();
-  // Exact match
+  
+  // Specific dish dictionary lookup takes precedence
   for (const [slug, url] of Object.entries(FOOD_IMAGES)) {
     if (key === slug || key.startsWith(slug) || key.includes(slug)) {
       return url;
     }
   }
+
+  if (imageUrl && !imageUrl.includes('placeholder') && !imageUrl.includes('food_salmon')) {
+    return imageUrl;
+  }
+
   // Fallback – try category
   for (const [cat, url] of Object.entries(CATEGORY_IMAGES)) {
     if (key.includes(cat)) return url;
   }
   return '/images/food_salmon_1787013684123.jpg';
+}
+
+export function getRestaurantImage(name: string, imageUrl?: string | null): string {
+  const key = name.toLowerCase().trim();
+  for (const [slug, url] of Object.entries(RESTAURANT_IMAGES)) {
+    if (key === slug || key.includes(slug) || slug.includes(key)) {
+      return url;
+    }
+  }
+  if (imageUrl && !imageUrl.includes('placeholder')) {
+    return imageUrl;
+  }
+  return 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1200';
 }
 
 export function getFoodPrice(name: string, dbPrice?: number | null): number {
@@ -153,7 +183,12 @@ export const foodService = {
         return { data: [], count: 0 };
       }
 
-      return { data: (data as Restaurant[]) || [], count: count || 0 };
+      const enriched: Restaurant[] = ((data as Restaurant[]) || []).map(r => ({
+        ...r,
+        image_url: getRestaurantImage(r.name, r.image_url)
+      }));
+
+      return { data: enriched, count: count || enriched.length };
     } catch (err) {
       console.error('Error in getRestaurants:', err);
       return { data: [], count: 0 };

@@ -13,6 +13,8 @@ export type ImageCategory =
   | 'product' 
   | 'infra' 
   | 'activity'
+  | 'culture'
+  | 'history'
   | 'default';
 
 const CATEGORY_FALLBACKS: Record<ImageCategory, string> = {
@@ -27,6 +29,8 @@ const CATEGORY_FALLBACKS: Record<ImageCategory, string> = {
   product: '/images/product_charger.jpg',
   infra: '/images/infra_windfarm.jpg',
   activity: '/images/preikestolen.jpg',
+  culture: 'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?q=80&w=800',
+  history: 'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?q=80&w=800',
   default: '/images/fjords.jpg'
 };
 
