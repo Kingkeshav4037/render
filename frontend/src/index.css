@@ -9,9 +9,15 @@
   --color-nordic-charcoal: #1E293B;
   --color-midnight: #0B1120;
   --color-deep-night: #020617;
+  --color-navy-900: #0F172A;
+  --color-navy-800: #1E293B;
+  --color-navy-700: #334155;
+  --color-navy-600: #475569;
 
   /* Theme Accents */
   --color-arctic-gold: #D4AF37;
+  --color-aurora-green: #10B981;
+  --color-aurora-teal: #0D9488;
   --color-glacier-blue: #7DD3FC;
   --color-royal-fjord: #1D4ED8;
   --color-aurora-violet: #8B5CF6;
