@@ -187,22 +187,8 @@ export const authService = {
     }
   },
 
-  async loginWithGoogle() {
-    // 1. Check if Google provider is enabled in the active Supabase project
-    try {
-      const settings = await this.getAuthSettings();
-      if (settings?.external && settings.external.google === false) {
-        return {
-          providerNotEnabled: true,
-          provider: 'google',
-          message: 'Google Sign-In is not enabled yet in your Supabase project (kyzlavxznlftzwjwzoah). Please enable Google under Authentication -> Providers -> Google in your Supabase Dashboard.'
-        } as any;
-      }
-    } catch (checkErr) {
-      console.warn('Google precheck note:', checkErr);
-    }
-
-    const redirectUrl = `${window.location.origin}/auth/callback`;
+  async loginWithGoogle(redirectTo?: string) {
+    const redirectUrl = redirectTo || `${window.location.origin}/auth/callback`;
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {

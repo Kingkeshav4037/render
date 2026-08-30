@@ -45,7 +45,6 @@ export const Login = () => {
 
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [googleProviderDisabled, setGoogleProviderDisabled] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -119,23 +118,16 @@ export const Login = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      if (targetRedirect !== '/home') {
+      if (targetRedirect && targetRedirect !== '/home') {
         sessionStorage.setItem('returnTo', targetRedirect);
       }
       setGoogleLoading(true);
       setLoading(true);
       setError(null);
-      const res: any = await authService.loginWithGoogle();
-      if (res?.providerNotEnabled) {
-        setGoogleLoading(false);
-        setLoading(false);
-        setGoogleProviderDisabled(true);
-        setError('Google Sign-In is not enabled yet in your Supabase project. You can continue below using the Demo Google Account.');
-        return;
-      }
+      await authService.loginWithGoogle();
     } catch (e: any) {
-      console.warn('Google login notice:', e);
-      setError(e.message || 'Unable to connect to Google sign-in. Please use Email or Phone.');
+      console.warn('Google login error:', e);
+      setError(e.message || 'Unable to connect to Google sign-in. Please try again.');
       setGoogleLoading(false);
       setLoading(false);
     }
@@ -423,31 +415,6 @@ export const Login = () => {
                   {googleLoading ? 'Connecting to Google...' : 'Continue with Google'}
                 </span>
               </button>
-
-              {googleProviderDisabled && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-3 bg-amber-500/10 border border-amber-500/30 rounded-xl p-3.5 text-left text-xs text-snow/90 space-y-2.5"
-                >
-                  <div className="flex items-center gap-2 text-amber-400 font-bold">
-                    <Sparkles className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                    <span>Google Provider Not Active in Supabase</span>
-                  </div>
-                  <p className="text-snow/70 leading-relaxed text-[11px]">
-                    To enable live Google login, toggle on Google in your Supabase Console (<strong>Authentication &rarr; Providers &rarr; Google</strong>). Or continue instantly with the Demo Google Account:
-                  </p>
-                  <button
-                    type="button"
-                    onClick={handleDemoGoogleLogin}
-                    disabled={loading}
-                    className="w-full py-2.5 px-3 bg-aurora-green/20 hover:bg-aurora-green/30 text-aurora-green hover:text-white font-bold rounded-lg border border-aurora-green/40 transition-all text-xs flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_15px_rgba(0,255,135,0.15)]"
-                  >
-                    <Sparkles className="w-4 h-4" />
-                    Sign In with Demo Google Traveler
-                  </button>
-                </motion.div>
-              )}
             </div>
           </div>
         </motion.form>
