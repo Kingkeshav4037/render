@@ -1,4 +1,4 @@
-import { useEffect, Suspense, lazy } from 'react';
+import { useEffect, useState, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { ProtectedRoute } from "./components/layout/ProtectedRoute";
@@ -22,7 +22,21 @@ const GlobalLoader = () => (
 // --- Auth-aware root redirect (ISSUE-008) ---
 const RootRedirect = () => {
   const { user, loading } = useAuthStore();
-  if (loading) return <GlobalLoader />;
+  const [checkingAuthRedirect, setCheckingAuthRedirect] = useState(() => {
+    return typeof window !== 'undefined' && (
+      window.location.hash.includes('access_token') || 
+      window.location.search.includes('code=')
+    );
+  });
+
+  useEffect(() => {
+    if (checkingAuthRedirect) {
+      const timer = setTimeout(() => setCheckingAuthRedirect(false), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [checkingAuthRedirect]);
+
+  if (loading || checkingAuthRedirect) return <GlobalLoader />;
   return <Navigate to={user ? '/home' : '/login'} replace />;
 };
 
