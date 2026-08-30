@@ -1,7 +1,19 @@
 -- Migration: Synchronize Admin & Super Admin Roles, Permissions, and RLS
 -- Allows users set as SUPER_ADMIN or ADMIN in public.profiles to be recognized everywhere
 
--- 1. Upgrade public.has_permission function to recognize profiles.role directly
+-- 0. Ensure SUPER_ADMIN and other roles exist in the user_role enum if it is an enum type
+DO $$ BEGIN
+    ALTER TYPE public.user_role ADD VALUE IF NOT EXISTS 'SUPER_ADMIN';
+    ALTER TYPE public.user_role ADD VALUE IF NOT EXISTS 'ADMIN';
+    ALTER TYPE public.user_role ADD VALUE IF NOT EXISTS 'PROVIDER';
+    ALTER TYPE public.user_role ADD VALUE IF NOT EXISTS 'MODERATOR';
+    ALTER TYPE public.user_role ADD VALUE IF NOT EXISTS 'ANALYST';
+    ALTER TYPE public.user_role ADD VALUE IF NOT EXISTS 'DATA_MANAGER';
+EXCEPTION WHEN duplicate_object THEN NULL;
+          WHEN undefined_object THEN NULL;
+END $$;
+
+-- 1. Upgrade public.has_permission function to recognize profiles.role directly (using ::text cast)
 CREATE OR REPLACE FUNCTION public.has_permission(p_user_id uuid, p_permission_name text)
 RETURNS boolean AS $$
 DECLARE
@@ -12,8 +24,8 @@ BEGIN
         RETURN false;
     END IF;
 
-    -- Check if user is directly SUPER_ADMIN or ADMIN in public.profiles (case-insensitive and format-tolerant)
-    SELECT UPPER(REPLACE(COALESCE(role, ''), ' ', '_')) INTO v_role
+    -- Check if user is directly SUPER_ADMIN or ADMIN in public.profiles using role::text
+    SELECT UPPER(REPLACE(COALESCE(role::text, ''), ' ', '_')) INTO v_role
     FROM public.profiles
     WHERE id = p_user_id;
 
@@ -45,7 +57,7 @@ DECLARE
     v_clean_role text;
     v_role_id uuid;
 BEGIN
-    v_clean_role := UPPER(REPLACE(COALESCE(NEW.role, 'USER'), ' ', '_'));
+    v_clean_role := UPPER(REPLACE(COALESCE(NEW.role::text, 'USER'), ' ', '_'));
     
     -- Ensure app_roles has this role
     IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'app_roles') THEN
@@ -81,7 +93,7 @@ DO $$ BEGIN
             EXISTS (
                 SELECT 1 FROM public.profiles p 
                 WHERE p.id = auth.uid() 
-                AND UPPER(REPLACE(COALESCE(p.role, ''), ' ', '_')) IN ('ADMIN', 'SUPER_ADMIN')
+                AND p.role::text IN ('ADMIN', 'SUPER_ADMIN')
             )
         );
 
@@ -92,7 +104,7 @@ DO $$ BEGIN
             EXISTS (
                 SELECT 1 FROM public.profiles p 
                 WHERE p.id = auth.uid() 
-                AND UPPER(REPLACE(COALESCE(p.role, ''), ' ', '_')) IN ('ADMIN', 'SUPER_ADMIN')
+                AND p.role::text IN ('ADMIN', 'SUPER_ADMIN')
             )
         );
 EXCEPTION WHEN undefined_table THEN NULL;
