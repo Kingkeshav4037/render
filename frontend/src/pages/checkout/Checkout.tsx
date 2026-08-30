@@ -602,7 +602,7 @@ export const Checkout = () => {
                     <button 
                       onClick={handleRazorpayMock}
                       disabled={processing}
-                      className="px-12 py-4 bg-[#3395FF] text-white font-bold uppercase tracking-widest text-sm hover:bg-[#2275d4] transition-colors shadow-lg shadow-blue-500/30 flex items-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
+                      className="px-12 py-4 bg-blue-600 text-white font-bold uppercase tracking-widest text-sm border border-blue-500 hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300 shadow-lg shadow-blue-600/30 flex items-center gap-3 rounded-xl transition-all disabled:bg-slate-500 disabled:text-slate-200 disabled:border-slate-400 disabled:shadow-none disabled:cursor-not-allowed cursor-pointer"
                     >
                       {processing ? (
                         'Connecting...'
