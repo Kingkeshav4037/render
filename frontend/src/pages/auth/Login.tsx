@@ -40,8 +40,21 @@ export const Login = () => {
   const location = useLocation();
   const { user } = useAuthStore();
 
-  const rawRedirect = new URLSearchParams(location.search).get('redirect') || location.state?.from?.pathname;
+  const searchParams = new URLSearchParams(location.search);
+  const rawRedirect = searchParams.get('returnTo') || searchParams.get('redirect') || location.state?.returnTo || location.state?.from?.pathname;
   const targetRedirect = sanitizeRedirectUrl(rawRedirect);
+  const urlMessage = searchParams.get('message') || location.state?.message;
+
+  const contextualMessage = React.useMemo(() => {
+    if (urlMessage) return urlMessage;
+    if (!rawRedirect || targetRedirect === '/home') return null;
+    if (targetRedirect.includes('/stay') || targetRedirect.includes('/book')) return 'Sign in to book your stay';
+    if (targetRedirect.includes('/shop') || targetRedirect.includes('/cart') || targetRedirect.includes('/checkout')) return 'Sign in to continue to checkout';
+    if (targetRedirect.includes('/planner') || targetRedirect.includes('/trips')) return 'Sign in to create your personalized trip';
+    if (targetRedirect.includes('/wishlist') || targetRedirect.includes('/favorites')) return 'Sign in to access your saved items';
+    if (targetRedirect.includes('/dashboard') || targetRedirect.includes('/profile')) return 'Sign in to access your account dashboard';
+    return 'Sign in to continue';
+  }, [urlMessage, rawRedirect, targetRedirect]);
 
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -274,6 +287,23 @@ export const Login = () => {
       subtitle="Sign in to your Norway SmartLife account"
       bgImage="/images/northern_lights.jpg"
     >
+      {/* Contextual Action Prompt Banner */}
+      {contextualMessage && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-5 p-3.5 bg-aurora-green/10 border border-aurora-green/30 rounded-xl flex items-center gap-3 text-snow text-xs font-semibold shadow-[0_0_15px_rgba(0,255,135,0.1)]"
+        >
+          <div className="w-8 h-8 rounded-lg bg-aurora-green/20 text-aurora-green flex items-center justify-center shrink-0">
+            <Sparkles className="w-4 h-4" />
+          </div>
+          <div className="flex-1">
+            <p className="text-white font-bold">{contextualMessage}</p>
+            <p className="text-snow/60 text-[11px] font-normal">Your progress and destination will be restored immediately after sign-in.</p>
+          </div>
+        </motion.div>
+      )}
+
       {/* Auth Method Switcher Tabs */}
       <div className="flex bg-deep-night/50 p-1 rounded-xl border border-white/10 mb-6 backdrop-blur-sm">
         <button
@@ -560,7 +590,11 @@ export const Login = () => {
       
       <div className="mt-8 text-center text-sm text-snow/60 border-t border-white/10 pt-6">
         Don't have an account?{' '}
-        <Link to="/register" state={{ from: location.state?.from }} className="font-bold text-aurora-green hover:text-green-300 transition-colors">
+        <Link 
+          to={`/register?returnTo=${encodeURIComponent(targetRedirect)}`} 
+          state={{ from: location.state?.from, returnTo: targetRedirect }} 
+          className="font-bold text-aurora-green hover:text-green-300 transition-colors"
+        >
           Sign up
         </Link>
       </div>

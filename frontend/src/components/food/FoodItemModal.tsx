@@ -5,6 +5,7 @@ import { useCartStore } from '../../store/useCartStore';
 import { useCurrencyStore } from '../../store/useCurrencyStore';
 import { OptimizedImage } from '../shared/OptimizedImage';
 import { useNavigate } from 'react-router-dom';
+import { useRequireAuth } from '../../hooks/useRequireAuth';
 
 interface FoodItemModalProps {
   food: Food | null;
@@ -83,6 +84,7 @@ export const FoodItemModal: React.FC<FoodItemModalProps> = ({ food, onClose }) =
   const [isAdded, setIsAdded] = useState(false);
   const { addItem } = useCartStore();
   const { formatPrice } = useCurrencyStore();
+  const { requireAuth } = useRequireAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -117,34 +119,38 @@ export const FoodItemModal: React.FC<FoodItemModalProps> = ({ food, onClose }) =
   };
 
   const handleAddToCart = () => {
-    addItem({
-      item_type: 'PRODUCT',
-      item_id: food.id,
-      name: food.name,
-      description: food.description || meta.region,
-      unit_price: foodPrice,
-      quantity: quantity,
-      image: foodImage,
-    });
-    setIsAdded(true);
-    setTimeout(() => {
-      setIsAdded(false);
-      onClose();
-    }, 1200);
+    requireAuth(() => {
+      addItem({
+        item_type: 'PRODUCT',
+        item_id: food.id,
+        name: food.name,
+        description: food.description || meta.region,
+        unit_price: foodPrice,
+        quantity: quantity,
+        image: foodImage,
+      });
+      setIsAdded(true);
+      setTimeout(() => {
+        setIsAdded(false);
+        onClose();
+      }, 1200);
+    }, { message: 'Sign in to add food orders to your cart.' });
   };
 
   const handleOrderNow = () => {
-    addItem({
-      item_type: 'PRODUCT',
-      item_id: food.id,
-      name: food.name,
-      description: food.description || meta.region,
-      unit_price: foodPrice,
-      quantity: quantity,
-      image: foodImage,
-    });
-    onClose();
-    navigate('/checkout');
+    requireAuth(() => {
+      addItem({
+        item_type: 'PRODUCT',
+        item_id: food.id,
+        name: food.name,
+        description: food.description || meta.region,
+        unit_price: foodPrice,
+        quantity: quantity,
+        image: foodImage,
+      });
+      onClose();
+      navigate('/checkout');
+    }, { message: 'Sign in to order and checkout.' });
   };
 
   return (

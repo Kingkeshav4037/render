@@ -19,11 +19,13 @@ import { useCartStore } from '../../store/useCartStore';
 import { useCurrencyStore } from '../../store/useCurrencyStore';
 import { OptimizedImage } from '../../components/shared/OptimizedImage';
 import { SEO } from '../../components/shared/SEO';
+import { useRequireAuth } from '../../hooks/useRequireAuth';
 
 export const ShopCart: React.FC = () => {
   const navigate = useNavigate();
   const { items, updateQuantity, removeItem, clearCart, getCartTotal } = useCartStore();
   const { formatPrice } = useCurrencyStore();
+  const { requireAuth } = useRequireAuth();
 
   const subtotal = getCartTotal();
   const freeShippingThreshold = 500;
@@ -243,7 +245,11 @@ export const ShopCart: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => navigate('/checkout')}
+                onClick={() => {
+                  requireAuth(() => {
+                    navigate('/checkout');
+                  }, { message: 'Sign in to continue to checkout.', returnTo: '/checkout' });
+                }}
                 className="w-full py-4 px-6 bg-arctic-gold hover:bg-snow text-deep-night rounded-2xl text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-xl hover:shadow-arctic-gold/20 cursor-pointer"
               >
                 <span>Proceed to Checkout</span>

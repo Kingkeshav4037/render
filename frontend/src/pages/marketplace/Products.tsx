@@ -12,6 +12,7 @@ import { EmptyState } from '../../components/ui/EmptyState';
 import { Button } from '../../components/ui/Button';
 import { ProductDetailModal } from '../../components/marketplace/ProductDetailModal';
 import { SEO } from '../../components/shared/SEO';
+import { useRequireAuth } from '../../hooks/useRequireAuth';
 
 export const Products = () => {
   const navigate = useNavigate();
@@ -20,6 +21,8 @@ export const Products = () => {
   const { user } = useAuthStore();
   const { items: cart, addItem, removeItem, updateQuantity, getCartTotal } = useCartStore();
   const { formatPrice } = useCurrencyStore();
+  const { requireAuth } = useRequireAuth();
+
   const [filter, setFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('Featured');
@@ -29,6 +32,12 @@ export const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const handleCheckoutClick = () => {
+    requireAuth(() => {
+      navigate('/checkout');
+    }, { message: 'Sign in to continue to checkout.' });
+  };
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -70,10 +79,6 @@ export const Products = () => {
   } else if (sortBy === 'Top Rated') {
     filteredProducts.sort((a, b) => b.rating - a.rating);
   }
-  
-  const handleCheckoutClick = () => {
-    navigate('/checkout');
-  };
 
 
   return (
@@ -303,16 +308,18 @@ export const Products = () => {
                               disabled={isOutOfStock}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                addItem({
-                                  item_type: 'PRODUCT',
-                                  item_id: product.id,
-                                  name: product.name,
-                                  description: product.category,
-                                  unit_price: product.price,
-                                  quantity: 1,
-                                  image: product.img
-                                });
-                                setShowCart(true);
+                                requireAuth(() => {
+                                  addItem({
+                                    item_type: 'PRODUCT',
+                                    item_id: product.id,
+                                    name: product.name,
+                                    description: product.category,
+                                    unit_price: product.price,
+                                    quantity: 1,
+                                    image: product.img
+                                  });
+                                  setShowCart(true);
+                                }, { message: 'Sign in to add items to your cart.' });
                               }}
                               className="bg-white/5 hover:bg-arctic-gold hover:text-deep-night border border-white/10 hover:border-arctic-gold px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                               title={isOutOfStock ? "Out of stock" : "Add to cart"}

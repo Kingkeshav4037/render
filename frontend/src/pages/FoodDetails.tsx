@@ -5,6 +5,7 @@ import { foodService, Restaurant, Food, getFoodImage, getRestaurantImage, getFoo
 import { OptimizedImage } from '../components/shared/OptimizedImage';
 import { useCartStore } from '../store/useCartStore';
 import { useCurrencyStore } from '../store/useCurrencyStore';
+import { useRequireAuth } from '../hooks/useRequireAuth';
 import { SEO } from '../components/shared/SEO';
 
 // Cultural details and culinary metadata for Norwegian traditional foods
@@ -86,6 +87,7 @@ export const FoodDetails = () => {
   const [isAdded, setIsAdded] = useState(false);
   const { addItem } = useCartStore();
   const { formatPrice } = useCurrencyStore();
+  const { requireAuth } = useRequireAuth();
   const [addedItemName, setAddedItemName] = useState<string | null>(null);
 
   // 5-Step Reservation State
@@ -108,25 +110,29 @@ export const FoodDetails = () => {
           setFoodItem(null);
           setLoading(false);
         } else {
-          // If not restaurant, check if it's a food dish
-          const dishData = await foodService.getFoodById(id);
-          if (dishData) {
-            setFoodItem(dishData);
+          // If not a restaurant, check if it's a food dish
+          const allFoods = await foodService.getFoods();
+          const foodList = allFoods?.data || [];
+          const foundFood = foodList.find((f: Food) => f.id === id || f.name.toLowerCase().replace(/\s+/g, '-') === id.toLowerCase());
+          if (foundFood) {
+            setFoodItem(foundFood);
             setRestaurant(null);
-            const { data: allDishes } = await foodService.getFoods({}, 1, 8);
-            setRelatedFoods(allDishes.filter(d => d.id !== dishData.id).slice(0, 4));
+            setRelatedFoods(foodList.filter((f: Food) => f.id !== foundFood.id).slice(0, 3));
           }
           setLoading(false);
         }
+      }).catch(err => {
+        console.error('Failed to load culinary details:', err);
+        setLoading(false);
       });
     }
   }, [id]);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-deep-night pt-32 pb-24 flex flex-col items-center justify-center text-snow">
-        <div className="w-10 h-10 border-4 border-[#FF7F50] border-t-transparent rounded-full animate-spin mb-4" />
-        <p className="text-xs font-bold uppercase tracking-widest text-snow/60">Loading Culinary Experience...</p>
+      <div className="min-h-screen bg-deep-night text-snow font-sans flex flex-col items-center justify-center p-6">
+        <div className="w-12 h-12 border-4 border-arctic-gold border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="text-sm uppercase tracking-widest text-snow/60 font-bold">Loading Culinary Details...</p>
       </div>
     );
   }
@@ -152,30 +158,34 @@ export const FoodDetails = () => {
     };
 
     const handleAddDishToCart = () => {
-      addItem({
-        item_type: 'PRODUCT',
-        item_id: foodItem.id,
-        name: foodItem.name,
-        description: foodItem.description || meta.region,
-        unit_price: foodPrice,
-        quantity: quantity,
-        image: foodImage,
-      });
-      setIsAdded(true);
-      setTimeout(() => setIsAdded(false), 1500);
+      requireAuth(() => {
+        addItem({
+          item_type: 'PRODUCT',
+          item_id: foodItem.id,
+          name: foodItem.name,
+          description: foodItem.description || meta.region,
+          unit_price: foodPrice,
+          quantity: quantity,
+          image: foodImage,
+        });
+        setIsAdded(true);
+        setTimeout(() => setIsAdded(false), 1500);
+      }, { message: 'Sign in to add food orders to your cart.' });
     };
 
     const handleOrderDishNow = () => {
-      addItem({
-        item_type: 'PRODUCT',
-        item_id: foodItem.id,
-        name: foodItem.name,
-        description: foodItem.description || meta.region,
-        unit_price: foodPrice,
-        quantity: quantity,
-        image: foodImage,
-      });
-      navigate('/checkout');
+      requireAuth(() => {
+        addItem({
+          item_type: 'PRODUCT',
+          item_id: foodItem.id,
+          name: foodItem.name,
+          description: foodItem.description || meta.region,
+          unit_price: foodPrice,
+          quantity: quantity,
+          image: foodImage,
+        });
+        navigate('/checkout');
+      }, { message: 'Sign in to order and checkout.' });
     };
 
     return (
@@ -440,18 +450,20 @@ export const FoodDetails = () => {
   };
 
   const handleAddMenuItem = (item: any, categoryName?: string) => {
-    const unitPrice = parsePrice(item.price);
-    addItem({
-      item_type: 'RESTAURANT',
-      item_id: restaurant.id,
-      name: `${restaurant.name}: ${item.name}`,
-      description: `${categoryName ? categoryName + ' • ' : ''}${item.description || ''}`,
-      unit_price: unitPrice,
-      quantity: 1,
-      image: photos[0] || restaurantMainImage,
-    });
-    setAddedItemName(item.name);
-    setTimeout(() => setAddedItemName(null), 1500);
+    requireAuth(() => {
+      const unitPrice = parsePrice(item.price);
+      addItem({
+        item_type: 'RESTAURANT',
+        item_id: restaurant.id,
+        name: `${restaurant.name}: ${item.name}`,
+        description: `${categoryName ? categoryName + ' • ' : ''}${item.description || ''}`,
+        unit_price: unitPrice,
+        quantity: 1,
+        image: photos[0] || restaurantMainImage,
+      });
+      setAddedItemName(item.name);
+      setTimeout(() => setAddedItemName(null), 1500);
+    }, { message: 'Sign in to add restaurant orders to your cart.' });
   };
 
   const handleNextStep = () => {

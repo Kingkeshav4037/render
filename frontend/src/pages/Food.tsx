@@ -9,6 +9,7 @@ import { SEO } from '../components/shared/SEO';
 import { OptimizedImage } from '../components/shared/OptimizedImage';
 import { useCartStore } from '../store/useCartStore';
 import { useCurrencyStore } from '../store/useCurrencyStore';
+import { useRequireAuth } from '../hooks/useRequireAuth';
 import { PageHeader } from '../components/ui/PageHeader';
 import { FoodItemModal } from '../components/food/FoodItemModal';
 
@@ -57,6 +58,7 @@ export const Food = () => {
   const [selectedFood, setSelectedFood] = useState<FoodType | null>(null);
   const { addItem, getItemCount, getCartTotal, setIsOpen } = useCartStore();
   const { formatPrice } = useCurrencyStore();
+  const { requireAuth } = useRequireAuth();
   const [addedId, setAddedId] = useState<string | null>(null);
   const [dishQuantities, setDishQuantities] = useState<Record<string, number>>({});
 
@@ -74,19 +76,21 @@ export const Food = () => {
 
   const handleAddFood = (food: any, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    const price = getFoodPrice(food.name, food.price);
-    const qty = dishQuantities[food.id] || 1;
-    addItem({
-      item_type: 'PRODUCT',
-      item_id: food.id,
-      name: food.name,
-      description: food.description || '',
-      unit_price: price,
-      quantity: qty,
-      image: getFoodImage(food.name, food.image_url),
-    });
-    setAddedId(food.id);
-    setTimeout(() => setAddedId(null), 1500);
+    requireAuth(() => {
+      const price = getFoodPrice(food.name, food.price);
+      const qty = dishQuantities[food.id] || 1;
+      addItem({
+        item_type: 'PRODUCT',
+        item_id: food.id,
+        name: food.name,
+        description: food.description || '',
+        unit_price: price,
+        quantity: qty,
+        image: getFoodImage(food.name, food.image_url),
+      });
+      setAddedId(food.id);
+      setTimeout(() => setAddedId(null), 1500);
+    }, { message: 'Sign in to add food orders to your cart.' });
   };
 
   // Pagination State

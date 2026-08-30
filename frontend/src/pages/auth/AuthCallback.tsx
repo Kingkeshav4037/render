@@ -61,30 +61,17 @@ export const AuthCallback = () => {
           const type = hashParams.get('type') || searchParams.get('type');
           
           if (type === 'recovery') {
-            navigate('/reset-password', { replace: true });
+            navigate('/reset-password');
           } else {
-            const returnTo = sessionStorage.getItem('returnTo') || '/home';
+            const rawReturnTo = sessionStorage.getItem('returnTo') || '/home';
             sessionStorage.removeItem('returnTo');
-            navigate(returnTo, { replace: true });
+            const safeDestination = rawReturnTo.startsWith('/') && !rawReturnTo.startsWith('//') && !rawReturnTo.includes('\\')
+              ? rawReturnTo 
+              : '/home';
+            navigate(safeDestination);
           }
         } else {
-          // Check onAuthStateChange fallback in case of latency
-          const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-            if (session?.user && isMounted) {
-              authListener.subscription.unsubscribe();
-              const returnTo = sessionStorage.getItem('returnTo') || '/home';
-              sessionStorage.removeItem('returnTo');
-              navigate(returnTo, { replace: true });
-            }
-          });
-
-          // Timeout fallback to login
-          setTimeout(() => {
-            if (isMounted) {
-              authListener.subscription.unsubscribe();
-              navigate('/login', { replace: true });
-            }
-          }, 2000);
+          navigate('/login');
         }
       } catch (err: any) {
         console.error('Auth callback error:', err);

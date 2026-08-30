@@ -11,7 +11,14 @@ export const ProtectedRoute = () => {
   }
 
   if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    const returnTo = location.pathname + location.search;
+    return (
+      <Navigate 
+        to={`/login?returnTo=${encodeURIComponent(returnTo)}`} 
+        state={{ from: location, returnTo }} 
+        replace 
+      />
+    );
   }
 
   return <Outlet />;

@@ -13,6 +13,7 @@ import { useCartStore } from '../store/useCartStore';
 import { OptimizedImage } from '../components/shared/OptimizedImage';
 import { SEO } from '../components/shared/SEO';
 import { toast } from 'sonner';
+import { useRequireAuth } from '../hooks/useRequireAuth';
 
 export const StayDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,6 +21,7 @@ export const StayDetails = () => {
   const navigate = useNavigate();
   const { formatPrice } = useCurrencyStore();
   const { addItem } = useCartStore();
+  const { requireAuth } = useRequireAuth();
 
   // Initialize dates
   const defaultCheckIn = useMemo(() => {
@@ -96,19 +98,20 @@ export const StayDetails = () => {
   // Calculate nights
   const nights = useMemo(() => {
     if (!checkIn || !checkOut) return 0;
-    const start = new Date(checkIn);
-    const end = new Date(checkOut);
-    if (isNaN(start.getTime()) || isNaN(end.getTime()) || start >= end) return 0;
-    return Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 3600 * 24)));
+    const start = new Date(checkIn).getTime();
+    const end = new Date(checkOut).getTime();
+    const diff = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+    return diff > 0 ? diff : 0;
   }, [checkIn, checkOut]);
 
+  // Active room fallback to first room
   const activeRoom = useMemo(() => {
     return rooms.find(r => r.id === selectedRoomId) || rooms[0] || null;
   }, [rooms, selectedRoomId]);
 
   const activePricePerNight = Number(activeRoom?.price_per_night || stay?.price_per_night || 2400);
-  const totalBasePrice = nights * activePricePerNight;
-  const vatIncluded = Math.round(totalBasePrice * 0.20); // 25% MVA included in gross
+  const totalBasePrice = activePricePerNight * nights;
+  const vatIncluded = totalBasePrice * 0.25;
 
   const isRoomAvailable = activeRoom ? (availabilityMap[activeRoom.id] ?? true) : true;
 
@@ -124,7 +127,10 @@ export const StayDetails = () => {
       return;
     }
 
-    navigate(`/checkout/stay/${id}?roomId=${activeRoom.id}&checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`);
+    const bookingTarget = `/checkout/stay/${id}?roomId=${activeRoom.id}&checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`;
+    requireAuth(() => {
+      navigate(bookingTarget);
+    }, { message: 'Sign in to continue with your stay booking.', returnTo: bookingTarget });
   };
 
   const handleAddToCart = () => {
@@ -134,20 +140,22 @@ export const StayDetails = () => {
       return;
     }
 
-    addItem({
-      item_type: 'ACCOMMODATION',
-      item_id: activeRoom.id,
-      name: `${stay.name} - ${activeRoom.name}`,
-      description: `${nights} nights (${checkIn} to ${checkOut}) for ${guests} guests. ${activeRoom.bed}`,
-      unit_price: activePricePerNight,
-      quantity: nights,
-      image: activeRoom.image_url || stay.image_url,
-      start_time: new Date(checkIn).toISOString(),
-      end_time: new Date(checkOut).toISOString(),
-      pax: guests,
-    });
+    requireAuth(() => {
+      addItem({
+        item_type: 'ACCOMMODATION',
+        item_id: activeRoom.id,
+        name: `${stay.name} - ${activeRoom.name}`,
+        description: `${nights} nights (${checkIn} to ${checkOut}) for ${guests} guests. ${activeRoom.bed}`,
+        unit_price: activePricePerNight,
+        quantity: nights,
+        image: activeRoom.image_url || stay.image_url,
+        start_time: new Date(checkIn).toISOString(),
+        end_time: new Date(checkOut).toISOString(),
+        pax: guests,
+      });
 
-    toast.success(`${activeRoom.name} added to cart!`);
+      toast.success(`${activeRoom.name} added to cart!`);
+    }, { message: 'Sign in to add stays to your cart.' });
   };
 
   // Scroll to top on mount

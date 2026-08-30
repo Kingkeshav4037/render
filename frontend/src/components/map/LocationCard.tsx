@@ -5,6 +5,9 @@ import { weatherService, WeatherData } from '../../services/live/weatherService'
 import { auroraService, AuroraData } from '../../services/live/auroraService';
 import { OptimizedImage } from '../shared/OptimizedImage';
 
+import { toast } from 'sonner';
+import { useRequireAuth } from '../../hooks/useRequireAuth';
+
 interface LocationCardProps {
   marker: MapMarker;
   onClose: () => void;
@@ -14,6 +17,7 @@ interface LocationCardProps {
 
 const LocationCard: React.FC<LocationCardProps> = ({ marker, onClose, onRouteHere, isAuroraMode }) => {
   const { addItem } = useCart();
+  const { requireAuth } = useRequireAuth();
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [aurora, setAurora] = useState<AuroraData | null>(null);
   const [loadingWeather, setLoadingWeather] = useState(true);
@@ -40,14 +44,16 @@ const LocationCard: React.FC<LocationCardProps> = ({ marker, onClose, onRouteHer
   }, [marker.latitude, marker.longitude, isAuroraMode]);
 
   const handleAddToCart = () => {
-    addItem({
-      item_type: 'ACTIVITY',
-      item_id: marker.location_id,
-      name: marker.name,
-      unit_price: marker.base_price_nok || 0,
-      quantity: 1,
-    });
-    alert(`${marker.name} added to cart!`);
+    requireAuth(() => {
+      addItem({
+        item_type: 'ACTIVITY',
+        item_id: marker.location_id,
+        name: marker.name,
+        unit_price: marker.base_price_nok || 0,
+        quantity: 1,
+      });
+      toast.success(`${marker.name} added to cart!`);
+    }, { message: 'Sign in to book locations and activities.' });
   };
 
   return (

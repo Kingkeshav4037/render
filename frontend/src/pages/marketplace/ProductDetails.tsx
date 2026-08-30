@@ -27,10 +27,12 @@ import { useCurrencyStore } from '../../store/useCurrencyStore';
 import { OptimizedImage } from '../../components/shared/OptimizedImage';
 import { SEO } from '../../components/shared/SEO';
 import { Button } from '../../components/ui/Button';
+import { useRequireAuth } from '../../hooks/useRequireAuth';
 
 export const ProductDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { requireAuth } = useRequireAuth();
   
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
@@ -81,31 +83,35 @@ export const ProductDetails: React.FC = () => {
 
   const handleAddToCart = () => {
     if (!product) return;
-    addItem({
-      item_type: 'PRODUCT',
-      item_id: product.id,
-      name: product.name,
-      description: `${product.category} • ${product.origin}`,
-      unit_price: product.price,
-      quantity: quantity,
-      image: product.img,
-    });
-    setIsAdded(true);
-    setTimeout(() => setIsAdded(false), 1600);
+    requireAuth(() => {
+      addItem({
+        item_type: 'PRODUCT',
+        item_id: product.id,
+        name: product.name,
+        description: `${product.category} • ${product.origin}`,
+        unit_price: product.price,
+        quantity: quantity,
+        image: product.img,
+      });
+      setIsAdded(true);
+      setTimeout(() => setIsAdded(false), 1600);
+    }, { message: 'Sign in to add items to your cart.' });
   };
 
   const handleBuyNow = () => {
     if (!product) return;
-    addItem({
-      item_type: 'PRODUCT',
-      item_id: product.id,
-      name: product.name,
-      description: `${product.category} • ${product.origin}`,
-      unit_price: product.price,
-      quantity: quantity,
-      image: product.img,
-    });
-    navigate('/checkout');
+    requireAuth(() => {
+      addItem({
+        item_type: 'PRODUCT',
+        item_id: product.id,
+        name: product.name,
+        description: `${product.category} • ${product.origin}`,
+        unit_price: product.price,
+        quantity: quantity,
+        image: product.img,
+      });
+      navigate('/checkout');
+    }, { message: 'Sign in to buy and checkout.' });
   };
 
   // 1. Loading State

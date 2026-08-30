@@ -10,6 +10,7 @@ import { activityService, Activity } from '../services/activityService';
 import { getActivityImage } from '../services/home/homeContentService';
 import { OptimizedImage } from '../components/shared/OptimizedImage';
 import { SEO } from '../components/shared/SEO';
+import { useRequireAuth } from '../hooks/useRequireAuth';
 
 const DATES = [
   { date: '14', day: 'Mon', available: true },
@@ -28,6 +29,7 @@ const TIMES = [
 export const ActivityDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { requireAuth } = useRequireAuth();
   const { formatPrice } = useCurrencyStore();
   const { addItem } = useCartStore();
   
@@ -82,17 +84,19 @@ export const ActivityDetails = () => {
 
   const handleBookExperience = () => {
     if (!activity || !selectedTime) return;
-    addItem({
-      item_type: 'ACTIVITY',
-      item_id: activity.id,
-      name: `${activity.name} (${selectedDate} Aug @ ${selectedTime})`,
-      description: activity.description,
-      unit_price: activity.price,
-      quantity: tickets,
-      image: actImage,
-      pax: tickets
-    });
-    navigate('/checkout');
+    requireAuth(() => {
+      addItem({
+        item_type: 'ACTIVITY',
+        item_id: activity.id,
+        name: `${activity.name} (${selectedDate} Aug @ ${selectedTime})`,
+        description: activity.description,
+        unit_price: activity.price,
+        quantity: tickets,
+        image: actImage,
+        pax: tickets
+      });
+      navigate('/checkout');
+    }, { message: 'Sign in to book activities and experiences.' });
   };
 
   return (

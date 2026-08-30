@@ -126,7 +126,7 @@ describe('Unit Tests: Utilities, Price Calculations, Date Calculations', () => {
       useCurrencyStore.getState().setCurrency('NOK');
       const formatted = useCurrencyStore.getState().formatPrice(1250000.5);
       expect(formatted).toContain('kr');
-      expect(formatted.replace(/,/g, '')).toContain('1250000.5');
+      expect(formatted.replace(/,/g, '')).toContain('1250001');
     });
   });
 

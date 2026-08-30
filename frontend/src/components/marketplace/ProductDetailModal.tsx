@@ -7,6 +7,8 @@ import { OptimizedImage } from '../shared/OptimizedImage';
 import { useNavigate, Link } from 'react-router-dom';
 import { Product } from '../../services/shopService';
 
+import { useRequireAuth } from '../../hooks/useRequireAuth';
+
 type ProductRow = Database['public']['Tables']['products']['Row'];
 
 interface ProductDetailModalProps {
@@ -28,27 +30,31 @@ const PRODUCT_EXTENSIONS: Record<string, { specs: Record<string, string>; featur
     materials: 'Halogen-Free Thermoplastic Polyurethane'
   },
   'Nordic Wool Thermal Layer': {
-    specs: { 'Micron': '18.5 Ultra-Fine Merino', 'Weight': '260 g/m² Heavyweight', 'Origin': '100% Norwegian Grazed Wool', 'Care': 'Machine Washable Wool Cycle' },
-    features: ['Natural thermal temperature regulation', 'Odor-resistant antimicrobial fibers', 'Flatlock non-chafing seams', 'Breathable moisture-wicking weave'],
-    materials: 'Certified Animal-Welfare Norwegian Virgin Wool'
+    specs: { 'Fiber': '100% Norwegian Merino Wool', 'Weight': '260 g/m² Heavyweight', 'Origin': 'Gudbrandsdalen, Norway', 'Certification': 'Oeko-Tex Standard 100' },
+    features: ['Natural thermal insulation down to -25°C', 'Antibacterial & odor-resistant', 'Breathable moisture-wicking weave', 'Flame-retardant natural fiber'],
+    materials: '100% Pure Virgin Norwegian Wool'
   },
-  'Solar Adventure Pack 45L': {
-    specs: { 'Solar Output': '24W SunPower ETFE Cells', 'Output Ports': 'Dual USB-C PD 30W + USB-A', 'Volume': '45 Liters Expandable', 'Weight': '1.35 kg' },
-    features: ['High-efficiency flexible solar panel', 'Waterproof roll-top alpine compartment', 'Ergonomic air-mesh back ventilation', 'Integrated emergency whistle & rain cover'],
-    materials: '100% Ocean-Bound Recycled Ripstop Nylon'
+  'Solar Backcountry Powerbank': {
+    specs: { 'Capacity': '25,000 mAh / 92.5Wh', 'Solar Array': 'SunPower Maxeon 6.5W', 'Ports': '2x USB-C PD 65W, 1x USB-A QC', 'Weather': 'IP65 Water & Dust Resistant' },
+    features: ['Charges laptop, phone & drone in wilderness', 'Built-in 400 lumen SOS emergency beacon', 'Cold-resistant Lithium-Polymer cells', 'Pass-through multi-device charging'],
+    materials: 'Recycled Polycarbonate & Anodized Aluminium'
   }
 };
 
 export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClose }) => {
-  const [quantity, setQuantity] = useState(1);
-  const [isAdded, setIsAdded] = useState(false);
+  const navigate = useNavigate();
   const { addItem } = useCartStore();
   const { formatPrice } = useCurrencyStore();
-  const navigate = useNavigate();
+  const { requireAuth } = useRequireAuth();
+  const [quantity, setQuantity] = useState(1);
+  const [isAdded, setIsAdded] = useState(false);
+  const [activeTab, setActiveTab] = useState<'specs' | 'features' | 'sustainability'>('specs');
 
+  // Reset state on new product
   useEffect(() => {
     setQuantity(1);
     setIsAdded(false);
+    setActiveTab('specs');
   }, [product]);
 
   useEffect(() => {
@@ -61,7 +67,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product,
 
   if (!product) return null;
 
-  const productName = product.name;
+  const productName = product.name || 'Nordic Product';
   const productPrice = Number(product.price);
   const extKey = Object.keys(PRODUCT_EXTENSIONS).find(k => productName.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(productName.toLowerCase()));
   const ext = extKey ? PRODUCT_EXTENSIONS[extKey] : {
@@ -71,34 +77,38 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product,
   };
 
   const handleAddToCart = () => {
-    addItem({
-      item_type: 'PRODUCT',
-      item_id: product.id,
-      name: product.name,
-      description: product.category,
-      unit_price: productPrice,
-      quantity: quantity,
-      image: product.img,
-    });
-    setIsAdded(true);
-    setTimeout(() => {
-      setIsAdded(false);
-      onClose();
-    }, 1200);
+    requireAuth(() => {
+      addItem({
+        item_type: 'PRODUCT',
+        item_id: product.id,
+        name: product.name,
+        description: product.category,
+        unit_price: productPrice,
+        quantity: quantity,
+        image: product.img,
+      });
+      setIsAdded(true);
+      setTimeout(() => {
+        setIsAdded(false);
+        onClose();
+      }, 1200);
+    }, { message: 'Sign in to add items to your cart.' });
   };
 
   const handleBuyNow = () => {
-    addItem({
-      item_type: 'PRODUCT',
-      item_id: product.id,
-      name: product.name,
-      description: product.category,
-      unit_price: productPrice,
-      quantity: quantity,
-      image: product.img,
-    });
-    onClose();
-    navigate('/checkout');
+    requireAuth(() => {
+      addItem({
+        item_type: 'PRODUCT',
+        item_id: product.id,
+        name: product.name,
+        description: product.category,
+        unit_price: productPrice,
+        quantity: quantity,
+        image: product.img,
+      });
+      onClose();
+      navigate('/checkout');
+    }, { message: 'Sign in to buy and checkout.' });
   };
 
   return (

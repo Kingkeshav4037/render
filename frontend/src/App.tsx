@@ -19,9 +19,8 @@ const GlobalLoader = () => (
   </div>
 );
 
-// --- Auth-aware root redirect (ISSUE-008) ---
+// --- Auth-aware root redirect ---
 const RootRedirect = () => {
-  const { user, loading } = useAuthStore();
   const [checkingAuthRedirect, setCheckingAuthRedirect] = useState(() => {
     return typeof window !== 'undefined' && (
       window.location.hash.includes('access_token') || 
@@ -36,8 +35,8 @@ const RootRedirect = () => {
     }
   }, [checkingAuthRedirect]);
 
-  if (loading || checkingAuthRedirect) return <GlobalLoader />;
-  return <Navigate to={user ? '/home' : '/login'} replace />;
+  if (checkingAuthRedirect) return <GlobalLoader />;
+  return <Navigate to="/home" replace />;
 };
 
 // --- 404 Not Found page (ISSUE-009) ---
@@ -218,142 +217,131 @@ function App() {
           <Route path="/provider/join" element={<ProviderLanding />} />
           <Route path="/provider/register" element={<ProviderRegister />} />
           
-          <Route element={<ProtectedRoute />}>
-            {/* ── GROUP 1: Main public routes ─────────────────────────────── */}
-            <Route element={
-              <RouteErrorBoundary groupName="Main">
-                <MainLayout />
+          {/* ── MAIN USER LAYOUT ────────────────────────────────────────── */}
+          <Route element={
+            <RouteErrorBoundary groupName="Main">
+              <MainLayout />
+            </RouteErrorBoundary>
+          }>
+            {/* ── PUBLIC GUEST ROUTES (Browse freely without login) ───────── */}
+            <Route path="/home" element={<Home />} />
+            <Route path="/explore" element={<Explore />} />
+            <Route path="/destinations" element={<Navigate to="/explore" replace />} />
+            <Route path="/explore/:slug" element={<DestinationDetails />} />
+            <Route path="/smart-city" element={<SmartCity />} />
+            <Route path="/smart-map" element={<Navigate to="/map" replace />} />
+            <Route path="/insights" element={<Insights />} />
+            <Route path="/trails" element={<HikingTrails />} />
+            <Route path="/trails/:id" element={<TrailDetails />} />
+            <Route path="/winter" element={<WinterSports />} />
+            <Route path="/winter/:id" element={<WinterResortDetails />} />
+            <Route path="/shop" element={<Products />} />
+            <Route path="/shop/cart" element={<ShopCart />} />
+            <Route path="/shop/:id" element={<ProductDetails />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/products/cart" element={<ShopCart />} />
+            <Route path="/products/:id" element={<ProductDetails />} />
+            <Route path="/cart" element={<ShopCart />} />
+            <Route path="/sitemap" element={<Sitemap />} />
+            <Route path="/places" element={<Places />} />
+            <Route path="/nature" element={<NatureHub />} />
+            <Route path="/fjords" element={<Fjords />} />
+            <Route path="/mountains" element={<Mountains />} />
+            <Route path="/wildlife" element={<Wildlife />} />
+            <Route path="/wildlife/:id" element={<WildlifeDetail />} />
+            <Route path="/flora" element={<Flora />} />
+            <Route path="/nature/flora" element={<Flora />} />
+            <Route path="/nature/plants-trees" element={<Flora />} />
+            <Route path="/plants-trees" element={<Navigate to="/nature/plants-trees" replace />} />
+            <Route path="/history" element={<History />} />
+            <Route path="/resorts" element={<WinterSports />} />
+            <Route path="/food" element={<Food />} />
+            <Route path="/restaurants" element={<Navigate to="/food" replace />} />
+            <Route path="/hotels" element={<Navigate to="/stay" replace />} />
+            <Route path="/stay" element={<Stay />} />
+            <Route path="/stay/:id" element={<StayDetails />} />
+            <Route path="/food/:id" element={<FoodDetails />} />
+            <Route path="/activities" element={<Activities />} />
+            <Route path="/activities/:id" element={<ActivityDetails />} />
+            <Route path="/infrastructure" element={<Infrastructure />} />
+            <Route path="/transport" element={<Navigate to="/travel" replace />} />
+            <Route path="/travel" element={<Travel />} />
+            <Route path="/travel/route/:id" element={<TransportDetails />} />
+            <Route path="/road-trips" element={<RoadTrips />} />
+            <Route path="/events" element={<Events />} />
+            <Route path="/live" element={<SmartNorway />} />
+            <Route path="/deals" element={<Deals />} />
+            <Route path="/packages" element={<Navigate to="/deals" replace />} />
+            <Route path="/guides" element={<Guides />} />
+            <Route path="/weather" element={<LiveWeather />} />
+            <Route path="/aurora" element={<AuroraTracker />} />
+            <Route path="/safety" element={<SafetyAlerts />} />
+            <Route path="/sustainability" element={<Sustainability />} />
+            <Route path="/recommendations" element={<Recommendations />} />
+            <Route path="/mobility/ev" element={<EVCharging />} />
+            <Route path="/mobility/ev/:id" element={<EVStationDetails />} />
+            <Route path="/mobility/ferry" element={<SmartFerry />} />
+            <Route path="/infrastructure/energy" element={<EnergyDashboard />} />
+            <Route path="/infrastructure/iot" element={<IoTDashboard />} />
+            <Route path="/infrastructure/iot/:id" element={<DeviceDetail />} />
+            <Route path="/map" element={
+              <RouteErrorBoundary groupName="Maps">
+                <SmartMap />
               </RouteErrorBoundary>
-            }>
-              <Route path="/home" element={<Home />} />
-              <Route path="/explore" element={<Explore />} />
-              <Route path="/destinations" element={<Navigate to="/explore" replace />} />
-              <Route path="/explore/:slug" element={<DestinationDetails />} />
-              <Route path="/smart-city" element={<SmartCity />} />
-              <Route path="/smart-map" element={<Navigate to="/map" replace />} />
-              <Route path="/insights" element={<Insights />} />
-              <Route path="/trails" element={<HikingTrails />} />
-              <Route path="/trails/:id" element={<TrailDetails />} />
-              <Route path="/winter" element={<WinterSports />} />
-              <Route path="/winter/:id" element={<WinterResortDetails />} />
-              <Route path="/shop" element={<Products />} />
-              <Route path="/shop/cart" element={<ShopCart />} />
-              <Route path="/shop/:id" element={<ProductDetails />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/products/cart" element={<ShopCart />} />
-              <Route path="/products/:id" element={<ProductDetails />} />
-              <Route path="/cart" element={<ShopCart />} />
-              {/* /industry removed — duplicate of /infrastructure (ISSUE-010) */}
+            } />
 
-
-
-              {/* Site Directory */}
-              <Route path="/sitemap" element={<Sitemap />} />
-
-              {/* Dedicated & Category Landing Hubs */}
-              <Route path="/places" element={<Places />} />
-              <Route path="/nature" element={<NatureHub />} />
-              <Route path="/fjords" element={<Fjords />} />
-              <Route path="/mountains" element={<Mountains />} />
-              <Route path="/wildlife" element={<Wildlife />} />
-              <Route path="/wildlife/:id" element={<WildlifeDetail />} />
-              <Route path="/flora" element={<Flora />} />
-              <Route path="/nature/flora" element={<Flora />} />
-              <Route path="/nature/plants-trees" element={<Flora />} />
-              <Route path="/plants-trees" element={<Navigate to="/nature/plants-trees" replace />} />
-              <Route path="/history" element={<History />} />
-              <Route path="/resorts" element={<WinterSports />} />
-              <Route path="/food" element={<Food />} />
-              <Route path="/restaurants" element={<Navigate to="/food" replace />} />
-              <Route path="/hotels" element={<Navigate to="/stay" replace />} />
-              <Route path="/stay" element={<Stay />} />
-              <Route path="/stay/:id" element={<StayDetails />} />
-              <Route path="/stay/:id/book" element={<StayBooking />} />
-              <Route path="/food/:id" element={<FoodDetails />} />
-              <Route path="/activities" element={<Activities />} />
-              <Route path="/activities/:id" element={<ActivityDetails />} />
-              <Route path="/infrastructure" element={<Infrastructure />} />
-              <Route path="/transport" element={<Navigate to="/travel" replace />} />
-              <Route path="/travel" element={<Travel />} />
-              <Route path="/travel/route/:id" element={<TransportDetails />} />
-              <Route path="/road-trips" element={<RoadTrips />} />
-              <Route path="/events" element={<Events />} />
-              <Route path="/live" element={<SmartNorway />} />
-              <Route path="/deals" element={<Deals />} />
-              <Route path="/packages" element={<Navigate to="/deals" replace />} />
-              <Route path="/guides" element={<Guides />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/checkout/stay/:id" element={<StayBooking />} />
-              <Route path="/checkout/booking/:roomId" element={<StayBooking />} />
-              <Route path="/payment-success" element={<PaymentSuccess />} />
-              <Route path="/payment-failure" element={<PaymentFailure />} />
-              <Route path="/payment-failed" element={<Navigate to="/payment-failure" replace />} />
-
-
-              {/* ── GROUP 2: Protected User routes ───────────────────────────── */}
-              <Route element={<ProtectedRoute />}>
-                <Route path="/dashboard" element={
-                  <RouteErrorBoundary groupName="Dashboard">
-                    <Dashboard />
-                  </RouteErrorBoundary>
-                } />
-                <Route path="/profile" element={<ProfileLayout />}>
-                  <Route index element={<ProfileOverview />} />
-                  <Route path="preferences" element={<ProfilePreferences />} />
-                  <Route path="security" element={<ProfileSecurity />} />
-                  <Route path="privacy" element={<ProfilePrivacy />} />
-                </Route>
-                <Route path="/wishlist" element={<Wishlist />} />
-                <Route path="/favorites" element={<Wishlist />} />
-                <Route path="/saved" element={<Navigate to="/favorites" replace />} />
-                <Route path="/trips" element={<TripsList />} />
-                <Route path="/trips/:id" element={<TripDetails />} />
-                <Route path="/wallet" element={<TravelWallet />} />
-                <Route path="/notifications" element={<Notifications />} />
-                <Route path="/reviews" element={<Reviews />} />
-                <Route path="/user/history" element={<TravelHistory />} />
-                <Route path="/user/travel-history" element={<TravelHistory />} />
-                <Route path="/impact" element={<Impact />} />
-                <Route path="/expenses" element={<Expenses />} />
-                <Route path="/settings" element={<Navigate to="/profile" replace />} />
-                <Route path="/settings/preferences" element={<Navigate to="/profile/preferences" replace />} />
-                <Route path="/settings/security" element={<Navigate to="/profile/security" replace />} />
-                <Route path="/settings/privacy" element={<Navigate to="/profile/privacy" replace />} />
-                <Route path="/settings/notifications" element={<NotificationSettings />} />
-                <Route path="/user/bookings" element={<MyBookings />} />
-                <Route path="/bookings" element={<Navigate to="/user/bookings" replace />} />
-                <Route path="/user/bookings/:id" element={<BookingDetails />} />
-                <Route path="/bookings/:id" element={<BookingDetails />} />
-                <Route path="/invoices" element={<Invoices />} />
-                <Route path="/user/invoices" element={<Invoices />} />
-              </Route>
-
-              {/* ── GROUP 3: Maps & Smart City ──────────────────────────── */}
-              <Route path="/map" element={
-                <RouteErrorBoundary groupName="Maps">
-                  <SmartMap />
+            {/* ── PROTECTED USER ROUTES (Login Required) ────────────────── */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/dashboard" element={
+                <RouteErrorBoundary groupName="Dashboard">
+                  <Dashboard />
                 </RouteErrorBoundary>
               } />
+              <Route path="/profile" element={<ProfileLayout />}>
+                <Route index element={<ProfileOverview />} />
+                <Route path="preferences" element={<ProfilePreferences />} />
+                <Route path="security" element={<ProfileSecurity />} />
+                <Route path="privacy" element={<ProfilePrivacy />} />
+              </Route>
+              <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/favorites" element={<Wishlist />} />
+              <Route path="/saved" element={<Navigate to="/favorites" replace />} />
+              <Route path="/trips" element={<TripsList />} />
+              <Route path="/trips/:id" element={<TripDetails />} />
               <Route path="/planner" element={<TripPlanner />} />
               <Route path="/ai-planner" element={<Navigate to="/planner" replace />} />
               <Route path="/plan-trip" element={<Navigate to="/planner" replace />} />
               <Route path="/planner/itinerary/:id" element={<ItineraryView />} />
-              <Route path="/weather" element={<LiveWeather />} />
-              <Route path="/aurora" element={<AuroraTracker />} />
-              <Route path="/safety" element={<SafetyAlerts />} />
-              <Route path="/sustainability" element={<Sustainability />} />
-              <Route path="/recommendations" element={<Recommendations />} />
-              <Route path="/mobility/ev" element={<EVCharging />} />
-              <Route path="/mobility/ev/:id" element={<EVStationDetails />} />
-              <Route path="/mobility/ferry" element={<SmartFerry />} />
-              <Route path="/infrastructure/energy" element={<EnergyDashboard />} />
-              <Route path="/infrastructure/iot" element={<IoTDashboard />} />
-              <Route path="/infrastructure/iot/:id" element={<DeviceDetail />} />
-
-              {/* ── GROUP 4: Checkout & Payment ─────────────────────────── */}
+              <Route path="/wallet" element={<TravelWallet />} />
+              <Route path="/notifications" element={<Notifications />} />
+              <Route path="/reviews" element={<Reviews />} />
+              <Route path="/user/history" element={<TravelHistory />} />
+              <Route path="/user/travel-history" element={<TravelHistory />} />
+              <Route path="/impact" element={<Impact />} />
+              <Route path="/expenses" element={<Expenses />} />
+              <Route path="/settings" element={<Navigate to="/profile" replace />} />
+              <Route path="/settings/preferences" element={<Navigate to="/profile/preferences" replace />} />
+              <Route path="/settings/security" element={<Navigate to="/profile/security" replace />} />
+              <Route path="/settings/privacy" element={<Navigate to="/profile/privacy" replace />} />
+              <Route path="/settings/notifications" element={<NotificationSettings />} />
+              <Route path="/user/bookings" element={<MyBookings />} />
+              <Route path="/bookings" element={<Navigate to="/user/bookings" replace />} />
+              <Route path="/user/bookings/:id" element={<BookingDetails />} />
+              <Route path="/bookings/:id" element={<BookingDetails />} />
+              <Route path="/invoices" element={<Invoices />} />
+              <Route path="/user/invoices" element={<Invoices />} />
+              
+              {/* Protected Booking & Checkout Flows */}
+              <Route path="/stay/:id/book" element={<StayBooking />} />
               <Route path="/checkout" element={
                 <RouteErrorBoundary groupName="Checkout">
                   <Checkout />
+                </RouteErrorBoundary>
+              } />
+              <Route path="/checkout/stay/:id" element={<StayBooking />} />
+              <Route path="/checkout/booking/:roomId" element={
+                <RouteErrorBoundary groupName="Checkout">
+                  <StayBooking />
                 </RouteErrorBoundary>
               } />
               <Route path="/payment-success" element={
@@ -361,56 +349,53 @@ function App() {
                   <PaymentSuccess />
                 </RouteErrorBoundary>
               } />
-              <Route path="/checkout/booking/:roomId" element={
-                <RouteErrorBoundary groupName="Checkout">
-                  <StayBooking />
-                </RouteErrorBoundary>
-              } />
+              <Route path="/payment-failure" element={<PaymentFailure />} />
+              <Route path="/payment-failed" element={<Navigate to="/payment-failure" replace />} />
 
-              {/* ── GROUP 5: AI Functionality ───────────────────────────── */}
+              {/* Protected AI Functionality */}
               <Route path="/assistant" element={
                 <RouteErrorBoundary groupName="AI Assistant">
                   <Assistant />
                 </RouteErrorBoundary>
               } />
             </Route>
+          </Route>
 
-            {/* ── GROUP 6: Provider B2B Routes ───────────────────────── */}
-            <Route path="/provider" element={<ProviderGuard />}>
-              {/* Fullscreen Wizards & Editors */}
-              <Route path="listings/:id/edit" element={
-                <RouteErrorBoundary groupName="Provider">
-                  <ListingEditor />
-                </RouteErrorBoundary>
-              } />
-              <Route path="listings/:id/preview" element={
-                <RouteErrorBoundary groupName="Provider">
-                  <ListingPreview />
-                </RouteErrorBoundary>
-              } />
+          {/* ── GROUP 6: Provider B2B Routes ───────────────────────── */}
+          <Route path="/provider" element={<ProviderGuard />}>
+            {/* Fullscreen Wizards & Editors */}
+            <Route path="listings/:id/edit" element={
+              <RouteErrorBoundary groupName="Provider">
+                <ListingEditor />
+              </RouteErrorBoundary>
+            } />
+            <Route path="listings/:id/preview" element={
+              <RouteErrorBoundary groupName="Provider">
+                <ListingPreview />
+              </RouteErrorBoundary>
+            } />
 
-              {/* Standard Dashboard Layout */}
-              <Route element={
-                <RouteErrorBoundary groupName="Provider">
-                  <ProviderLayout />
-                </RouteErrorBoundary>
-              }>
-                <Route path="dashboard" element={<ProviderDashboard />} />
-                <Route path="listings" element={<ProviderListings />} />
-                <Route path="listings/new" element={<CreateListingWizard />} />
-                <Route path="calendar" element={<ProviderCalendar />} />
-                <Route path="bookings" element={<ProviderBookings />} />
-                <Route path="bookings/:id" element={<ProviderBookingDetails />} />
-                <Route path="customers" element={<ProviderCustomers />} />
-                <Route path="messages" element={<ProviderMessages />} />
-                <Route path="reviews" element={<ProviderReviews />} />
-                <Route path="finance" element={<ProviderFinance />} />
-                <Route path="analytics" element={<ProviderAnalytics />} />
-                <Route path="marketing" element={<ProviderMarketing />} />
-                <Route path="settings" element={<ProviderSettings />} />
-              </Route>
-              </Route>
+            {/* Standard Dashboard Layout */}
+            <Route element={
+              <RouteErrorBoundary groupName="Provider">
+                <ProviderLayout />
+              </RouteErrorBoundary>
+            }>
+              <Route path="dashboard" element={<ProviderDashboard />} />
+              <Route path="listings" element={<ProviderListings />} />
+              <Route path="listings/new" element={<CreateListingWizard />} />
+              <Route path="calendar" element={<ProviderCalendar />} />
+              <Route path="bookings" element={<ProviderBookings />} />
+              <Route path="bookings/:id" element={<ProviderBookingDetails />} />
+              <Route path="customers" element={<ProviderCustomers />} />
+              <Route path="messages" element={<ProviderMessages />} />
+              <Route path="reviews" element={<ProviderReviews />} />
+              <Route path="finance" element={<ProviderFinance />} />
+              <Route path="analytics" element={<ProviderAnalytics />} />
+              <Route path="marketing" element={<ProviderMarketing />} />
+              <Route path="settings" element={<ProviderSettings />} />
             </Route>
+          </Route>
 
             {/* Admin Auth Route */}
             <Route path="/admin/login" element={<AdminLogin />} />

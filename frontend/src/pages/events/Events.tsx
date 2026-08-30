@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { eventService, Event } from '../../services/eventService';
 import { Calendar, MapPin, Tag, Search, Sparkles, X } from 'lucide-react';
 import { useCartStore } from '../../store/useCartStore';
+import { useRequireAuth } from '../../hooks/useRequireAuth';
 import { OptimizedImage } from '../../components/shared/OptimizedImage';
 import { SEO } from '../../components/shared/SEO';
 
@@ -14,6 +15,7 @@ export const Events = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const { addItem } = useCartStore();
+  const { requireAuth } = useRequireAuth();
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -160,18 +162,20 @@ export const Events = () => {
                           <span className="text-xl font-bold text-white">NOK {event.ticket_price}</span>
                         </div>
                         <button 
-                           onClick={() => {
-                             addItem({
-                               item_type: 'EVENT',
-                               item_id: event.id,
-                               name: event.name,
-                               unit_price: event.ticket_price,
-                               quantity: 1,
-                               image: event.image_url
-                             });
-                           }}
-                           className="bg-purple-600 hover:bg-purple-500 text-white px-8 py-3 rounded-xl font-bold transition-colors w-full sm:w-auto cursor-pointer"
-                        >
+                            onClick={() => {
+                              requireAuth(() => {
+                                addItem({
+                                  item_type: 'EVENT',
+                                  item_id: event.id,
+                                  name: event.name,
+                                  unit_price: event.ticket_price,
+                                  quantity: 1,
+                                  image: event.image_url
+                                });
+                              }, { message: 'Sign in to book event tickets.' });
+                            }}
+                            className="bg-purple-600 hover:bg-purple-500 text-white px-8 py-3 rounded-xl font-bold transition-colors w-full sm:w-auto cursor-pointer"
+                         >
                           Buy Ticket
                         </button>
                      </div>

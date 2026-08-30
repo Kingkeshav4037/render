@@ -7,11 +7,14 @@ import { useCart } from '../../store/useCartStore';
 import { CinematicBackground } from '../../design/backgrounds/CinematicBackground';
 import { OptimizedImage } from '../../components/shared/OptimizedImage';
 import { SEO } from '../../components/shared/SEO';
+import { useRequireAuth } from '../../hooks/useRequireAuth';
+
 export const Deals = () => {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { addItem } = useCart();
+  const { requireAuth } = useRequireAuth();
   const [activeCategory, setActiveCategory] = useState('All');
 
   const fetchDeals = async () => {
@@ -193,15 +196,17 @@ export const Deals = () => {
                     </div>
                     <button 
                       onClick={() => {
-                        addItem({
-                          item_type: 'DEAL',
-                          item_id: deal.id,
-                          name: deal.name,
-                          unit_price: deal.price,
-                          quantity: 1,
-                          image: deal.image_url
-                        });
-                        toast.success(`${deal.name} added to your selection!`);
+                        requireAuth(() => {
+                          addItem({
+                            item_type: 'DEAL',
+                            item_id: deal.id,
+                            name: deal.name,
+                            unit_price: deal.price,
+                            quantity: 1,
+                            image: deal.image_url
+                          });
+                          toast.success(`${deal.name} added to your selection!`);
+                        }, { message: 'Sign in to claim special travel deals.' });
                       }}
                       className="bg-[#D97706] text-white p-4 rounded-sm hover:bg-[#B45309] hover:shadow-lg transition-all hover:-translate-y-1 active:translate-y-0"
                       title="Add to Cart"
