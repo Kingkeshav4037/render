@@ -55,7 +55,7 @@ export const resortService = {
       snow_depth_cm: estimatedSnowDepth,
       status: resortStatus,
       current_temp: estimatedTemp,
-      image: heroImage || firstImage || '/images/galdhopiggen_1786936412055.jpg'
+      image: heroImage || firstImage || 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=norway+ski+resort+winter+slopes&w=1200'
     };
   }
 };

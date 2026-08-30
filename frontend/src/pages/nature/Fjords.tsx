@@ -34,7 +34,7 @@ const FJORD_HIGHLIGHTS = [
     badge: "Orchard & Glacier Fjord",
     region: "Vestland",
     description: "Norway's second longest fjord, famed for spring fruit blossoms, Folgefonna glacier, and the Vøringsfossen waterfall.",
-    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=hardangerfjord+norway&w=1200",
+    image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=hardangerfjord+norway+blue+water&w=1200",
     slug: "hardangerfjord",
     tags: ["Cider Route", "Glaciers", "Trolltunga Access"]
   },

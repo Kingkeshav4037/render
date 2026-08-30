@@ -61,9 +61,9 @@ const getPlaceholderImage = (name: string) => {
     return '/images/fjords_1786935800026.jpg';
   }
   if (n.includes('museum') || n.includes('munch') || n.includes('opera') || n.includes('oslo')) {
-    return '/images/login_background_1786937688053.jpg';
+    return 'https://images.unsplash.com/photo-1578632767115-351597cf2477?q=oslo+opera+house+museum+architecture&w=1200';
   }
-  return '/images/preikestolen_1786936002797.jpg';
+  return 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=norway+landmarks+architecture&w=1200';
 };
 
 export const Places = () => {
@@ -120,7 +120,7 @@ export const Places = () => {
         title="Iconic Places & Landmarks"
         description="From 800-year-old stave churches and coastal lighthouses to cutting-edge Nordic architectural viewpoints, explore Norway's most notable places."
         breadcrumb="Places"
-        backgroundImage="/images/besseggen_1786936349992.jpg"
+        backgroundImage="https://images.unsplash.com/photo-1548625361-195feee1361c?q=norway+stave+church+places+landmark&w=1600"
       >
         <div className="flex flex-wrap items-center gap-6 mt-8">
           <div className="flex items-center gap-2 text-snow/80">

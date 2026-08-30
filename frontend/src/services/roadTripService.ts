@@ -26,7 +26,7 @@ const DEFAULT_ROAD_TRIPS: RoadTrip[] = [
     season: 'Year-round',
     difficulty: 'Easy',
     scenic_highlights: ['Storseisundet Bridge', 'Sea fishing', 'Birdwatching', 'Coastal villages', 'Storm watching in winter'],
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&q=80&w=1400',
+    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=atlantic+ocean+road+norway+bridge&w=1400',
     start_point: 'Kristiansund',
     end_point: 'Molde'
   },
@@ -40,7 +40,7 @@ const DEFAULT_ROAD_TRIPS: RoadTrip[] = [
     season: 'May–October',
     difficulty: 'Moderate',
     scenic_highlights: ['11 hairpin bends', 'Stigfossen Waterfall', 'Summit viewpoint', 'Geiranger UNESCO fjord', 'Eagle Road pass'],
-    image: 'https://images.unsplash.com/photo-1519451241324-20b4ea2c4220?auto=format&fit=crop&q=80&w=1400',
+    image: 'https://images.unsplash.com/photo-1519451241324-20b4ea2c4220?q=trollstigen+mountain+pass+hairpin&w=1400',
     start_point: 'Åndalsnes',
     end_point: 'Geiranger'
   },
@@ -82,7 +82,7 @@ const DEFAULT_ROAD_TRIPS: RoadTrip[] = [
     season: 'May–Oct',
     difficulty: 'Easy',
     scenic_highlights: ['Vøringsfossen waterfall', 'Trolltunga viewpoint', 'Folgefonna glacier', 'Apple blossom route', 'Eidfjord medieval church'],
-    image: '/images/trolltunga_1786936111320.jpg',
+    image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=hardangerfjord+waterfall+blossom&w=1400',
     start_point: 'Bergen',
     end_point: 'Odda'
   },

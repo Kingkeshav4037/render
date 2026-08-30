@@ -87,7 +87,7 @@ export const FALLBACK_EVENTS: Event[] = [
     end_date: '2026-08-14T20:00:00Z',
     ticket_price: 250,
     currency: 'NOK',
-    image_url: '/images/fjords_1786935800026.jpg',
+    image_url: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=vintage+steamship+maritime+festival&w=1200',
     featured: false,
     lat: 60.8631,
     lng: 7.1132

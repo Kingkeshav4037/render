@@ -46,7 +46,7 @@ export const FALLBACK_DEALS: Deal[] = [
     original_price: 3800,
     discount_percentage: 22,
     valid_until: '2026-10-31T23:59:59Z',
-    image_url: '/images/fjords_1786935800026.jpg',
+    image_url: 'https://images.unsplash.com/photo-1448375240586-882707db888b?q=flamsbana+railway+scenic+train+norway&w=1200',
     featured: true,
     status: 'PUBLISHED'
   },

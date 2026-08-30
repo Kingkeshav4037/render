@@ -16,12 +16,12 @@ import { getWildlifeImage } from '../wildlifeService';
 export const ACTIVITY_CATEGORY_IMAGES: Record<string, string> = {
   HIKING:    '/images/preikestolen_1786936002797.jpg',
   AURORA:    '/images/northern_lights_1786935879330.jpg',
-  KAYAK:     '/images/fjords_1786935800026.jpg',
+  KAYAK:     'https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=kayak+fjord+norway&w=1200',
   WILDLIFE:  '/images/wildlife_reindeer_1787013667019.jpg',
-  CRUISE:    '/images/fjords_1786935800026.jpg',
+  CRUISE:    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=fjord+electric+cruise+norway&w=1200',
   CLIMBING:  '/images/kjeragbolten_1786936275605.jpg',
   MOUNTAIN:  '/images/galdhopiggen_1786936412055.jpg',
-  SKIING:    '/images/galdhopiggen_1786936412055.jpg',
+  SKIING:    'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=skiing+norway+slopes&w=1200',
   DEFAULT:   '/images/fjords_1786935800026.jpg',
 };
 
@@ -51,17 +51,17 @@ const FALLBACK_ACTIVITIES: HomeActivity[] = [
 ];
 
 const FALLBACK_FOODS: HomeFood[] = [
-  { id: 'fo-01', name: 'Fårikål', category: 'Traditional', origin_region: 'Nationwide', short_description: "Norway's national dish: lamb slow-cooked with cabbage and black pepper.", image: 'https://images.unsplash.com/photo-1534482421-64566f976cfa?q=80&w=800' },
-  { id: 'fo-02', name: 'Gravlaks', category: 'Seafood', origin_region: 'Coastal Norway', short_description: 'Cold-cured salmon with dill, mustard, and aquavit — an iconic Nordic starter.', image: '/images/food_salmon_1787013684123.jpg' },
-  { id: 'fo-03', name: 'Brunost', category: 'Traditional', origin_region: 'Gudbrandsdalen', short_description: 'Caramelised brown whey cheese — utterly unique and deeply Norwegian.', image: 'https://images.unsplash.com/photo-1452195100486-9cc805987862?q=80&w=800' },
-  { id: 'fo-04', name: 'Pinnekjøtt', category: 'Land Food', origin_region: 'Western Norway', short_description: 'Salted dried lamb ribs steamed over birch twigs — the Christmas centrepiece.', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=800' },
+  { id: 'fo-01', name: 'Fårikål', category: 'Traditional', origin_region: 'Nationwide', short_description: "Norway's national dish: lamb slow-cooked with cabbage and black pepper.", image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?q=lamb+cabbage+stew+pot&w=800' },
+  { id: 'fo-02', name: 'Gravlaks', category: 'Seafood', origin_region: 'Coastal Norway', short_description: 'Cold-cured salmon with dill, mustard, and aquavit — an iconic Nordic starter.', image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=gravlax+salmon+dill&w=800' },
+  { id: 'fo-03', name: 'Brunost', category: 'Traditional', origin_region: 'Gudbrandsdalen', short_description: 'Caramelised brown whey cheese — utterly unique and deeply Norwegian.', image: 'https://images.unsplash.com/photo-1452195100486-9cc805987862?q=brown+cheese+norway&w=800' },
+  { id: 'fo-04', name: 'Pinnekjøtt', category: 'Land Food', origin_region: 'Western Norway', short_description: 'Salted dried lamb ribs steamed over birch twigs — the Christmas centrepiece.', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?q=lamb+ribs+steamed&w=800' },
 ];
 
 const FALLBACK_WILDLIFE: HomeAnimal[] = [
-  { id: 'w-01', name: 'Arctic Fox', scientific_name: 'Vulpes lagopus', category: 'Land', habitat: 'Arctic tundra', short_description: 'One of Norway\'s most endangered mammals, perfectly adapted to extreme cold.', image: 'https://images.unsplash.com/photo-1516214104703-d2507f01dda4?q=80&w=800', best_season: 'Winter' },
-  { id: 'w-02', name: 'Moose', scientific_name: 'Alces alces', category: 'Land', habitat: 'Boreal forest', short_description: 'The largest of the deer family, a majestic sight in Norway\'s forests.', image: 'https://images.unsplash.com/photo-1547844075-8e2b2fb0c930?q=80&w=800', best_season: 'Summer' },
-  { id: 'w-03', name: 'Atlantic Puffin', scientific_name: 'Fratercula arctica', category: 'Bird', habitat: 'Sea cliffs', short_description: 'Colourful seabird nesting in millions along Norway\'s western coast.', image: 'https://images.unsplash.com/photo-1550950158-d0d960dff51b?q=80&w=800', best_season: 'Summer' },
-  { id: 'w-04', name: 'Orca', scientific_name: 'Orcinus orca', category: 'Marine', habitat: 'Fjords', short_description: 'Pods of orcas follow herring into Norwegian fjords each winter.', image: 'https://images.unsplash.com/photo-1568430462989-44163eb1752f?q=80&w=800', best_season: 'Winter' },
+  { id: 'w-01', name: 'Arctic Fox', scientific_name: 'Vulpes lagopus', category: 'Land', habitat: 'Arctic tundra', short_description: 'One of Norway\'s most endangered mammals, perfectly adapted to extreme cold.', image: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=arctic+fox+white+snow+winter&w=800', best_season: 'Winter' },
+  { id: 'w-02', name: 'Moose', scientific_name: 'Alces alces', category: 'Land', habitat: 'Boreal forest', short_description: 'The largest of the deer family, a majestic sight in Norway\'s forests.', image: 'https://images.unsplash.com/photo-1543946602-a0fce8117697?q=moose+norway+forest&w=800', best_season: 'Summer' },
+  { id: 'w-03', name: 'Atlantic Puffin', scientific_name: 'Fratercula arctica', category: 'Bird', habitat: 'Sea cliffs', short_description: 'Colourful seabird nesting in millions along Norway\'s western coast.', image: 'https://images.unsplash.com/photo-1550950158-d0d960dff51b?q=atlantic+puffin+norway&w=800', best_season: 'Summer' },
+  { id: 'w-04', name: 'Orca', scientific_name: 'Orcinus orca', category: 'Marine', habitat: 'Fjords', short_description: 'Pods of orcas follow herring into Norwegian fjords each winter.', image: 'https://images.unsplash.com/photo-1568430462989-44163eb1752f?q=orca+whale+norway+fjord&w=800', best_season: 'Winter' },
 ];
 
 const FALLBACK_HOTELS: HomeHotel[] = [
@@ -78,8 +78,8 @@ const FALLBACK_RESTAURANTS = [
 
 const FALLBACK_EVENTS: HomeEvent[] = [
   { id: 'ev-01', name: 'Bergen International Festival', date: 'May 21 – Jun 1', location: 'Bergen', category: 'Culture', image: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=800' },
-  { id: 'ev-02', name: 'Tromsø International Film Festival', date: 'Jan 17–22', location: 'Tromsø', category: 'Film', image: '/images/northern_lights_1786935879330.jpg' },
-  { id: 'ev-03', name: 'Midnight Sun Marathon', date: 'Jun 21', location: 'Tromsø', category: 'Sport', image: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?q=80&w=800' },
+  { id: 'ev-02', name: 'Tromsø International Film Festival', date: 'Jan 17–22', location: 'Tromsø', category: 'Film', image: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?q=outdoor+cinema+arctic+film+festival&w=800' },
+  { id: 'ev-03', name: 'Midnight Sun Marathon', date: 'Jun 21', location: 'Tromsø', category: 'Sport', image: 'https://images.unsplash.com/photo-1530549387789-4c1017266635?q=marathon+running+athletes&w=800' },
 ];
 
 // ─── SERVICE ──────────────────────────────────────────────────────────────────
@@ -196,12 +196,12 @@ export const homeContentService = {
         .select('*, content_media(media_url, media_type)')
         .limit(3);
       if (error || !data || data.length === 0) return [
-        { id: 'rt-01', name: 'Atlantic Ocean Road', duration_days: 3, image: '/images/fjords_1786935800026.jpg', region: 'Møre og Romsdal' },
-        { id: 'rt-02', name: 'Trollstigen Mountain Route', duration_days: 2, image: '/images/besseggen_1786936349992.jpg', region: 'Vestland' },
+        { id: 'rt-01', name: 'Atlantic Ocean Road', duration_days: 3, image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=atlantic+ocean+road+norway+bridge&w=1400', region: 'Møre og Romsdal' },
+        { id: 'rt-02', name: 'Trollstigen Mountain Route', duration_days: 2, image: 'https://images.unsplash.com/photo-1519451241324-20b4ea2c4220?q=trollstigen+mountain+pass+hairpin&w=1400', region: 'Vestland' },
       ];
       return data.map((t: any) => ({
         ...t,
-        image: t.content_media?.find((m: any) => m.media_type === 'HERO')?.media_url || t.content_media?.[0]?.media_url || '/images/fjords_1786935800026.jpg'
+        image: t.content_media?.find((m: any) => m.media_type === 'HERO')?.media_url || t.content_media?.[0]?.media_url || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=scenic+road+norway&w=1400'
       }));
     } catch { return []; }
   },

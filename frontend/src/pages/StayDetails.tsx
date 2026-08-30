@@ -185,9 +185,10 @@ export const StayDetails = () => {
         </div>
         <div className="hidden md:block col-span-1 h-full relative group overflow-hidden">
           <OptimizedImage 
-            src="/images/northern_lights_1786935879330.jpg" 
-            alt="Gallery Aurora" 
-            category="aurora"
+            src="https://images.unsplash.com/photo-1590490360182-c33d57733427?q=luxury+nordic+hotel+interior+room&w=800" 
+            alt="Room & Interior" 
+            category="stay"
+            fallbackSrc="/images/hotel_juvet_1787013813000.jpg"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
             containerClassName="w-full h-full"
           />
@@ -195,18 +196,20 @@ export const StayDetails = () => {
         <div className="hidden md:flex col-span-1 h-full flex-col gap-2">
           <div className="h-1/2 relative group overflow-hidden">
             <OptimizedImage 
-              src="/images/fjords_1786935800026.jpg" 
-              alt="Gallery Fjord" 
-              category="landscape"
+              src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=scandinavian+resort+room+view&w=800" 
+              alt="Panoramic View" 
+              category="stay"
+              fallbackSrc="/images/hotel_juvet_1787013813000.jpg"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
               containerClassName="w-full h-full"
             />
           </div>
           <div className="h-1/2 relative group overflow-hidden">
             <OptimizedImage 
-              src="/images/besseggen_1786936349992.jpg" 
-              alt="Gallery Nature" 
-              category="trail"
+              src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=nordic+sauna+wellness+resort&w=800" 
+              alt="Sauna & Spa" 
+              category="stay"
+              fallbackSrc="/images/hotel_juvet_1787013813000.jpg"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
               containerClassName="w-full h-full"
             />

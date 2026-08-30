@@ -17,7 +17,7 @@ export const demoTransportModes: TransportMode[] = [
     type: 'train',
     description: 'Experience some of the most beautiful train journeys in the world, including the Flåm Railway.',
     is_eco: true,
-    image_url: '/images/trolltunga_1786936111320.jpg'
+    image_url: 'https://images.unsplash.com/photo-1448375240586-882707db888b?q=scenic+train+norway+railway&w=1200'
   },
   {
     id: 'mode-ferry',
@@ -25,7 +25,7 @@ export const demoTransportModes: TransportMode[] = [
     type: 'ferry',
     description: 'Cruise the majestic fjords silently and emission-free on our modern electric ferries.',
     is_eco: true,
-    image_url: '/images/fjords_1786935800026.jpg'
+    image_url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=electric+ferry+fjord+cruise+norway&w=1200'
   },
   {
     id: 'mode-ev',
@@ -33,7 +33,7 @@ export const demoTransportModes: TransportMode[] = [
     type: 'ev',
     description: 'Rent an electric vehicle and explore Norway with the worlds best charging infrastructure.',
     is_eco: true,
-    image_url: '/images/northern_lights_1786935879330.jpg'
+    image_url: 'https://images.unsplash.com/photo-1563720223185-11003d516935?q=electric+car+ev+charging+norway&w=1200'
   }
 ];
 

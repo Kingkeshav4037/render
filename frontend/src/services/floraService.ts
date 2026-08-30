@@ -129,7 +129,7 @@ export const FALLBACK_FLORA: FloraSpecies[] = [
     ecological_role: 'Produces antifreeze proteins allowing its cells to survive freezing nightly summer blizzards.',
     traditional_uses: 'Symbol of alpine resilience and high-mountain Norwegian mountaineering heritage.',
     foraging_tips: 'Strictly observe Leave No Trace principles; alpine tundra plants take decades to recover.',
-    image_url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=alpine+flower+glacier&w=1080'
+    image_url: 'https://images.unsplash.com/photo-1533038590840-1cde6e668a91?q=ranunculus+glacialis+alpine+buttercup+flower&w=1080'
   },
   {
     id: 'f7',

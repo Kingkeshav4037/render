@@ -17,13 +17,13 @@ export interface AdventureCategory {
 
 export const ADVENTURE_CATEGORIES: AdventureCategory[] = [
   { id: 'hiking',   name: 'Hiking',    description: 'Norwegian mountain trails.',          image: '/images/trolltunga_1786936111320.jpg',      count: 245 },
-  { id: 'skiing',   name: 'Skiing',    description: 'Alpine and cross-country experiences.',image: '/images/galdhopiggen.jpg',               count: 120 },
-  { id: 'kayaking', name: 'Kayaking',  description: 'Fjords and coastal exploration.',       image: '/images/fjords_1786935800026.jpg',           count: 85  },
-  { id: 'cycling',  name: 'Cycling',   description: 'Scenic roads and mountain routes.',     image: '/images/besseggen_1786936349992.jpg',        count: 150 },
-  { id: 'fishing',  name: 'Fishing',   description: 'Freshwater and coastal fishing.',       image: '/images/lofoten_1787013505867.jpg',          count: 320 },
+  { id: 'skiing',   name: 'Skiing',    description: 'Alpine and cross-country experiences.',image: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=skiing+norway+winter&w=800', count: 120 },
+  { id: 'kayaking', name: 'Kayaking',  description: 'Fjords and coastal exploration.',       image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=kayak+fjord+norway&w=800', count: 85  },
+  { id: 'cycling',  name: 'Cycling',   description: 'Scenic roads and mountain routes.',     image: 'https://images.unsplash.com/photo-1541625602330-2277a4c46182?q=cycling+road+norway&w=800', count: 150 },
+  { id: 'fishing',  name: 'Fishing',   description: 'Freshwater and coastal fishing.',       image: 'https://images.unsplash.com/photo-1534482421-64566f976cfa?q=fishing+norway+sea&w=800', count: 320 },
   { id: 'camping',  name: 'Camping',   description: 'Wilderness stays.',                     image: '/images/ryten_1786936427556.jpg',             count: 400 },
   { id: 'climbing', name: 'Climbing',  description: 'Rock and mountain climbing.',           image: '/images/kjeragbolten_1786936275605.jpg',     count: 65  },
-  { id: 'wildlife', name: 'Wildlife',  description: 'Wildlife experiences.',                 image: '/images/reindeer.jpg',                       count: 45  },
+  { id: 'wildlife', name: 'Wildlife',  description: 'Wildlife experiences.',                 image: '/images/wildlife_reindeer_1787013667019.jpg', count: 45  },
 ];
 export const Activities = () => {
   const [searchQuery, setSearchQuery] = useState('');
