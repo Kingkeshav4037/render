@@ -178,6 +178,13 @@ export const Dashboard = () => {
               <span>AI Trip Planner</span>
             </Link>
             <Link 
+              to="/wallet" 
+              className="px-5 h-11 rounded-full border border-white/20 bg-white/5 backdrop-blur-md flex items-center gap-2 text-snow hover:bg-white hover:text-navy-900 transition-all text-xs font-bold uppercase tracking-wider shadow-sm cursor-pointer"
+            >
+              <Wallet size={16} className="text-amber-400" />
+              <span>Travel Wallet</span>
+            </Link>
+            <Link 
               to="/explore" 
               className="px-6 h-11 rounded-full bg-aurora-green text-navy-900 font-bold text-xs uppercase tracking-widest hover:bg-green-400 transition-all shadow-[0_0_20px_rgba(0,255,135,0.3)] flex items-center gap-2 cursor-pointer"
             >
@@ -413,10 +420,10 @@ export const Dashboard = () => {
                         <span>7-Day Fjord & Arctic Route</span>
                       </div>
                       <h3 className="text-3xl md:text-4xl font-display font-black text-white leading-tight mb-2">
-                        Lofoten Archipelago & Senja
+                        Lofoten
                       </h3>
                       <p className="text-white/80 font-medium text-sm">
-                        Experience traditional rorbu cabins, midnight sun or auroras, and dramatic peaks rising from the sea.
+                        Your next adventure starts in 12 days. Experience traditional rorbu cabins, midnight sun, and dramatic peaks rising from the arctic sea.
                       </p>
                     </div>
                     <div className="flex items-center gap-3 shrink-0">
