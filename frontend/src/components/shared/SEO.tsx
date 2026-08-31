@@ -86,7 +86,7 @@ export const generateDestinationSchema = (data: {
   image: data.image,
   containedInPlace: {
     '@type': 'AdministrativeArea',
-    name: data.region || 'Norway',
+    name: 'Norway',
   },
   ...(data.latitude && data.longitude ? {
     geo: {
@@ -101,7 +101,7 @@ export const generateDestinationSchema = (data: {
 /**
  * Generates Schema.org LodgingBusiness structured data
  */
-export const generateAccommodationSchema = (data: {
+export const generateStaySchema = (data: {
   name: string;
   description: string;
   image?: string;
@@ -128,6 +128,48 @@ export const generateAccommodationSchema = (data: {
       reviewCount: data.reviewCount || 1,
     }
   } : {}),
+});
+
+export const generateAccommodationSchema = generateStaySchema;
+
+/**
+ * Generates Schema.org TouristAttraction structured data
+ */
+export const generateActivitySchema = (data: {
+  name: string;
+  description: string;
+  priceNok?: number;
+  image?: string;
+}) => ({
+  '@context': 'https://schema.org',
+  '@type': 'TouristAttraction',
+  name: data.name,
+  description: data.description,
+  ...(data.priceNok !== undefined ? {
+    offers: {
+      '@type': 'Offer',
+      price: data.priceNok,
+      priceCurrency: 'NOK',
+      availability: 'https://schema.org/InStock',
+    }
+  } : {}),
+  ...(data.image ? { image: data.image } : {}),
+});
+
+/**
+ * Generates Schema.org BreadcrumbList structured data
+ */
+export const generateBreadcrumbSchema = (items: Array<{ name: string; url: string }>) => ({
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: items.map((item, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: item.name,
+    item: item.url.startsWith('http') 
+      ? item.url 
+      : `https://norway-smartlife.vercel.app${item.url.startsWith('/') ? '' : '/'}${item.url}`,
+  })),
 });
 
 /**

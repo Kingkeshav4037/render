@@ -270,7 +270,7 @@ export const Login = () => {
     } catch (err: any) {
       const message = err.message || '';
       if (message.includes('Invalid login credentials')) {
-        setError('Incorrect email or password. Please try again.');
+        setError('Invalid login credentials. Please check your email and password.');
       } else if (message.includes('Email not confirmed')) {
         setError('Please verify your email address before signing in. Check your inbox for the confirmation link.');
       } else if (message.includes('Too many requests') || message.includes('rate limit')) {
