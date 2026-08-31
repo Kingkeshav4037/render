@@ -13,8 +13,8 @@ export interface SEOProps {
 export const SEO = ({ 
   title, 
   description, 
-  canonicalUrl, 
-  ogImage = '/images/logo.png', 
+  canonicalUrl = 'https://norway-smartlife.vercel.app/', 
+  ogImage = 'https://norway-smartlife.vercel.app/og-image.jpg', 
   ogType = 'website',
   keywords,
   schema
@@ -22,6 +22,10 @@ export const SEO = ({
   const siteTitle = title.includes('Norway SmartLife') 
     ? title 
     : `${title} | Norway SmartLife`;
+
+  const absoluteImageUrl = ogImage.startsWith('http') 
+    ? ogImage 
+    : `https://norway-smartlife.vercel.app${ogImage.startsWith('/') ? '' : '/'}${ogImage}`;
   
   return (
     <Helmet>
@@ -30,17 +34,25 @@ export const SEO = ({
       <meta name="description" content={description} />
       {keywords && <meta name="keywords" content={keywords} />}
       
-      {/* Open Graph / Facebook */}
+      {/* Open Graph / Facebook / WhatsApp / LinkedIn */}
+      <meta property="og:site_name" content="Norway SmartLife" />
       <meta property="og:type" content={ogType} />
+      <meta property="og:url" content={canonicalUrl} />
       <meta property="og:title" content={siteTitle} />
       <meta property="og:description" content={description} />
-      <meta property="og:image" content={ogImage} />
+      <meta property="og:image" content={absoluteImageUrl} />
+      <meta property="og:image:secure_url" content={absoluteImageUrl} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
+      <meta property="og:image:alt" content={siteTitle} />
       
-      {/* Twitter */}
+      {/* Twitter / X */}
       <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:url" content={canonicalUrl} />
       <meta name="twitter:title" content={siteTitle} />
       <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={ogImage} />
+      <meta name="twitter:image" content={absoluteImageUrl} />
+      <meta name="twitter:image:alt" content={siteTitle} />
       
       {/* Canonical URL */}
       {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
@@ -71,11 +83,10 @@ export const generateDestinationSchema = (data: {
   '@type': 'TouristDestination',
   name: data.name,
   description: data.description,
-  image: data.image || 'https://norway-smartlife.vercel.app/images/logo.png',
-  touristType: ['Eco-Tourism', 'Adventure', 'Nature', 'Culture'],
+  image: data.image,
   containedInPlace: {
-    '@type': 'Country',
-    name: 'Norway',
+    '@type': 'AdministrativeArea',
+    name: data.region || 'Norway',
   },
   ...(data.latitude && data.longitude ? {
     geo: {
@@ -88,9 +99,9 @@ export const generateDestinationSchema = (data: {
 });
 
 /**
- * Generates Schema.org LodgingBusiness / Hotel structured data
+ * Generates Schema.org LodgingBusiness structured data
  */
-export const generateStaySchema = (data: {
+export const generateAccommodationSchema = (data: {
   name: string;
   description: string;
   image?: string;
@@ -98,14 +109,13 @@ export const generateStaySchema = (data: {
   address?: string;
   rating?: number;
   reviewCount?: number;
-  url?: string;
 }) => ({
   '@context': 'https://schema.org',
   '@type': 'LodgingBusiness',
   name: data.name,
   description: data.description,
-  image: data.image || 'https://norway-smartlife.vercel.app/images/logo.png',
-  priceRange: data.priceRange || 'NOK 1,500 - 5,000',
+  image: data.image,
+  priceRange: data.priceRange || '$$$',
   address: {
     '@type': 'PostalAddress',
     addressCountry: 'NO',
@@ -115,51 +125,77 @@ export const generateStaySchema = (data: {
     aggregateRating: {
       '@type': 'AggregateRating',
       ratingValue: data.rating,
-      reviewCount: data.reviewCount || 10,
-      bestRating: 5,
+      reviewCount: data.reviewCount || 1,
     }
   } : {}),
-  ...(data.url ? { url: data.url } : {}),
 });
 
 /**
- * Generates Schema.org TouristAttraction structured data
+ * Generates Schema.org Restaurant structured data
  */
-export const generateActivitySchema = (data: {
+export const generateRestaurantSchema = (data: {
   name: string;
   description: string;
   image?: string;
-  priceNok?: number;
-  location?: string;
-  url?: string;
+  servesCuisine?: string;
+  priceRange?: string;
+  address?: string;
+  rating?: number;
 }) => ({
   '@context': 'https://schema.org',
-  '@type': 'TouristAttraction',
+  '@type': 'Restaurant',
   name: data.name,
   description: data.description,
-  image: data.image || 'https://norway-smartlife.vercel.app/images/logo.png',
-  isAccessibleForFree: data.priceNok === 0,
-  ...(data.priceNok ? {
-    offers: {
-      '@type': 'Offer',
-      price: data.priceNok,
-      priceCurrency: 'NOK',
-      availability: 'https://schema.org/InStock',
+  image: data.image,
+  servesCuisine: data.servesCuisine || 'Nordic',
+  priceRange: data.priceRange || '$$$',
+  address: {
+    '@type': 'PostalAddress',
+    addressCountry: 'NO',
+    streetAddress: data.address || 'Norway',
+  },
+  ...(data.rating ? {
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: data.rating,
     }
   } : {}),
-  ...(data.url ? { url: data.url } : {}),
 });
 
 /**
- * Generates Schema.org BreadcrumbList structured data
+ * Generates Schema.org Event structured data
  */
-export const generateBreadcrumbSchema = (crumbs: Array<{ name: string; url: string }>) => ({
+export const generateEventSchema = (data: {
+  name: string;
+  description: string;
+  startDate: string;
+  endDate?: string;
+  image?: string;
+  location?: string;
+  price?: number;
+  currency?: string;
+}) => ({
   '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: crumbs.map((crumb, index) => ({
-    '@type': 'ListItem',
-    position: index + 1,
-    name: crumb.name,
-    item: crumb.url.startsWith('http') ? crumb.url : `https://norway-smartlife.vercel.app${crumb.url}`,
-  })),
+  '@type': 'Event',
+  name: data.name,
+  description: data.description,
+  startDate: data.startDate,
+  ...(data.endDate ? { endDate: data.endDate } : {}),
+  image: data.image,
+  location: {
+    '@type': 'Place',
+    name: data.location || 'Norway',
+    address: {
+      '@type': 'PostalAddress',
+      addressCountry: 'NO',
+    },
+  },
+  ...(data.price ? {
+    offers: {
+      '@type': 'Offer',
+      price: data.price,
+      priceCurrency: data.currency || 'NOK',
+      availability: 'https://schema.org/InStock',
+    }
+  } : {}),
 });
