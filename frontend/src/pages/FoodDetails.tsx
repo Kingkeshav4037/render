@@ -7,6 +7,8 @@ import { useCartStore } from '../store/useCartStore';
 import { useCurrencyStore } from '../store/useCurrencyStore';
 import { useRequireAuth } from '../hooks/useRequireAuth';
 import { SEO } from '../components/shared/SEO';
+import { FavoriteButton } from '../components/common/FavoriteButton';
+import { recentlyViewedService } from '../services/recentlyViewedService';
 
 // Cultural details and culinary metadata for Norwegian traditional foods
 const DISH_STORIES: Record<string, { region: string; dietary: string[]; tags: string[]; story: string; ingredients: string[] }> = {
@@ -118,6 +120,14 @@ export const FoodDetails = () => {
             setFoodItem(foundFood);
             setRestaurant(null);
             setRelatedFoods(foodList.filter((f: Food) => f.id !== foundFood.id).slice(0, 3));
+            recentlyViewedService.trackView({
+              item_type: 'FOOD',
+              item_id: foundFood.id,
+              title: foundFood.name,
+              image_url: getFoodImage(foundFood.name, foundFood.image_url),
+              route: `/food/${foundFood.id}`,
+              metadata: { price: `NOK ${getFoodPrice(foundFood.name, (foundFood as any).price)}` }
+            }).catch(() => {});
           }
           setLoading(false);
         }
@@ -233,9 +243,17 @@ export const FoodDetails = () => {
                 </span>
               </div>
 
-              <h1 className="text-4xl md:text-6xl font-display font-bold text-snow drop-shadow-md leading-tight">
-                {foodItem.name}
-              </h1>
+              <div className="flex items-start justify-between gap-4">
+                <h1 className="text-4xl md:text-6xl font-display font-bold text-snow drop-shadow-md leading-tight">
+                  {foodItem.name}
+                </h1>
+                <FavoriteButton 
+                  itemType="FOOD" 
+                  itemId={foodItem.id} 
+                  className="bg-white/10 hover:bg-white/20 text-white shadow-xl backdrop-blur-md p-3" 
+                  size={24} 
+                />
+              </div>
               
               <div className="flex items-center gap-3 text-xs text-snow/70 mt-2 font-medium">
                 <span className="flex items-center gap-1"><MapPin size={14} className="text-[#FF7F50]" /> {meta.region}</span>

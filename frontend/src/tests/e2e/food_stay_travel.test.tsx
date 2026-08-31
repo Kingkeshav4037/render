@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom/vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
@@ -50,6 +51,7 @@ vi.mock('../../services/stay/staysService', () => ({
     searchStays: vi.fn(),
     getStayById: vi.fn(),
   },
+  getStayImage: (name?: string, type?: string, img?: string) => img || '/images/hotel_juvet_1787013813000.jpg',
 }));
 
 vi.mock('../../services/transportService', () => ({

@@ -4,6 +4,7 @@ import { ArrowRight, CloudSun, Calendar, Plus, Heart, MapPin, X, Bookmark, Compa
 import { OptimizedImage } from '../../../components/shared/OptimizedImage';
 import { SEO } from '../../../components/shared/SEO';
 import { toast } from 'sonner';
+import { RecentlyViewedSection } from '../../../components/common/RecentlyViewedSection';
 
 interface SavedTrip {
   id: string;
@@ -95,7 +96,7 @@ export const TripsList = () => {
         if (Array.isArray(favs)) setFavorites(favs);
       } else {
         setFavorites([
-          { id: 'fav-1', type: 'DESTINATION', title: 'Geirangerfjord', region: 'Fjord Norway', image: '/images/besseggen_1786936236965.jpg', url: '/destinations/geirangerfjord' },
+          { id: 'fav-1', type: 'DESTINATION', title: 'Geirangerfjord', region: 'Fjord Norway', image: '/images/fjords_1786935800026.jpg', url: '/explore/geirangerfjord' },
           { id: 'fav-2', type: 'ACTIVITY', title: 'Preikestolen Guided Sunrise Hike', region: 'Rogaland', image: '/images/preikestolen_1786936002797.jpg', url: '/activities' }
         ]);
       }
@@ -140,7 +141,7 @@ export const TripsList = () => {
       nights: diffDays,
       activities: 0,
       status: 'Upcoming',
-      image: '/images/besseggen_1786936236965.jpg',
+      image: '/images/fjords_1786935800026.jpg',
       weather: '14°C',
       summary: newNotes ? newNotes.trim() : `Custom itinerary planned for ${newDest || 'Norway'}.`,
       destinations: newDest ? [newDest.trim()] : ['Norway'],
@@ -239,9 +240,10 @@ export const TripsList = () => {
             >
               <div className="absolute inset-0">
                 <OptimizedImage 
-                  src={trip.image || '/images/besseggen_1786936236965.jpg'} 
+                  src={trip.image || '/images/fjords_1786935800026.jpg'} 
                   alt={trip.name} 
                   category="landscape"
+                  fallbackSrc="/images/fjords_1786935800026.jpg"
                   className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
                   containerClassName="w-full h-full"
                 />
@@ -327,6 +329,13 @@ export const TripsList = () => {
           )}
         </div>
       )}
+
+      {/* Recently Viewed Section for Quick Trip Planning */}
+      <RecentlyViewedSection
+        title="Recently Explored Places"
+        subtitle="Places and experiences you viewed that you might want to add to your journal"
+        className="mt-16 border-t border-gray-100"
+      />
 
       {/* Create Trip Modal */}
       {isCreateModalOpen && (

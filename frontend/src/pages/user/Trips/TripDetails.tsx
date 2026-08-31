@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
   ArrowLeft, 
@@ -16,11 +16,21 @@ import {
   Home, 
   FileText,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Share2,
+  Printer,
+  Download,
+  Copy,
+  AlertTriangle,
+  Clock,
+  DollarSign
 } from 'lucide-react';
 import { OptimizedImage } from '../../../components/shared/OptimizedImage';
 import { SEO } from '../../../components/shared/SEO';
 import { toast } from 'sonner';
+import { tripService, TripDay, SmartTripWarning } from '../../../services/tripService';
+import { tripExportService } from '../../../services/tripExportService';
+import { ShareTripModal } from '../../../components/trips/ShareTripModal';
 
 const DEFAULT_TRIP_DETAILS: Record<string, any> = {
   '1': {
@@ -129,6 +139,9 @@ export const TripDetails = () => {
   const [itemDesc, setItemDesc] = useState('');
   const [itemCost, setItemCost] = useState('');
 
+  // Share Modal
+  const [isShareOpen, setIsShareOpen] = useState(false);
+
   const loadTrip = () => {
     if (!id) {
       setLoading(false);
@@ -161,6 +174,26 @@ export const TripDetails = () => {
       setTrip(null);
     }
     setLoading(false);
+  };
+
+  const handleDuplicateTrip = () => {
+    if (!trip) return;
+    try {
+      const duplicated = {
+        ...trip,
+        id: `trip-${Date.now()}`,
+        name: `${trip.name || trip.title} (Copy)`,
+        title: `${trip.title || trip.name} (Copy)`,
+        status: 'Planned',
+      };
+      const savedStr = localStorage.getItem('nsl_user_saved_trips');
+      const saved = savedStr ? JSON.parse(savedStr) : [];
+      localStorage.setItem('nsl_user_saved_trips', JSON.stringify([duplicated, ...saved]));
+      toast.success('Trip duplicated successfully!');
+      navigate(`/trips/${duplicated.id}`);
+    } catch (err) {
+      toast.error('Failed to duplicate trip.');
+    }
   };
 
   useEffect(() => {
@@ -340,9 +373,10 @@ export const TripDetails = () => {
       {/* Hero Header */}
       <div className="relative h-[50vh] min-h-[400px] w-full">
         <OptimizedImage 
-          src={trip.image || '/images/besseggen_1786936236965.jpg'} 
+          src={trip.image || '/images/fjords_1786935800026.jpg'} 
           alt={trip.name} 
           category="landscape"
+          fallbackSrc="/images/fjords_1786935800026.jpg"
           className="w-full h-full object-cover" 
           containerClassName="w-full h-full"
         />
@@ -352,22 +386,50 @@ export const TripDetails = () => {
           <button onClick={() => navigate('/trips')} className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white hover:text-navy-900 transition-colors cursor-pointer">
             <ArrowLeft size={20} />
           </button>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 flex-wrap justify-end">
+            <button
+              onClick={() => setIsShareOpen(true)}
+              className="px-3.5 py-2 rounded-full bg-white/20 hover:bg-white text-white hover:text-navy-900 backdrop-blur-md font-bold text-xs uppercase tracking-widest flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="Share Trip Link"
+            >
+              <Share2 size={13} /> Share
+            </button>
+            <button
+              onClick={() => tripExportService.exportToPDF({ trip, days: trip.days || [] })}
+              className="px-3.5 py-2 rounded-full bg-white/20 hover:bg-white text-white hover:text-navy-900 backdrop-blur-md font-bold text-xs uppercase tracking-widest flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="Download or Print PDF"
+            >
+              <Printer size={13} /> PDF
+            </button>
+            <button
+              onClick={() => tripExportService.exportToCalendar({ trip, days: trip.days || [] })}
+              className="px-3.5 py-2 rounded-full bg-white/20 hover:bg-white text-white hover:text-navy-900 backdrop-blur-md font-bold text-xs uppercase tracking-widest flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="Export to Calendar (.ics)"
+            >
+              <Download size={13} /> iCal
+            </button>
+            <button
+              onClick={handleDuplicateTrip}
+              className="px-3.5 py-2 rounded-full bg-white/20 hover:bg-white text-white hover:text-navy-900 backdrop-blur-md font-bold text-xs uppercase tracking-widest flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="Duplicate Trip"
+            >
+              <Copy size={13} /> Duplicate
+            </button>
             <button
               onClick={() => setIsEditDatesOpen(true)}
-              className="px-4 py-2 rounded-full bg-white/20 hover:bg-white text-white hover:text-navy-900 backdrop-blur-md font-bold text-xs uppercase tracking-widest flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="px-3.5 py-2 rounded-full bg-white/20 hover:bg-white text-white hover:text-navy-900 backdrop-blur-md font-bold text-xs uppercase tracking-widest flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <Edit3 size={12} /> Edit Dates
             </button>
-            <span className="px-4 py-2 rounded-full bg-aurora-green text-navy-900 font-bold text-xs uppercase tracking-widest">
+            <span className="px-3 py-1.5 rounded-full bg-aurora-green text-navy-900 font-bold text-xs uppercase tracking-widest">
               {trip.status || 'Planned'}
             </span>
             <button
               onClick={handleDeleteTrip}
-              className="p-2.5 rounded-full bg-red-500/20 hover:bg-red-500 text-white border border-red-500/30 transition-all cursor-pointer"
+              className="p-2 rounded-full bg-red-500/20 hover:bg-red-500 text-white border border-red-500/30 transition-all cursor-pointer"
               title="Delete Trip"
             >
-              <Trash2 size={16} />
+              <Trash2 size={15} />
             </button>
           </div>
         </div>
@@ -388,7 +450,61 @@ export const TripDetails = () => {
       <div className="max-w-[1440px] mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-12 mt-8">
         
         {/* Main Itinerary Content Column */}
-        <div className="lg:col-span-8 space-y-12">
+        <div className="lg:col-span-8 space-y-8">
+          
+          {/* Smart Trip Warnings Panel */}
+          {(() => {
+            const formattedDays = (trip.days || []).map((d: any, idx: number) => ({
+              id: `day-${idx}`,
+              trip_id: trip.id,
+              day_number: d.day || idx + 1,
+              date: d.date || trip.startDate,
+              description: d.title,
+              activities: (d.activities || []).map((a: any, aIdx: number) => ({
+                id: `act-${idx}-${aIdx}`,
+                activity_title: a.title,
+                activity_type: 'Activity',
+                start_time: a.time ? `${d.date || '2026-09-12'}T${a.time}:00Z` : undefined,
+                end_time: a.time ? `${d.date || '2026-09-12'}T${a.time}:00Z` : undefined,
+                location: { name: a.location },
+              })),
+              stays: (trip.staysList || []).map((s: any) => ({
+                id: s.id,
+                accommodation_name: s.name,
+                location: { name: s.location },
+                check_in: trip.startDate,
+                check_out: trip.endDate,
+              })),
+            }));
+
+            const warnings = tripService.analyzeTripSchedule(formattedDays, trip);
+            if (warnings.length === 0) return null;
+
+            return (
+              <div className="p-6 bg-amber-500/10 border border-amber-500/30 rounded-3xl space-y-3">
+                <div className="flex items-center gap-2 text-amber-800 font-bold text-sm">
+                  <AlertTriangle className="w-5 h-5 text-amber-600" />
+                  <span>Smart Schedule Insights & Conflict Detection ({warnings.length})</span>
+                </div>
+                <div className="space-y-2">
+                  {warnings.map(w => (
+                    <div key={w.id} className="p-3.5 bg-white rounded-xl border border-amber-200 text-xs">
+                      <div className="font-bold text-navy-900 flex items-center justify-between">
+                        <span>{w.title}</span>
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${w.severity === 'HIGH' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-800'}`}>
+                          {w.severity}
+                        </span>
+                      </div>
+                      <p className="text-gray-600 mt-1">{w.description}</p>
+                      {w.recommendation && (
+                        <p className="text-navy-900 font-semibold mt-1">💡 Tip: {w.recommendation}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
           
           {/* Destinations Section */}
           <div className="p-8 bg-white border border-gray-100 rounded-3xl shadow-sm">
@@ -569,9 +685,76 @@ export const TripDetails = () => {
               </Link>
             </div>
           </div>
+
+          {/* Estimated Cost Breakdown Card */}
+          <div className="p-8 bg-white border border-gray-100 rounded-3xl shadow-sm">
+            <h3 className="font-display font-bold text-xl text-navy-900 mb-4 flex items-center gap-2">
+              <DollarSign className="w-5 h-5 text-emerald-600" /> Estimated Cost
+            </h3>
+            {(() => {
+              const formattedDays = (trip.days || []).map((d: any, idx: number) => ({
+                id: `day-${idx}`,
+                trip_id: trip.id,
+                day_number: d.day || idx + 1,
+                date: d.date || trip.startDate,
+                activities: (d.activities || []).map((a: any) => ({ price_nok: a.cost || 650 })),
+                stays: (trip.staysList || []).map(() => ({ price_nok: 2500 })),
+              }));
+              const costSummary = tripService.calculateEstimatedTripCost(formattedDays, trip.budget_nok || 20000);
+
+              return (
+                <div className="space-y-3 text-xs">
+                  <div className="flex justify-between text-gray-600">
+                    <span>Stays & Cabins</span>
+                    <span className="font-semibold">NOK {costSummary.accommodation_total_nok.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-gray-600">
+                    <span>Activities & Hikes</span>
+                    <span className="font-semibold">NOK {costSummary.activities_total_nok.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-gray-600">
+                    <span>Transit & Ferries</span>
+                    <span className="font-semibold">NOK {costSummary.transport_total_nok.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-gray-600">
+                    <span>Dining Estimate</span>
+                    <span className="font-semibold">NOK {costSummary.food_estimate_nok.toLocaleString()}</span>
+                  </div>
+                  <div className="pt-3 border-t border-gray-200 flex justify-between font-bold text-sm text-navy-900">
+                    <span>Total Estimate</span>
+                    <span className="text-emerald-600">NOK {costSummary.grand_total_nok.toLocaleString()}</span>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
         </div>
 
       </div>
+
+      {/* Share Trip Modal */}
+      <ShareTripModal
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        trip={{
+          id: trip.id,
+          title: trip.name || trip.title,
+          description: trip.summary,
+          start_date: trip.startDate,
+          end_date: trip.endDate,
+          status: trip.status,
+          visibility: trip.visibility || 'PRIVATE',
+          share_token: trip.share_token,
+          notes: trip.notes,
+        }}
+        onTripUpdated={(updated) => {
+          saveUpdatedTrip({
+            ...trip,
+            visibility: updated.visibility,
+            share_token: updated.share_token,
+          });
+        }}
+      />
 
       {/* Edit Dates Modal */}
       {isEditDatesOpen && (

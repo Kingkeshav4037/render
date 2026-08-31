@@ -104,7 +104,7 @@ export const AuthCallback = () => {
     <div className="min-h-screen relative flex items-center justify-center overflow-hidden bg-deep-night">
       <div 
         className="absolute inset-0 z-0 bg-cover bg-center transition-all duration-1000 opacity-20"
-        style={{ backgroundImage: "url('/images/northern_lights.jpg')" }}
+        style={{ backgroundImage: "url('/images/northern_lights_1786935879330.jpg')" }}
       >
         <div className="absolute inset-0 bg-navy-900/50 backdrop-blur-[4px]"></div>
       </div>

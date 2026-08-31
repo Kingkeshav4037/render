@@ -1,21 +1,28 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Bookmark, Heart, MapPin, ArrowRight, Trash2, Plus, Search, ExternalLink, Filter, Zap, Compass, Bed, Mountain } from 'lucide-react';
+import { 
+  Bookmark, Heart, MapPin, ArrowRight, Trash2, Plus, Search, 
+  ExternalLink, Filter, Zap, Compass, Bed, Mountain, Utensils, 
+  ShoppingBag, BookOpen, Star, RefreshCw, Loader2 
+} from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { OptimizedImage } from '../../components/shared/OptimizedImage';
 import { EmptyState } from '../../components/ui/EmptyState';
-import { toast } from '../../store/useToastStore';
+import { toast } from 'sonner';
 import { useAuthStore } from '../../store/useAuthStore';
-import { supabase } from '../../lib/supabase';
+import { favoriteService, HydratedFavorite, FavoriteCategory, normalizeItemType } from '../../services/favoriteService';
 import { motion, AnimatePresence } from 'framer-motion';
+import { SEO } from '../../components/shared/SEO';
 
 export interface SavedFavorite {
   id: string;
-  type: 'DESTINATION' | 'TRAIL' | 'STAY' | 'EV_STATION' | 'ACTIVITY';
+  type: 'DESTINATION' | 'TRAIL' | 'STAY' | 'EV_STATION' | 'ACTIVITY' | 'FOOD' | 'PRODUCT' | 'GUIDE' | 'PLACE' | string;
   title: string;
   region: string;
   image: string;
   url: string;
   description?: string;
+  price?: number | string;
+  rating?: number;
   savedAt?: string;
 }
 
@@ -58,43 +65,89 @@ const DEFAULT_FAVORITES: SavedFavorite[] = [
   }
 ];
 
-export const Wishlist = () => {
+export const Wishlist: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
   
-  const [favorites, setFavorites] = useState<SavedFavorite[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
-
-  // Load Favorites from LocalStorage + Supabase
-  useEffect(() => {
+  const [localFavorites, setLocalFavorites] = useState<SavedFavorite[]>(() => {
     try {
       const stored = localStorage.getItem('nsl_user_favorites');
       if (stored) {
         const parsed = JSON.parse(stored);
-        setFavorites(parsed.length > 0 ? parsed : DEFAULT_FAVORITES);
-      } else {
-        setFavorites(DEFAULT_FAVORITES);
-        localStorage.setItem('nsl_user_favorites', JSON.stringify(DEFAULT_FAVORITES));
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       }
-    } catch (e) {
-      console.warn('Failed to load local favorites:', e);
-      setFavorites(DEFAULT_FAVORITES);
-    }
-  }, []);
+    } catch {}
+    return DEFAULT_FAVORITES;
+  });
+  const [supabaseFavorites, setSupabaseFavorites] = useState<HydratedFavorite[] | null>(null);
+  const [isRemoteLoading, setIsRemoteLoading] = useState<boolean>(false);
 
-  const handleRemoveFavorite = (id: string, title: string) => {
-    const updated = favorites.filter(f => f.id !== id);
-    setFavorites(updated);
+  // 1. Fetch remote Supabase hydrated favorites when user is authenticated
+  const loadSupabaseFavorites = async () => {
+    if (!user?.id) {
+      setSupabaseFavorites(null);
+      return;
+    }
+
+    try {
+      setIsRemoteLoading(true);
+      const data = await favoriteService.getHydratedFavorites(user.id);
+      setSupabaseFavorites(data || []);
+    } catch (err) {
+      console.warn('Failed to load Supabase favorites:', err);
+    } finally {
+      setIsRemoteLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadSupabaseFavorites();
+  }, [user?.id]);
+
+  // Combine and deduplicate items
+  const allFavorites: SavedFavorite[] = useMemo(() => {
+    if (user && supabaseFavorites !== null) {
+      return supabaseFavorites.map(f => ({
+        id: f.itemId || f.id,
+        type: f.itemType,
+        title: f.title,
+        region: f.region,
+        image: f.image,
+        url: f.url,
+        description: f.description,
+        price: f.price,
+        rating: f.rating,
+        savedAt: f.createdAt
+      }));
+    }
+
+    if (localFavorites.length > 0) {
+      return localFavorites;
+    }
+
+    return DEFAULT_FAVORITES;
+  }, [user, supabaseFavorites, localFavorites]);
+
+  const handleRemoveFavorite = async (id: string, title: string) => {
+    // 1. Remove from local list
+    const updated = allFavorites.filter(f => f.id !== id && f.title !== title);
+    setLocalFavorites(updated);
+    if (supabaseFavorites) {
+      setSupabaseFavorites(supabaseFavorites.filter(f => f.itemId !== id && f.id !== id && f.title !== title));
+    }
     localStorage.setItem('nsl_user_favorites', JSON.stringify(updated));
 
+    // 2. Remove from Supabase if logged in
     if (user?.id) {
-      (supabase.from('favorites') as any)
-        .delete()
-        .eq('user_id', user.id)
-        .eq('item_id', id)
-        .then(() => {})
-        .catch(() => {});
+      try {
+        const itemToRemove = allFavorites.find(f => f.id === id || f.title === title);
+        const itemType = itemToRemove?.type || 'DESTINATION';
+        await favoriteService.removeFavorite(user.id, itemType, id);
+      } catch (err) {
+        console.warn('Failed to remove remote favorite:', err);
+      }
     }
 
     toast.info(`Removed ${title} from saved items.`);
@@ -132,27 +185,59 @@ export const Wishlist = () => {
     }
   };
 
-  const handleClearAll = () => {
+  const handleClearAll = async () => {
     if (window.confirm('Are you sure you want to clear all saved favorites?')) {
-      setFavorites([]);
+      setLocalFavorites([]);
+      setSupabaseFavorites([]);
       localStorage.setItem('nsl_user_favorites', JSON.stringify([]));
+
+      if (user?.id) {
+        await favoriteService.clearAllFavorites(user.id);
+      }
+
       toast.info('All saved favorites cleared.');
     }
   };
 
   const filteredFavorites = useMemo(() => {
-    return favorites.filter(item => {
-      const matchesCategory = activeCategory === 'ALL' || item.type === activeCategory;
+    return allFavorites.filter(item => {
+      const normItemType = normalizeItemType(item.type);
+      const matchesCategory = 
+        activeCategory === 'ALL' || 
+        item.type === activeCategory ||
+        normItemType === activeCategory ||
+        (activeCategory === 'TRAIL' && (normItemType === 'ACTIVITY' || item.type === 'TRAIL')) ||
+        (activeCategory === 'ACTIVITY' && (normItemType === 'ACTIVITY' || item.type === 'TRAIL')) ||
+        (activeCategory === 'EV_STATION' && (normItemType === 'PLACE' || item.type === 'EV_STATION'));
+
       const matchesSearch = !searchQuery || 
         item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.region.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()));
+
       return matchesCategory && matchesSearch;
     });
-  }, [favorites, activeCategory, searchQuery]);
+  }, [allFavorites, activeCategory, searchQuery]);
+
+  const CATEGORIES = [
+    { id: 'ALL', label: 'All Saved', icon: <Bookmark size={14} /> },
+    { id: 'DESTINATION', label: 'Destinations', icon: <Compass size={14} /> },
+    { id: 'TRAIL', label: 'Trails & Peaks', icon: <Mountain size={14} /> },
+    { id: 'STAY', label: 'Stays & Cabins', icon: <Bed size={14} /> },
+    { id: 'ACTIVITY', label: 'Activities', icon: <Mountain size={14} /> },
+    { id: 'FOOD', label: 'Food & Dining', icon: <Utensils size={14} /> },
+    { id: 'PRODUCT', label: 'Products & Gear', icon: <ShoppingBag size={14} /> },
+    { id: 'GUIDE', label: 'Travel Guides', icon: <BookOpen size={14} /> },
+    { id: 'EV_STATION', label: 'EV Charging', icon: <Zap size={14} /> }
+  ];
 
   return (
-    <div className="min-h-screen bg-[#FDFDFD] font-sans pb-32">
+    <div className="min-h-screen bg-[#FDFDFD] font-sans pb-32 selection:bg-red-500/20 selection:text-red-900">
+      <SEO 
+        title="My Favorites & Saved Places | Norway SmartLife"
+        description="Your personal collection of saved Norwegian fjords, hotels, alpine trails, restaurants, and gear."
+      />
+
       {/* Header */}
       <div className="pt-32 pb-12 px-6 md:px-12 max-w-[1440px] mx-auto border-b border-gray-100 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
@@ -165,15 +250,15 @@ export const Wishlist = () => {
           <h1 className="text-4xl md:text-5xl font-display font-bold text-navy-900 tracking-tight">
             Saved Places & Favorites
           </h1>
-          <p className="mt-2 text-base text-gray-500">
-            Bookmark destinations, alpine trails, boutique stays, and EV chargers for quick trip assembly.
+          <p className="mt-2 text-base text-gray-500 max-w-2xl leading-relaxed">
+            Bookmark destinations, alpine trails, boutique stays, culinary dishes, and gear for seamless itinerary planning.
           </p>
         </div>
 
-        {favorites.length > 0 && (
+        {allFavorites.length > 0 && (
           <div className="flex items-center gap-3">
             <span className="text-xs font-bold uppercase tracking-wider text-gray-400 bg-gray-100 px-3 py-1.5 rounded-lg">
-              {favorites.length} {favorites.length === 1 ? 'Item' : 'Items'} Saved
+              {allFavorites.length} {allFavorites.length === 1 ? 'Item' : 'Items'} Saved
             </span>
             <button
               onClick={handleClearAll}
@@ -190,13 +275,7 @@ export const Wishlist = () => {
         {/* Controls: Search & Categories */}
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-10">
           <div className="flex flex-wrap items-center gap-2">
-            {[
-              { id: 'ALL', label: 'All Saved', icon: <Bookmark size={14} /> },
-              { id: 'DESTINATION', label: 'Destinations', icon: <Compass size={14} /> },
-              { id: 'TRAIL', label: 'Trails & Peaks', icon: <Mountain size={14} /> },
-              { id: 'STAY', label: 'Stays & Cabins', icon: <Bed size={14} /> },
-              { id: 'EV_STATION', label: 'EV Charging', icon: <Zap size={14} /> }
-            ].map(cat => (
+            {CATEGORIES.map(cat => (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
@@ -218,20 +297,68 @@ export const Wishlist = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search saved items..."
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-aurora-green text-navy-900"
+              className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-400 text-navy-900 shadow-sm"
             />
           </div>
         </div>
 
-        {/* Favorites Grid */}
-        {filteredFavorites.length === 0 ? (
-          <EmptyState 
-            title="No Saved Items Found"
-            message={searchQuery ? "No saved items match your current filter." : "Your saved places, fjord hotels, and alpine trails will appear here."}
-            actionLabel="Start Exploring Norway"
-            onAction={() => navigate('/explore')}
-          />
+        {/* Loading State */}
+        {user && isRemoteLoading && supabaseFavorites === null && localFavorites.length === 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 py-8">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <div key={i} className="bg-white rounded-3xl p-4 border border-gray-100 animate-pulse space-y-4">
+                <div className="h-48 bg-gray-200 rounded-2xl w-full" />
+                <div className="h-4 bg-gray-200 rounded w-1/3" />
+                <div className="h-6 bg-gray-200 rounded w-3/4" />
+                <div className="h-4 bg-gray-200 rounded w-full" />
+              </div>
+            ))}
+          </div>
+        ) : filteredFavorites.length === 0 ? (
+          /* Empty State */
+          <div className="bg-white rounded-3xl border border-gray-100 p-12 text-center max-w-2xl mx-auto shadow-sm my-8">
+            <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Heart size={32} />
+            </div>
+            <h2 className="text-2xl font-display font-bold text-navy-900 mb-2">
+              {searchQuery ? 'No Matching Favorites' : 'Your Personal Collection is Empty'}
+            </h2>
+            <p className="text-gray-500 text-sm mb-8 leading-relaxed">
+              {searchQuery 
+                ? `No saved items matched "${searchQuery}". Try selecting another category tab or clearing your search.`
+                : 'Click the heart icon (❤️) on any destination, fjord hotel, alpine trail, gourmet dish, or shop item to bookmark it here for your journey.'
+              }
+            </p>
+
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <button
+                onClick={() => navigate('/explore')}
+                className="px-5 py-2.5 bg-navy-900 text-white rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-navy-800 transition-colors cursor-pointer"
+              >
+                Explore Destinations
+              </button>
+              <button
+                onClick={() => navigate('/stay')}
+                className="px-5 py-2.5 bg-gray-100 text-navy-900 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-gray-200 transition-colors cursor-pointer"
+              >
+                Browse Stays
+              </button>
+              <button
+                onClick={() => navigate('/food')}
+                className="px-5 py-2.5 bg-gray-100 text-navy-900 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-gray-200 transition-colors cursor-pointer"
+              >
+                Discover Food
+              </button>
+              <button
+                onClick={() => navigate('/shop')}
+                className="px-5 py-2.5 bg-gray-100 text-navy-900 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-gray-200 transition-colors cursor-pointer"
+              >
+                Marketplace Gear
+              </button>
+            </div>
+          </div>
         ) : (
+          /* Favorites Grid */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredFavorites.map((item) => (
               <motion.div
@@ -251,11 +378,11 @@ export const Wishlist = () => {
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                     containerClassName="w-full h-full"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-navy-900/80 via-transparent to-transparent pointer-events-none"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-navy-900/80 via-transparent to-transparent pointer-events-none" />
                   
                   <div className="absolute top-4 left-4">
                     <span className="bg-navy-900/80 backdrop-blur-md text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-white/10">
-                      {item.type.replace('_', ' ')}
+                      {item.type.replace(/_/g, ' ')}
                     </span>
                   </div>
 
@@ -264,8 +391,9 @@ export const Wishlist = () => {
                       e.stopPropagation();
                       handleRemoveFavorite(item.id, item.title);
                     }}
-                    className="absolute top-4 right-4 w-9 h-9 bg-white/90 hover:bg-white text-red-500 hover:text-red-600 rounded-full flex items-center justify-center transition-all shadow-md cursor-pointer"
+                    className="absolute top-4 right-4 w-9 h-9 bg-white/90 hover:bg-white text-red-500 hover:text-red-600 rounded-full flex items-center justify-center transition-all shadow-md cursor-pointer z-10"
                     aria-label={`Remove ${item.title} from favorites`}
+                    title="Remove from favorites"
                   >
                     <Trash2 size={16} />
                   </button>
@@ -313,4 +441,5 @@ export const Wishlist = () => {
   );
 };
 
+export const Favorites = Wishlist;
 export default Wishlist;

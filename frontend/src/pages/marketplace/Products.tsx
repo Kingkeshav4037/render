@@ -13,6 +13,7 @@ import { Button } from '../../components/ui/Button';
 import { ProductDetailModal } from '../../components/marketplace/ProductDetailModal';
 import { SEO } from '../../components/shared/SEO';
 import { useRequireAuth } from '../../hooks/useRequireAuth';
+import { FavoriteButton } from '../../components/common/FavoriteButton';
 
 export const Products = () => {
   const navigate = useNavigate();
@@ -254,6 +255,13 @@ export const Products = () => {
                               In Stock
                             </span>
                           )}
+                        </div>
+
+                        <div 
+                          className="absolute bottom-4 right-4 z-20"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <FavoriteButton itemType="PRODUCT" itemId={product.id} />
                         </div>
                       </div>
 

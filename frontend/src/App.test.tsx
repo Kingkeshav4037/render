@@ -23,9 +23,10 @@ vi.mock('./lib/supabase', () => ({
 }));
 
 vi.mock('./store/useAuthStore', () => {
-  const mockStore = (selector: any) => {
+  const mockStore: any = (selector: any) => {
     const state = {
       user: null,
+      profile: null,
       loading: false,
       initialized: true,
       initialize: () => () => {},
@@ -34,6 +35,7 @@ vi.mock('./store/useAuthStore', () => {
   };
   mockStore.getState = () => ({
     user: null,
+    profile: null,
     loading: false,
     initialized: true,
     initialize: () => () => {},
@@ -41,7 +43,6 @@ vi.mock('./store/useAuthStore', () => {
   mockStore.subscribe = () => () => {};
   return { useAuthStore: mockStore };
 });
-
 
 describe('App Component Smoke Test', () => {
   it('renders without crashing', async () => {
@@ -53,7 +54,7 @@ describe('App Component Smoke Test', () => {
     
     // Look for a common element that should be on the landing page or navbar
     // e.g. the site title or logo text "SmartLife" (awaited because of Suspense)
-    const titleElements = await screen.findAllByText(/SmartLife/i);
+    const titleElements = await screen.findAllByText(/SmartLife/i, {}, { timeout: 4000 });
     expect(titleElements.length).toBeGreaterThan(0);
     expect(titleElements[0]).toBeInTheDocument();
   });

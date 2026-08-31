@@ -1,13 +1,12 @@
-// @ts-nocheck
+import { supabase } from '../lib/supabase';
+import { availabilityService } from './availabilityService';
+
 /**
  * Booking Service
  * 
  * V2 Architecture: This service abstracts the database calls for bookings.
  * React components should call these methods instead of using Supabase directly.
  */
-
-import { supabase } from '../lib/supabase';
-
 export const bookingService = {
   /**
    * Fetch bookings for the authenticated user
@@ -23,22 +22,17 @@ export const bookingService = {
   },
 
   /**
-   * Check availability for a specific product
+   * Check availability for a specific product/stay
    */
-  async checkAvailability(productType: string, productId: string, date: string, participants: number) {
-    const { data, error } = await supabase
-      .rpc('check_availability', {
-        p_item_type: productType,
-        p_item_id: productId,
-        p_start_date: date,
-        p_end_date: date,
-        p_quantity: participants
-      });
-
-    if (error) throw error;
-    return data; // Returns boolean
+  async checkAvailability(productType: string, productId: string, startDate: string, endDate?: string) {
+    const end = endDate || startDate;
+    const res = await availabilityService.checkAvailability(productType, productId, startDate, end);
+    return res.available;
   },
 
+  /**
+   * Fetch all bookings (Admin/Provider)
+   */
   async fetchAllBookings() {
     const { data, error } = await supabase
       .from('bookings')

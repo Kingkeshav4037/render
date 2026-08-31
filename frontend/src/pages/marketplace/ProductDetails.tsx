@@ -28,6 +28,8 @@ import { OptimizedImage } from '../../components/shared/OptimizedImage';
 import { SEO } from '../../components/shared/SEO';
 import { Button } from '../../components/ui/Button';
 import { useRequireAuth } from '../../hooks/useRequireAuth';
+import { FavoriteButton } from '../../components/common/FavoriteButton';
+import { recentlyViewedService } from '../../services/recentlyViewedService';
 
 export const ProductDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -65,6 +67,15 @@ export const ProductDetails: React.FC = () => {
         // Fetch real related products
         const related = await shopService.getRelatedProducts(data.id, data.category, 3);
         setRelatedProducts(related);
+        // Track recently viewed product
+        recentlyViewedService.trackView({
+          item_type: 'PRODUCT',
+          item_id: String(data.id),
+          title: data.name,
+          image_url: data.img || data.gallery?.[0],
+          route: `/shop/${data.id}`,
+          metadata: { price: `NOK ${data.price}` }
+        }).catch(() => {});
       }
     } catch (err: any) {
       console.error('Failed to load product details:', err);
@@ -243,9 +254,17 @@ export const ProductDetails: React.FC = () => {
               <div className="flex items-center gap-2 text-xs text-snow/50 uppercase font-bold tracking-widest mb-2">
                 <MapPin size={14} className="text-arctic-gold" /> {product.origin}
               </div>
-              <h1 className="text-3xl md:text-4xl font-display font-bold text-snow mb-4 leading-tight">
-                {product.name}
-              </h1>
+              <div className="flex items-start justify-between gap-4 mb-4">
+                <h1 className="text-3xl md:text-4xl font-display font-bold text-snow leading-tight">
+                  {product.name}
+                </h1>
+                <FavoriteButton 
+                  itemType="PRODUCT" 
+                  itemId={product.id} 
+                  className="bg-white/10 hover:bg-white/20 text-white shadow-xl backdrop-blur-md p-3" 
+                  size={22} 
+                />
+              </div>
               <p className="text-snow/70 text-sm leading-relaxed font-sans">
                 {product.description}
               </p>

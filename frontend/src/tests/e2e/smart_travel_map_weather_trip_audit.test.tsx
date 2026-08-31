@@ -188,7 +188,7 @@ describe('Priority 5: Smart Travel, Map, Weather, EV & Trip Planning System Audi
       expect(screen.getByRole('heading', { name: /Lofoten/i })).toBeInTheDocument();
       expect(screen.getByText(/Destinations in this Trip/i)).toBeInTheDocument();
       expect(screen.getByText(/Saved Activities/i)).toBeInTheDocument();
-      expect(screen.getByText(/Stays & Cabins/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/Stays & Cabins/i).length).toBeGreaterThan(0);
       expect(screen.getByText(/Reinebringen Summit Hike/i)).toBeInTheDocument();
       expect(screen.getByText(/Edit Dates/i)).toBeInTheDocument();
     });

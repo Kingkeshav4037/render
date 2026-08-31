@@ -18,8 +18,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
         <input
           ref={ref}
+          aria-invalid={!!error}
           className={cn(
-            "flex h-11 w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-aurora-green/50 focus:border-aurora-green disabled:cursor-not-allowed disabled:opacity-50 transition-all",
+            "flex h-11 w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-arctic-gold/60 focus-visible:border-arctic-gold disabled:cursor-not-allowed disabled:opacity-50 transition-all",
             leftIcon && "pl-10",
             rightIcon && "pr-10",
             error && "border-red-500 focus:ring-red-500/50 focus:border-red-500",
@@ -33,7 +34,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           </div>
         )}
         {error && (
-          <p className="mt-1 text-xs text-red-500">{error}</p>
+          <p role="alert" className="mt-1 text-xs text-red-500 font-medium">{error}</p>
         )}
       </div>
     );

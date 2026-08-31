@@ -12,6 +12,8 @@ import {
 import { OptimizedImage } from '../../components/shared/OptimizedImage';
 import { SEO } from '../../components/shared/SEO';
 import { toast } from 'sonner';
+import { availabilityService } from '../../services/availabilityService';
+import { useInventoryHold } from '../../hooks/useAvailability';
 
 export const StayBooking = () => {
   const { id = '', roomId: paramRoomId = '' } = useParams<{ id?: string; roomId?: string }>();
@@ -177,6 +179,60 @@ export const StayBooking = () => {
     navigate('/checkout');
   };
 
+  const { 
+    acquireHold, 
+    activeHold, 
+    formattedRemainingTime, 
+    remainingSeconds, 
+    isExpired, 
+    releaseHold 
+  } = useInventoryHold();
+
+  const [dateAvailability, setDateAvailability] = useState<{ checked: boolean; available: boolean; error?: string }>({
+    checked: false,
+    available: true,
+  });
+
+  // Real-time preflight availability check whenever dates change
+  useEffect(() => {
+    let isSubscribed = true;
+    const checkLiveAvailability = async () => {
+      if (!room?.id || !checkIn || !checkOut) return;
+
+      const ruleCheck = availabilityService.validateBookingRules(checkIn, checkOut, guests, {
+        minNights: 1,
+        maxNights: 30,
+        minGuests: 1,
+        maxGuests: (room as any)?.capacity || (room as any)?.max_guests || 10,
+      });
+
+      if (!ruleCheck.valid) {
+        if (isSubscribed) {
+          setDateAvailability({ checked: true, available: false, error: ruleCheck.error });
+        }
+        return;
+      }
+
+      try {
+        const res = await availabilityService.checkAvailability('ACCOMMODATION', room.id, checkIn, checkOut);
+        if (isSubscribed) {
+          setDateAvailability({
+            checked: true,
+            available: res.available,
+            error: res.available ? undefined : 'Selected dates are unavailable. Please choose different dates.'
+          });
+        }
+      } catch (e) {
+        if (isSubscribed) {
+          setDateAvailability({ checked: true, available: true });
+        }
+      }
+    };
+
+    checkLiveAvailability();
+    return () => { isSubscribed = false; };
+  }, [room?.id, checkIn, checkOut, guests]);
+
   const handleConfirmAndPay = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
@@ -191,8 +247,15 @@ export const StayBooking = () => {
       return;
     }
 
-    if (nights <= 0) {
-      toast.error('Please select a valid check-in and check-out date range.');
+    // 1. Client-Side Booking Rule Validation
+    const ruleCheck = availabilityService.validateBookingRules(checkIn, checkOut, guests, {
+      minNights: 1,
+      maxNights: 30,
+      minGuests: 1,
+      maxGuests: (room as any)?.capacity || (room as any)?.max_guests || 10,
+    });
+    if (!ruleCheck.valid) {
+      toast.error(ruleCheck.error);
       return;
     }
 
@@ -212,7 +275,29 @@ export const StayBooking = () => {
     }
 
     setProcessing(true);
+    let holdId: string | undefined;
+
     try {
+      // 2. Authoritative PostgreSQL Real-Time Availability Check & Temporary Inventory Hold (15 Min TTL)
+      const holdRes = await availabilityService.validateAndHoldInventory(
+        user.id,
+        'ACCOMMODATION',
+        room.id,
+        checkIn,
+        checkOut,
+        guests,
+        1,
+        15
+      );
+
+      if (!holdRes.success) {
+        toast.error(holdRes.message || 'Room no longer available for selected dates.');
+        setProcessing(false);
+        return;
+      }
+
+      holdId = holdRes.holdId;
+
       const bookingItems = [
         {
           id: room.id,
@@ -229,17 +314,17 @@ export const StayBooking = () => {
         }
       ];
 
-      // 1. Call processCheckout
+      // 3. Process Checkout
       const orderId = await checkoutService.processCheckout(user.id, bookingItems, 'NOK');
       
       if (!orderId) {
         throw new Error('Failed to generate reservation order');
       }
 
-      // 2. Create Payment Intent
+      // 4. Create Payment Intent
       const paymentIntent = await checkoutService.createPaymentIntent(orderId, 'Razorpay');
 
-      // 3. Handle Payment Gateways (Razorpay checkout)
+      // 5. Handle Payment Gateways (Razorpay checkout)
       if (typeof window !== 'undefined' && (window as any).Razorpay && paymentIntent?.gateway_order_id) {
         const options = {
           key: paymentIntent.keyId || (import.meta as any).env.VITE_RAZORPAY_KEY_ID || 'rzp_test_placeholder',
@@ -265,12 +350,14 @@ export const StayBooking = () => {
               navigate(`/payment-success?order_id=${orderId}`);
             } catch (verErr) {
               console.error('Payment verification failed:', verErr);
+              if (holdId) availabilityService.releaseInventoryHold(holdId, user.id);
               navigate(`/payment-failure?order_id=${orderId}`);
             }
           },
           modal: {
             ondismiss: function () {
-              toast.info('Payment cancelled. Your pending booking is saved.');
+              if (holdId) availabilityService.releaseInventoryHold(holdId, user.id);
+              toast.info('Payment cancelled. Your temporary hold has been released.');
               setProcessing(false);
             }
           }
@@ -284,6 +371,7 @@ export const StayBooking = () => {
         navigate(`/payment-success?order_id=${orderId}`);
       }
     } catch (err: any) {
+      if (holdId) availabilityService.releaseInventoryHold(holdId, user.id);
       console.error('Reservation error:', err);
       toast.error(err.message || 'Payment or reservation failed. Please try again.');
     } finally {
@@ -327,6 +415,35 @@ export const StayBooking = () => {
           <h1 className="text-3xl md:text-4xl font-display font-bold mt-2">Secure Your Stay</h1>
           <p className="text-sm text-snow/60 mt-1">Review dates, guest information, and complete your reservation.</p>
         </div>
+
+        {/* Reservation Hold Countdown Banner */}
+        {activeHold && remainingSeconds > 0 && !isExpired && (
+          <div className="mb-6 bg-gradient-to-r from-amber-500/20 via-arctic-gold/20 to-emerald-500/20 border border-arctic-gold/40 rounded-2xl p-4 flex items-center justify-between text-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-arctic-gold/20 flex items-center justify-center text-arctic-gold shrink-0">
+                <Lock size={16} />
+              </div>
+              <div>
+                <div className="font-bold text-snow">Room Temporarily Reserved</div>
+                <div className="text-xs text-snow/70">Your selection is held exclusively for you. Complete payment before the timer expires.</div>
+              </div>
+            </div>
+            <div className="bg-black/40 px-3 py-1.5 rounded-xl border border-white/10 font-mono font-bold text-arctic-gold text-sm tracking-wider">
+              ⏱ {formattedRemainingTime}
+            </div>
+          </div>
+        )}
+
+        {/* Date Availability Warning */}
+        {dateAvailability.checked && !dateAvailability.available && (
+          <div className="mb-6 bg-red-500/10 border border-red-500/30 rounded-2xl p-4 flex items-center gap-3 text-red-200 text-sm">
+            <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
+            <div>
+              <div className="font-bold">{dateAvailability.error || 'Selected dates are unavailable.'}</div>
+              <div className="text-xs text-red-300/80">Please select alternative check-in / check-out dates.</div>
+            </div>
+          </div>
+        )}
         
         <form onSubmit={handleConfirmAndPay} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           

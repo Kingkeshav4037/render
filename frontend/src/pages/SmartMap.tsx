@@ -172,7 +172,7 @@ export const SmartMap = () => {
         nights: 1,
         activities: 1,
         status: 'Upcoming',
-        image: point.image || '/images/besseggen_1786936236965.jpg',
+        image: point.image || '/images/besseggen_1786936349992.jpg',
         weather: '14°C',
         days: [
           {
@@ -391,7 +391,7 @@ export const SmartMap = () => {
           >
             <div 
               className="w-full md:w-2/5 h-48 md:h-auto bg-cover bg-center relative"
-              style={{ backgroundImage: `url(${selectedPoint.image || '/images/besseggen_1786936236965.jpg'})` }}
+              style={{ backgroundImage: `url(${selectedPoint.image || '/images/besseggen_1786936349992.jpg'})` }}
             >
                <button 
                  onClick={() => setSelectedPoint(null)}

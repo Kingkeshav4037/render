@@ -297,7 +297,7 @@ export const Login = () => {
     <AuthLayout 
       title="Welcome back" 
       subtitle="Sign in to your Norway SmartLife account"
-      bgImage="/images/northern_lights.jpg"
+      bgImage="/images/northern_lights_1786935879330.jpg"
     >
       {/* Contextual Action Prompt Banner */}
       {contextualMessage && (

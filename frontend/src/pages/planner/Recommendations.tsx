@@ -7,6 +7,8 @@ import { useAuthStore } from '../../store/useAuthStore';
 import { OptimizedImage } from '../../components/shared/OptimizedImage';
 import { SEO } from '../../components/shared/SEO';
 import { toast } from 'sonner';
+import { recommendationEngine, RecommendationItem } from '../../services/recommendationEngine';
+import { RecentlyViewedSection } from '../../components/common/RecentlyViewedSection';
 
 const TABS = ['For You', 'Adventure', 'Food & Dining', 'Scenic', 'Hidden Gems'];
 
@@ -465,6 +467,13 @@ export const Recommendations = () => {
             </button>
           </div>
         </section>
+
+        {/* Recently Viewed Tracking Section */}
+        <RecentlyViewedSection
+          title="Recently Explored"
+          subtitle="Continue planning from places and experiences you previously discovered"
+          className="mt-8"
+        />
 
       </div>
     </div>

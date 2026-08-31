@@ -2,6 +2,7 @@ import { QueryErrorResetBoundary } from '@tanstack/react-query';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { AlertTriangle, RefreshCcw, Home } from 'lucide-react';
 import React from 'react';
+import { monitoringService } from '../../services/monitoringService';
 
 // ─── Shared fallback UI ───────────────────────────────────────────────────────
 // Used by both GlobalErrorBoundary (full-screen) and RouteErrorBoundary (inline).
@@ -21,10 +22,11 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({
 }) => {
   // ── Error logging ─────────────────────────────────────────────────────
   // Log once on mount so every boundary records into the browser console
-  // (and can be picked up by external error-tracking integrations later).
+  // and dispatches to the monitoring telemetry service.
   React.useEffect(() => {
     const context = groupName ? `[${groupName}]` : '[App]';
     console.error(`${context} Unhandled render error:`, error);
+    monitoringService.trackError(error, { groupName });
   }, [error, groupName]);
 
   const wrapperClass = fullScreen

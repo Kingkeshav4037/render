@@ -6,6 +6,7 @@ import { supabase } from '../../lib/supabase';
 import { mapService } from '../../services/map/mapService';
 import { bookingService } from '../../services/bookingService';
 import { importService } from '../../services/importService';
+import { profileService } from '../../services/profile/profileService';
 
 // ─── Mock useAuthStore ────────────────────────────────────────────────
 vi.mock('../../store/useAuthStore', () => {
@@ -21,6 +22,7 @@ vi.mock('../../store/useAuthStore', () => {
     mfaLevel: 'aal2' as const,
     hasPermission: () => true,
     signOut: vi.fn(),
+    refreshProfile: vi.fn().mockResolvedValue({ id: 'adm-001', role: 'SUPER_ADMIN' }),
   };
   const mockHook: any = (selector?: any) => {
     if (typeof selector === 'function') return selector(store);
@@ -55,6 +57,14 @@ vi.mock('../../services/bookingService', () => ({
 vi.mock('../../services/importService', () => ({
   importService: {
     executeBulkImport: vi.fn(),
+  },
+}));
+
+vi.mock('../../services/profile/profileService', () => ({
+  profileService: {
+    getProfile: vi.fn(),
+    updateProfile: vi.fn().mockResolvedValue({}),
+    ensureProfileExists: vi.fn().mockResolvedValue({}),
   },
 }));
 
@@ -102,11 +112,19 @@ vi.mock('../../lib/supabase', () => ({
       limit: vi.fn().mockResolvedValue({ data: [], error: null }),
       ilike: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({ data: null, error: null }),
+      single: vi.fn().mockResolvedValue({ data: { id: 'adm-001', role: 'SUPER_ADMIN', permissions: ['*'] }, error: null }),
     }),
     rpc: vi.fn().mockResolvedValue({ data: null, error: null }),
     auth: {
       getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
+      signInWithPassword: vi.fn().mockResolvedValue({ data: { user: { id: 'adm-001' } }, error: null }),
+      signOut: vi.fn().mockResolvedValue({ error: null }),
+      mfa: {
+        getAuthenticatorAssuranceLevel: vi.fn().mockResolvedValue({
+          data: { currentLevel: 'aal1', nextLevel: 'aal2' },
+          error: null,
+        }),
+      },
     },
   },
 }));
@@ -146,13 +164,15 @@ describe('Admin Panel Complete Audit', () => {
   // ─── 1. Admin Authentication & Login ──────────────────────────────
   describe('Admin Login & Multi-Factor Authentication', () => {
     it('executes 2-step verification for administrative accounts', async () => {
+      (profileService.getProfile as any).mockResolvedValue({ id: 'adm-001', role: 'SUPER_ADMIN', permissions: ['*'] });
+
       render(
         <MemoryRouter>
           <AdminLogin />
         </MemoryRouter>
       );
 
-      expect(screen.getByText(/Norway SmartLife Administration/i)).toBeInTheDocument();
+      expect(screen.getByText(/Administration Portal/i)).toBeInTheDocument();
       expect(screen.getByPlaceholderText(/admin@norwaysmartlife.no/i)).toBeInTheDocument();
 
       // Step 1: Submit credentials with admin email
@@ -183,6 +203,8 @@ describe('Admin Panel Complete Audit', () => {
     });
 
     it('rejects unauthorized non-admin login attempts', async () => {
+      (profileService.getProfile as any).mockResolvedValue({ id: 'user-001', role: 'USER', permissions: [] });
+
       render(
         <MemoryRouter>
           <AdminLogin />

@@ -27,7 +27,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ...props 
   }, ref) => {
     
-    const baseStyles = "inline-flex items-center justify-center font-bold tracking-wide uppercase transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer select-none";
+    const baseStyles = "inline-flex items-center justify-center font-bold tracking-wide uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-arctic-gold focus-visible:ring-offset-2 focus-visible:ring-offset-deep-night disabled:opacity-50 disabled:pointer-events-none cursor-pointer select-none";
     
     const variants = {
       primary: "bg-royal-fjord text-white hover:bg-polar-indigo focus:ring-royal-fjord shadow-[0_0_15px_rgba(29,78,216,0.3)] hover:shadow-[0_0_20px_rgba(29,78,216,0.5)] rounded-xl border border-white/10",

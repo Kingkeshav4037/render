@@ -60,6 +60,14 @@ export const ItineraryView = () => {
       const existingStr = localStorage.getItem('nsl_user_saved_trips');
       const existing = existingStr ? JSON.parse(existingStr) : [];
       
+      const planTitleLower = (plan.title || '').toLowerCase();
+      let tripImage = '/images/fjords_1786935800026.jpg';
+      if (planTitleLower.includes('lofoten')) tripImage = '/images/lofoten_1787013505867.jpg';
+      else if (planTitleLower.includes('tromsø') || planTitleLower.includes('tromso') || planTitleLower.includes('aurora')) tripImage = '/images/northern_lights_1786935879330.jpg';
+      else if (planTitleLower.includes('trolltunga')) tripImage = '/images/trolltunga_1786936111320.jpg';
+      else if (planTitleLower.includes('kjerag')) tripImage = '/images/kjeragbolten_1786936275605.jpg';
+      else if (planTitleLower.includes('besseggen')) tripImage = '/images/besseggen_1786936349992.jpg';
+
       const newTrip = {
         id: plan.id,
         name: plan.title.includes(' in ') ? plan.title.split(' in ')[1] : plan.title,
@@ -68,7 +76,7 @@ export const ItineraryView = () => {
         nights: plan.days.length,
         activities: plan.days.reduce((acc, d) => acc + d.activities.length, 0),
         status: 'Upcoming',
-        image: '/images/besseggen_1786936236965.jpg',
+        image: tripImage,
         weather: '14°C',
         days: plan.days,
         summary: plan.summary

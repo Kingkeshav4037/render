@@ -1,45 +1,75 @@
 import React from 'react';
-import { Heart } from 'lucide-react';
+import { Heart, Loader2 } from 'lucide-react';
 import { useIsFavorite, useToggleFavorite } from '../../hooks/useFavorites';
-import { useAuthStore } from '../../store/useAuthStore';
+import { useRequireAuth } from '../../hooks/useRequireAuth';
 
 interface Props {
   itemType: string;
   itemId: string;
   className?: string;
   size?: number;
+  showLabel?: boolean;
+  label?: string;
 }
 
-export const FavoriteButton: React.FC<Props> = ({ itemType, itemId, className = '', size = 24 }) => {
-  const { user } = useAuthStore();
+export const FavoriteButton: React.FC<Props> = ({ 
+  itemType, 
+  itemId, 
+  className = '', 
+  size = 20,
+  showLabel = false,
+  label
+}) => {
+  const { user, requireAuth } = useRequireAuth();
   const { data: isFavorite, isLoading } = useIsFavorite(itemType, itemId);
   const toggleFavorite = useToggleFavorite();
-
-  if (!user) return null;
 
   const handleToggle = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (toggleFavorite.isPending) return;
-    toggleFavorite.mutate({ itemType, itemId });
+
+    requireAuth(() => {
+      if (toggleFavorite.isPending) return;
+      toggleFavorite.mutate({ itemType, itemId });
+    }, { message: 'Sign in to save items to your personal favorites.' });
   };
+
+  const isPending = toggleFavorite.isPending;
+  const isSaved = !!user && !!isFavorite;
+
+  const defaultAriaLabel = isSaved ? 'Remove from favorites' : 'Add to favorites';
 
   return (
     <button
+      type="button"
       onClick={handleToggle}
-      disabled={isLoading || toggleFavorite.isPending}
-      className={`p-2 rounded-full transition-all hover:scale-110 ${
-        isFavorite 
-          ? 'bg-red-50 text-red-500 hover:bg-red-100' 
-          : 'bg-white/80 text-gray-500 hover:bg-white hover:text-red-500 backdrop-blur-sm'
+      disabled={isLoading || isPending}
+      className={`group/fav relative inline-flex items-center justify-center gap-1.5 p-2 rounded-full transition-all duration-300 focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:outline-none cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed ${
+        isSaved 
+          ? 'bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/20' 
+          : 'bg-black/30 hover:bg-black/50 text-white/80 hover:text-white border border-white/10 backdrop-blur-md'
       } ${className}`}
-      aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+      aria-label={label || defaultAriaLabel}
+      title={label || (isSaved ? 'Saved in your Favorites' : 'Save to Favorites')}
     >
-      <Heart 
-        size={size} 
-        fill={isFavorite ? 'currentColor' : 'none'} 
-        className={`transition-all ${toggleFavorite.isPending ? 'opacity-50 scale-90' : ''}`}
-      />
+      {isPending ? (
+        <Loader2 size={size} className="animate-spin text-red-400" />
+      ) : (
+        <Heart 
+          size={size} 
+          fill={isSaved ? 'currentColor' : 'none'} 
+          className={`transition-transform duration-300 group-hover/fav:scale-110 ${
+            isSaved ? 'text-red-500' : 'text-current'
+          }`}
+        />
+      )}
+      {showLabel && (
+        <span className="text-xs font-bold uppercase tracking-wider">
+          {label || (isSaved ? 'Saved' : 'Save')}
+        </span>
+      )}
     </button>
   );
 };
+
+export default FavoriteButton;

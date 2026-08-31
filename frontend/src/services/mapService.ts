@@ -32,7 +32,7 @@ const FALLBACK_TRAIL_POINTS: MapEntity[] = [
     latitude: 58.9864,
     longitude: 6.1904,
     category: 'TRAIL',
-    image: '/images/kjeragbolten_1786936275605.jpg',
+    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200',
     description: 'Iconic clifftop plateau rising 604m directly above Lysefjord.',
     rating: 4.9,
     price: 'Free',
@@ -68,7 +68,7 @@ const FALLBACK_TRAIL_POINTS: MapEntity[] = [
     latitude: 61.5039,
     longitude: 8.7186,
     category: 'TRAIL',
-    image: '/images/besseggen_1786936236965.jpg',
+    image: '/images/besseggen_1786936349992.jpg',
     description: 'Legendary knife-edge alpine ridge between emerald Gjende and cobalt Bessvatnet.',
     rating: 4.8,
     price: 'Free',
@@ -86,7 +86,7 @@ const FALLBACK_TRAIL_POINTS: MapEntity[] = [
     latitude: 67.9284,
     longitude: 13.0763,
     category: 'TRAIL',
-    image: '/images/wildlife_eagle_1787013726715.jpg',
+    image: '/images/lofoten_1787013505867.jpg',
     description: '1,560 Sherpa stone steps leading to panoramic 360° views of Reinefjorden.',
     rating: 4.8,
     price: 'Free',
@@ -178,36 +178,37 @@ export const mapService = {
     let mapEntities: MapEntity[] = [];
 
     try {
-      // Call the RPC function
-      const { data: markers, error } = await supabase
-        .rpc('get_smart_map_markers', {
-          min_lat: minLat,
-          max_lat: maxLat,
-          min_lng: minLng,
-          max_lng: maxLng
-        });
+      if (typeof supabase.rpc === 'function') {
+        const { data: markers, error } = await supabase
+          .rpc('get_smart_map_markers', {
+            min_lat: minLat,
+            max_lat: maxLat,
+            min_lng: minLng,
+            max_lng: maxLng
+          });
 
-      if (error) {
-        console.error('Error fetching smart map markers:', error);
-      } else if (markers && markers.length > 0) {
-        mapEntities = markers.map((m: any) => ({
-          id: m.id,
-          entity_type: m.type,
-          entity_id: m.location_id || m.id,
-          name: m.name,
-          slug: m.slug,
-          detail_url: m.type === 'LOCATION' ? `/explore/${m.slug || m.id}` : `/explore/${m.slug || m.id}`,
-          latitude: m.latitude,
-          longitude: m.longitude,
-          category: m.category || 'DESTINATION',
-          image: m.image_url || '/images/trolltunga_1786936111320.jpg',
-          description: m.description || '',
-          rating: m.average_rating || 4.8,
-          price: m.base_price_nok ? `NOK ${m.base_price_nok}` : 'Free',
-          status: m.featured ? 'Featured' : 'Active',
-          extra: m.subcategory || undefined,
-          region: m.region
-        }));
+        if (error) {
+          console.error('Error fetching smart map markers:', error);
+        } else if (markers && markers.length > 0) {
+          mapEntities = markers.map((m: any) => ({
+            id: m.id,
+            entity_type: m.type || 'LOCATION',
+            entity_id: m.location_id || m.id,
+            name: m.name,
+            slug: m.slug,
+            detail_url: m.type === 'LOCATION' ? `/explore/${m.slug || m.id}` : `/explore/${m.slug || m.id}`,
+            latitude: m.lat || m.latitude,
+            longitude: m.lng || m.longitude,
+            category: m.type || m.category || 'DESTINATION',
+            image: m.image_url || '/images/trolltunga_1786936111320.jpg',
+            description: m.description || '',
+            rating: m.average_rating || 4.8,
+            price: m.base_price_nok ? `NOK ${m.base_price_nok}` : 'Free',
+            status: m.featured ? 'Featured' : 'Active',
+            extra: m.subcategory || undefined,
+            region: m.region
+          }));
+        }
       }
     } catch (rpcErr) {
       console.warn('RPC get_smart_map_markers error, falling back to local dataset:', rpcErr);

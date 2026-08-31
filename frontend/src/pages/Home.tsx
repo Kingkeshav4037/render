@@ -8,6 +8,7 @@ import { homeContentService, getActivityImage } from '../services/home/homeConte
 import { useCurrencyStore } from '../store/useCurrencyStore';
 import { SEO } from '../components/shared/SEO';
 import { OptimizedImage } from '../components/shared/OptimizedImage';
+import { RecentlyViewedSection } from '../components/common/RecentlyViewedSection';
 
 const HERO_IMAGE = '/images/northern_lights_1786935879330.jpg';
 
@@ -486,6 +487,13 @@ export const Home = () => {
             </div>
           </motion.section>
         )}
+
+        {/* ── 7. RECENTLY VIEWED ──────────────────────────────────── */}
+        <RecentlyViewedSection
+          title="Recently Explored by You"
+          subtitle="Pick up where you left off across Norwegian destinations, stays, and trails"
+          className="pt-4 pb-4"
+        />
 
         {/* ── 8. AI PLANNER CTA ─────────────────────────────────────── */}
         <motion.section {...fadeUp}

@@ -37,6 +37,88 @@ export interface AccommodationRoom {
   remaining?: number;
 }
 
+export const HOTEL_IMAGES: Record<string, string> = {
+  'juvet':                   '/images/hotel_juvet_1787013813000.jpg',
+  'thief':                   'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1200',
+  'grand hotel':             'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1200',
+  'sommerro':                'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1200',
+  'the hub':                 'https://images.unsplash.com/photo-1542314831-c6a4d14d8c85?q=80&w=1200',
+  'anker':                   'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?q=80&w=1200',
+  'opus xvi':                'https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=1200',
+  'norge':                   'https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=1200',
+  'hanseatiske':             'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1200',
+  'børs':                    'https://images.unsplash.com/photo-1564501049412-61c2a3083791?q=80&w=1200',
+  'bors':                    'https://images.unsplash.com/photo-1564501049412-61c2a3083791?q=80&w=1200',
+  'solstrand':               'https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=1200',
+  'britannia':               'https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1200',
+  'clarion hotel trondheim': 'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1200',
+  'bakklandet':              'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=1200',
+  'eilert smith':            'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1200',
+  'energy':                  'https://images.unsplash.com/photo-1542314831-c6a4d14d8c85?q=80&w=1200',
+  'preikestolen basecamp':   'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=1200',
+  'the edge':                'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?q=80&w=1200',
+  'ishavshotel':             'https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?q=80&w=1200',
+  'arctic panorama':         'https://images.unsplash.com/photo-1518780664697-55e3ad937233?q=80&w=1200',
+  'malangen':                'https://images.unsplash.com/photo-1507272931001-fc06c17e4f43?q=80&w=1200',
+  'sorrisniva':              '/images/northern_lights_1786935879330.jpg',
+  'snowhotel':               'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1200',
+  'hotel union':             'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200',
+  'grande fjord':            'https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1200',
+  'eliassen':                'https://images.unsplash.com/photo-1507272931001-fc06c17e4f43?q=80&w=1200',
+  'nusfjord':                'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=1200',
+  'hattvika':                'https://images.unsplash.com/photo-1516629910-c11438902888?q=80&w=1200',
+  'svinøya':                 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=1200',
+  'svinoya':                 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=1200',
+  'reine':                   '/images/lofoten_1787013505867.jpg',
+  'senja':                   'https://images.unsplash.com/photo-1490001851140-5e586071ea91?q=80&w=1200',
+  'mefjord':                 'https://images.unsplash.com/photo-1490001851140-5e586071ea91?q=80&w=1200',
+  'fretheim':                'https://images.unsplash.com/photo-1542314831-c6a4d14d8c85?q=80&w=1200',
+  'flåm marina':             'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200',
+  'vatnahalsen':             'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200',
+  'ullensvang':              'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200',
+  'kviknes':                 'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1200',
+  'walaker':                 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1200',
+  'dalen':                   'https://images.unsplash.com/photo-1549294413-26f195200c16?q=80&w=1200',
+  'finse':                   'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=80&w=1200',
+  'dr. holms':               'https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=1200',
+  'vestlia':                 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1200',
+  'basecamp hotel':          'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1200',
+  'funken':                  'https://images.unsplash.com/photo-1518780664697-55e3ad937233?q=80&w=1200',
+  'manshausen':              'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=1200',
+  'lyngen north':            '/images/northern_lights_1786935879330.jpg',
+  'trolltunga hotel':        '/images/trolltunga_1786936111320.jpg',
+  'radisson blu mountain':   'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=80&w=1200',
+  'wood hotel':              'https://images.unsplash.com/photo-1542314831-c6a4d14d8c85?q=80&w=1200',
+};
+
+const STAY_TYPE_FALLBACKS: Record<string, string> = {
+  HOTEL:       'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1200',
+  CABIN:       'https://images.unsplash.com/photo-1507272931001-fc06c17e4f43?q=80&w=1200',
+  LODGE:       'https://images.unsplash.com/photo-1518780664697-55e3ad937233?q=80&w=1200',
+  RESORT:      'https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=1200',
+  HOSTEL:      'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?q=80&w=1200',
+  UNIQUE_STAY: '/images/hotel_juvet_1787013813000.jpg',
+  ECO_STAY:    'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=1200',
+  CAMPING:     'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200',
+  APARTMENT:   'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1200',
+};
+
+export function getStayImage(name?: string, type?: string, imageUrl?: string | null): string {
+  const cleanName = (name || '').toLowerCase().trim();
+  for (const [key, url] of Object.entries(HOTEL_IMAGES)) {
+    if (cleanName.includes(key)) {
+      return url;
+    }
+  }
+
+  if (imageUrl && imageUrl.trim() && !imageUrl.includes('placeholder') && !imageUrl.includes('hotel_juvet_1787013813000')) {
+    return imageUrl;
+  }
+
+  const cleanType = (type || 'HOTEL').toUpperCase();
+  return STAY_TYPE_FALLBACKS[cleanType] || STAY_TYPE_FALLBACKS.HOTEL;
+}
+
 export const FALLBACK_STAYS: Accommodation[] = [
   {
     id: 'stay-juvet',
@@ -145,7 +227,11 @@ export const staysService = {
         return { data: [], count: 0 };
       }
 
-      let result = (data as any[]) || [];
+      let result = ((data as any[]) || []).map(stay => ({
+        ...stay,
+        image_url: getStayImage(stay.name, stay.type, stay.image_url)
+      }));
+
       if (filters.amenities && filters.amenities.length > 0) {
         result = result.filter(stay => {
           const stayAmenities = Array.isArray(stay.amenities) ? stay.amenities : [];
@@ -178,7 +264,10 @@ export const staysService = {
       const error = res?.error;
 
       if (error || !data) return null;
-      return data as any;
+      return {
+        ...data,
+        image_url: getStayImage(data.name, data.type, data.image_url)
+      } as any;
     } catch (err) {
       console.error('Error in getStayDetails:', err);
       return null;

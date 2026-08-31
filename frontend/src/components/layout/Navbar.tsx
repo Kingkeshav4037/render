@@ -190,10 +190,15 @@ export const Navbar = () => {
             </>
           ) : (
             <div className="flex items-center gap-3">
-              <Link to="/login" className="font-sans font-medium text-xs text-snow hover:text-arctic-gold transition-colors focus-visible:ring-2 focus-visible:ring-aurora-green focus:outline-none px-2 py-1 rounded">
+              <Link 
+                to={location.pathname !== '/login' && location.pathname !== '/register' ? `/login?returnTo=${encodeURIComponent(location.pathname + location.search)}` : '/login'} 
+                className="font-sans font-medium text-xs text-snow hover:text-arctic-gold transition-colors focus-visible:ring-2 focus-visible:ring-aurora-green focus:outline-none px-2 py-1 rounded"
+              >
                 {t('nav.login', 'Log in')}
               </Link>
-              <Link to="/register">
+              <Link 
+                to={location.pathname !== '/login' && location.pathname !== '/register' ? `/register?returnTo=${encodeURIComponent(location.pathname + location.search)}` : '/register'}
+              >
                 <Button variant="primary" className="text-xs py-2 px-4 rounded-xl bg-arctic-gold hover:bg-white text-deep-night font-bold shadow-md transition-all">
                   {t('nav.signup', 'Sign Up')}
                 </Button>
@@ -378,10 +383,16 @@ export const Navbar = () => {
             </div>
           ) : (
             <div className="flex flex-col space-y-3 pt-4 border-t border-slate-800">
-              <Link to="/login" onClick={() => setShowMobileMenu(false)}>
+              <Link 
+                to={location.pathname !== '/login' && location.pathname !== '/register' ? `/login?returnTo=${encodeURIComponent(location.pathname + location.search)}` : '/login'} 
+                onClick={() => setShowMobileMenu(false)}
+              >
                 <Button variant="outline" fullWidth className="rounded-xl border-slate-700 text-white hover:bg-slate-800">{t('nav.login', 'Log In')}</Button>
               </Link>
-              <Link to="/register" onClick={() => setShowMobileMenu(false)}>
+              <Link 
+                to={location.pathname !== '/login' && location.pathname !== '/register' ? `/register?returnTo=${encodeURIComponent(location.pathname + location.search)}` : '/register'} 
+                onClick={() => setShowMobileMenu(false)}
+              >
                 <Button variant="primary" fullWidth className="rounded-xl bg-arctic-gold hover:bg-white text-deep-night font-bold">{t('nav.signup', 'Sign Up')}</Button>
               </Link>
             </div>

@@ -12,11 +12,12 @@ import { Activities } from './pages/Activities';
 import { ActivityDetails } from './pages/ActivityDetails';
 import { RouteErrorBoundary } from './components/layout/GlobalErrorBoundary';
 
+import { PageLoadingSkeleton } from './components/ui/PageLoadingSkeleton';
+import { Compass, Home as HomeIcon, ArrowRight } from 'lucide-react';
+
 // --- Global Fallback Loader ---
 const GlobalLoader = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-navy-900">
-    <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
-  </div>
+  <PageLoadingSkeleton variant="full" />
 );
 
 // --- Auth-aware root redirect ---
@@ -39,16 +40,40 @@ const RootRedirect = () => {
   return <Navigate to="/home" replace />;
 };
 
-// --- 404 Not Found page (ISSUE-009) ---
+// --- 404 Not Found page ---
 const NotFound = () => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-navy-900 text-center px-6">
-      <div className="text-8xl font-black text-blue-500 mb-4">404</div>
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Page Not Found</h1>
-      <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md">The page you're looking for doesn't exist or has been moved.</p>
-      <Link to="/home" className="px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors">
-        Go to Home
-      </Link>
+    <div 
+      role="region" 
+      aria-label="404 Page Not Found"
+      className="min-h-screen flex flex-col items-center justify-center bg-deep-night text-center px-6 selection:bg-arctic-gold/30"
+    >
+      <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6 border border-white/10 text-arctic-gold">
+        <Compass size={40} className="animate-spin-slow" />
+      </div>
+      <div className="text-7xl md:text-9xl font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-arctic-gold to-white mb-4">
+        404
+      </div>
+      <h1 className="text-3xl md:text-4xl font-display font-bold text-snow mb-3">
+        Fjord Off the Map
+      </h1>
+      <p className="text-slate-400 mb-8 max-w-md text-sm md:text-base leading-relaxed">
+        The destination, trail, or itinerary you are seeking has drifted into uncharted Arctic waters or has moved.
+      </p>
+      <div className="flex flex-wrap items-center justify-center gap-4">
+        <Link 
+          to="/home" 
+          className="px-6 py-3.5 bg-arctic-gold hover:bg-white text-deep-night rounded-2xl font-bold text-xs uppercase tracking-widest transition-all shadow-lg flex items-center gap-2"
+        >
+          <HomeIcon size={16} /> Return to Home
+        </Link>
+        <Link 
+          to="/explore" 
+          className="px-6 py-3.5 bg-white/10 hover:bg-white/20 text-snow border border-white/10 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all flex items-center gap-2"
+        >
+          Explore Norway <ArrowRight size={16} />
+        </Link>
+      </div>
     </div>
   );
 };
@@ -84,6 +109,7 @@ const ProfilePrivacy = lazy(() => import('./pages/user/Profile/ProfilePrivacy').
 const Wishlist = lazy(() => import('./pages/user/Wishlist').then(m => ({ default: m.Wishlist })));
 const TripsList = lazy(() => import('./pages/user/Trips/TripsList').then(m => ({ default: m.TripsList })));
 const TripDetails = lazy(() => import('./pages/user/Trips/TripDetails').then(m => ({ default: m.TripDetails })));
+const SharedTripView = lazy(() => import('./pages/trips/SharedTripView').then(m => ({ default: m.SharedTripView })));
 const Assistant = lazy(() => import('./pages/user/Assistant').then(m => ({ default: m.Assistant })));
 const TravelWallet = lazy(() => import('./pages/user/TravelWallet').then(m => ({ default: m.TravelWallet })));
 const Notifications = lazy(() => import('./pages/user/Notifications').then(m => ({ default: m.Notifications })));
@@ -310,6 +336,8 @@ function App() {
               <Route path="/saved" element={<Navigate to="/favorites" replace />} />
               <Route path="/trips" element={<TripsList />} />
               <Route path="/trips/:id" element={<TripDetails />} />
+              <Route path="/trips/share/:token" element={<SharedTripView />} />
+              <Route path="/trips/public/:id" element={<SharedTripView />} />
               <Route path="/planner" element={<TripPlanner />} />
               <Route path="/ai-planner" element={<Navigate to="/planner" replace />} />
               <Route path="/plan-trip" element={<Navigate to="/planner" replace />} />

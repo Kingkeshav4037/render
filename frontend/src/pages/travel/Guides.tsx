@@ -4,6 +4,7 @@ import { BookOpen, Compass, ArrowRight, User, Search, Tag, X } from 'lucide-reac
 import { Link } from 'react-router-dom';
 import { OptimizedImage } from '../../components/shared/OptimizedImage';
 import { SEO } from '../../components/shared/SEO';
+import { FavoriteButton } from '../../components/common/FavoriteButton';
 
 export const Guides = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -176,6 +177,13 @@ export const Guides = () => {
                     <span className="bg-navy-900 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider shadow-md">
                       {article.category}
                     </span>
+                  </div>
+
+                  <div 
+                    className="absolute top-4 right-4 z-30"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <FavoriteButton itemType="GUIDE" itemId={article.id} />
                   </div>
                 </div>
                 

@@ -2,12 +2,14 @@ import { useState, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { MapPin, Calendar, Users, Search, Filter, ArrowRight, Check, Star, Zap, Waves, TreePine, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useStays } from '../hooks/useStays';
+import { getStayImage } from '../services/stay/staysService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCurrencyStore } from '../store/useCurrencyStore';
 import { AsyncStateWrapper } from '../components/shared/AsyncStateWrapper';
 import { SEO } from '../components/shared/SEO';
 import { OptimizedImage } from '../components/shared/OptimizedImage';
 import { PageHeader } from '../components/ui/PageHeader';
+import { FavoriteButton } from '../components/common/FavoriteButton';
 
 const AMENITIES_LIST = [
   { id: 'breakfast', label: 'Breakfast Included' },
@@ -342,9 +344,9 @@ export const Stay = () => {
                       >
                         <div className="h-48 overflow-hidden relative">
                           <OptimizedImage
-                            src={stay.image_url || '/images/hotel_juvet_1787013813000.jpg'}
+                            src={getStayImage(stay.name, stay.type, stay.image_url)}
                             alt={stay.name}
-                            fallbackSrc="/images/hotel_juvet_1787013813000.jpg"
+                            fallbackSrc={getStayImage(stay.name, stay.type)}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                           />
                           {stay.eco_certified && (
@@ -352,6 +354,9 @@ export const Stay = () => {
                               Eco Certified
                             </span>
                           )}
+                          <div className="absolute top-3 right-3 z-10">
+                            <FavoriteButton itemType="STAY" itemId={stay.id} />
+                          </div>
                         </div>
                         <div className="p-5 flex flex-col flex-grow">
                           <div className="flex justify-between items-start mb-2">

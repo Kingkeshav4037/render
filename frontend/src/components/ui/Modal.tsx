@@ -17,15 +17,24 @@ export const Modal: React.FC<ModalProps> = ({
   children, 
   size = 'md' 
 }) => {
-  // Prevent body scroll when modal is open
+  // Prevent body scroll and listen for Escape key when modal is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          onClose();
+        }
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.body.style.overflow = 'unset';
+        window.removeEventListener('keydown', handleKeyDown);
+      };
     } else {
       document.body.style.overflow = 'unset';
     }
-    return () => { document.body.style.overflow = 'unset'; };
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   const sizes = {
     sm: "max-w-sm",
@@ -45,8 +54,14 @@ export const Modal: React.FC<ModalProps> = ({
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-navy-900/40 backdrop-blur-sm"
             onClick={onClose}
+            aria-hidden="true"
           />
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+          <div 
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={title ? "modal-title" : undefined}
+          >
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -56,10 +71,11 @@ export const Modal: React.FC<ModalProps> = ({
             >
               {title && (
                 <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-white/10">
-                  <h2 className="text-xl font-bold text-navy-900 dark:text-white">{title}</h2>
+                  <h2 id="modal-title" className="text-xl font-bold text-navy-900 dark:text-white">{title}</h2>
                   <button 
                     onClick={onClose}
-                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors focus:outline-none"
+                    aria-label="Close modal dialog"
+                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-arctic-gold"
                   >
                     <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                   </button>
@@ -68,7 +84,8 @@ export const Modal: React.FC<ModalProps> = ({
               {!title && (
                 <button 
                   onClick={onClose}
-                  className="absolute top-4 right-4 p-2 z-10 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors focus:outline-none bg-white/50 backdrop-blur-sm"
+                  aria-label="Close dialog"
+                  className="absolute top-4 right-4 p-2 z-10 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-arctic-gold bg-white/50 backdrop-blur-sm"
                 >
                   <X className="w-5 h-5 text-gray-700 dark:text-gray-300" />
                 </button>

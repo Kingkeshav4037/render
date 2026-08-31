@@ -40,7 +40,7 @@ const CITIES: WeatherCity[] = [
     region: 'Arctic Circle, Northern Norway', 
     lat: 69.6492, 
     lon: 18.9553, 
-    bgImage: '/images/kjeragbolten_1786936275605.jpg',
+    bgImage: '/images/northern_lights_1786935879330.jpg',
     defaultTemp: '12°C',
     defaultCondition: 'Partly Cloudy'
   },
@@ -49,7 +49,7 @@ const CITIES: WeatherCity[] = [
     region: 'Fjord Coast, Western Norway', 
     lat: 60.3913, 
     lon: 5.3221, 
-    bgImage: '/images/trolltunga_1786936111320.jpg',
+    bgImage: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1600',
     defaultTemp: '15°C',
     defaultCondition: 'Light Showers'
   },
@@ -58,7 +58,7 @@ const CITIES: WeatherCity[] = [
     region: 'Oslofjord, Eastern Norway', 
     lat: 59.9139, 
     lon: 10.7522, 
-    bgImage: '/images/infra_windfarm_1786938637138.jpg',
+    bgImage: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600',
     defaultTemp: '19°C',
     defaultCondition: 'Sunny'
   },
@@ -67,7 +67,7 @@ const CITIES: WeatherCity[] = [
     region: 'UNESCO Fjord, Sunnmøre', 
     lat: 62.1008, 
     lon: 7.2059, 
-    bgImage: '/images/besseggen_1786936236965.jpg',
+    bgImage: '/images/fjords_1786935800026.jpg',
     defaultTemp: '14°C',
     defaultCondition: 'Clear Blue Skies'
   },
@@ -76,7 +76,7 @@ const CITIES: WeatherCity[] = [
     region: 'Archipelago, Northern Norway', 
     lat: 68.2343, 
     lon: 14.5682, 
-    bgImage: '/images/wildlife_eagle_1787013726715.jpg',
+    bgImage: '/images/lofoten_1787013505867.jpg',
     defaultTemp: '13°C',
     defaultCondition: 'Breezy & Bright'
   },
@@ -85,7 +85,7 @@ const CITIES: WeatherCity[] = [
     region: 'Aurlandsfjord, Western Norway', 
     lat: 60.8632, 
     lon: 7.1135, 
-    bgImage: '/images/trolltunga_1786936111320.jpg',
+    bgImage: 'https://images.unsplash.com/photo-1542314831-c6a4d14d8c85?q=80&w=1600',
     defaultTemp: '16°C',
     defaultCondition: 'Mild'
   },
@@ -94,7 +94,7 @@ const CITIES: WeatherCity[] = [
     region: 'High Arctic, 78°N', 
     lat: 78.2232, 
     lon: 15.6267, 
-    bgImage: '/images/wildlife_polar_bear_1787013636605.jpg',
+    bgImage: 'https://images.unsplash.com/photo-1589656966895-2f33e7653819?q=polar+bear+svalbard&w=1600',
     defaultTemp: '2°C',
     defaultCondition: 'Arctic Breeze'
   }

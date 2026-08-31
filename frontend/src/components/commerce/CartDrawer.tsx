@@ -3,12 +3,14 @@ import { X, ShoppingBag, ArrowRight, Trash2, Calendar, ShieldCheck, Plus, Minus 
 import { useNavigate } from 'react-router-dom';
 import { useCart, CartItem } from '../../store/useCartStore';
 import { useCurrencyStore } from '../../store/useCurrencyStore';
+import { useRequireAuth } from '../../hooks/useRequireAuth';
 import { OptimizedImage } from '../shared/OptimizedImage';
 import { Button } from '../ui/Button';
 
 export const CartDrawer = () => {
   const { items, getCartTotal, getItemCount, isOpen, setIsOpen, removeItem, updateQuantity, clearCart } = useCart();
   const { formatPrice } = useCurrencyStore();
+  const { requireAuth } = useRequireAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -129,7 +131,12 @@ export const CartDrawer = () => {
             <p className="text-[10px] text-slate-400">Taxes and MVA VAT calculated at checkout. Free cancellation up to 48 hours before experiences.</p>
             
             <button 
-              onClick={() => { setIsOpen(false); navigate('/checkout'); }}
+              onClick={() => {
+                setIsOpen(false);
+                requireAuth(() => {
+                  navigate('/checkout');
+                }, { message: 'Sign in to proceed to checkout.', returnTo: '/checkout' });
+              }}
               className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm tracking-wide py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-600/30 group focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-400 focus-visible:outline-none cursor-pointer"
             >
               <span>Proceed to Checkout</span>

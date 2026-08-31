@@ -12,6 +12,7 @@ import { FavoriteButton } from '../components/common/FavoriteButton';
 import { ReviewSection } from '../components/common/ReviewSection';
 import { openStreetMap } from '../lib/openStreetMap';
 import { SEO } from '../components/shared/SEO';
+import { recentlyViewedService } from '../services/recentlyViewedService';
 
 // Map database slugs/names to local images
 const getPlaceholderImage = (name: string) => {
@@ -72,9 +73,18 @@ export const DestinationDetails = () => {
       if (!slug) return;
       try {
         const result = await mapService.getDestinationDetails(slug as string);
-        if (result) {
-          setLocation(result.location);
+        if (result && result.location) {
+          const loc = result.location;
+          setLocation(loc);
           setScores(result.scores);
+          recentlyViewedService.trackView({
+            item_type: 'DESTINATION',
+            item_id: loc.id || slug || 'dest',
+            title: loc.name,
+            image_url: getPlaceholderImage(loc.name),
+            route: `/explore/${slug}`,
+            metadata: { region: loc.region }
+          }).catch(() => {});
         }
       } catch (error) {
         console.error("Failed to load details:", error);

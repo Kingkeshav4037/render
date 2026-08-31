@@ -11,6 +11,7 @@ import { getActivityImage } from '../services/home/homeContentService';
 import { OptimizedImage } from '../components/shared/OptimizedImage';
 import { SEO } from '../components/shared/SEO';
 import { useRequireAuth } from '../hooks/useRequireAuth';
+import { FavoriteButton } from '../components/common/FavoriteButton';
 
 const DATES = [
   { date: '14', day: 'Mon', available: true },
@@ -193,9 +194,14 @@ export const ActivityDetails = () => {
                 <div className="text-2xl font-bold text-[#A3B899]">{formatPrice(activityPrice)}</div>
                 <div className="text-[10px] uppercase tracking-widest text-snow/50 font-bold">per person</div>
               </div>
-              <div className="flex gap-2">
-                <button className="w-10 h-10 border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors"><Heart className="w-4 h-4"/></button>
-                <button className="w-10 h-10 border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors"><Share2 className="w-4 h-4"/></button>
+              <div className="flex gap-2 items-center">
+                <FavoriteButton 
+                  itemType="ACTIVITY" 
+                  itemId={activity?.id || id || 'act-activity'} 
+                  className="bg-white/5 border border-white/10 hover:bg-white/10"
+                  size={18}
+                />
+                <button className="w-10 h-10 border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors rounded-full"><Share2 className="w-4 h-4"/></button>
               </div>
             </div>
 

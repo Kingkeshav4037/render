@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { staysService, AccommodationRoom } from '../services/stay/staysService';
+import { staysService, AccommodationRoom, getStayImage } from '../services/stay/staysService';
 import { 
   MapPin, Star, Share2, Heart, Wifi, Car, Coffee, Wind, TreePine, 
   ChevronRight, Calendar, Users, Info, ShieldCheck, Check, ArrowRight,
@@ -14,6 +14,8 @@ import { OptimizedImage } from '../components/shared/OptimizedImage';
 import { SEO } from '../components/shared/SEO';
 import { toast } from 'sonner';
 import { useRequireAuth } from '../hooks/useRequireAuth';
+import { FavoriteButton } from '../components/common/FavoriteButton';
+import { recentlyViewedService } from '../services/recentlyViewedService';
 
 export const StayDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -54,6 +56,19 @@ export const StayDetails = () => {
     },
     enabled: !!id
   });
+
+  useEffect(() => {
+    if (stay) {
+      recentlyViewedService.trackView({
+        item_type: 'STAY',
+        item_id: stay.id,
+        title: stay.name,
+        image_url: stay.image_url,
+        route: `/stay/${stay.id}`,
+        metadata: { price: `NOK ${stay.price_per_night} / night` }
+      }).catch(() => {});
+    }
+  }, [stay]);
 
   // Fetch rooms
   const { data: rooms = [], isLoading: roomsLoading } = useQuery({
@@ -185,7 +200,7 @@ export const StayDetails = () => {
             src={stay.image_url} 
             alt={stay.name} 
             category="stay"
-            fallbackSrc="/images/hotel_juvet_1787013813000.jpg"
+            fallbackSrc={getStayImage(stay.name, stay.type)}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
             containerClassName="w-full h-full"
           />
@@ -196,7 +211,7 @@ export const StayDetails = () => {
             src="https://images.unsplash.com/photo-1590490360182-c33d57733427?q=luxury+nordic+hotel+interior+room&w=800" 
             alt="Room & Interior" 
             category="stay"
-            fallbackSrc="/images/hotel_juvet_1787013813000.jpg"
+            fallbackSrc={getStayImage(stay.name, stay.type)}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
             containerClassName="w-full h-full"
           />
@@ -207,7 +222,7 @@ export const StayDetails = () => {
               src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=scandinavian+resort+room+view&w=800" 
               alt="Panoramic View" 
               category="stay"
-              fallbackSrc="/images/hotel_juvet_1787013813000.jpg"
+              fallbackSrc={getStayImage(stay.name, stay.type)}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
               containerClassName="w-full h-full"
             />
@@ -217,7 +232,7 @@ export const StayDetails = () => {
               src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=nordic+sauna+wellness+resort&w=800" 
               alt="Sauna & Spa" 
               category="stay"
-              fallbackSrc="/images/hotel_juvet_1787013813000.jpg"
+              fallbackSrc={getStayImage(stay.name, stay.type)}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
               containerClassName="w-full h-full"
             />
@@ -242,7 +257,15 @@ export const StayDetails = () => {
             <div className="flex items-center gap-2 text-green-400 font-bold text-xs uppercase tracking-widest mb-3">
               <TreePine className="w-4 h-4" /> {stay.eco_certified ? 'Eco-Certified Nordic Property' : 'Certified Hospitality Partner'}
             </div>
-            <h1 className="text-3xl md:text-5xl font-display font-bold mb-4">{stay.name}</h1>
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <h1 className="text-3xl md:text-5xl font-display font-bold">{stay.name}</h1>
+              <FavoriteButton 
+                itemType="STAY" 
+                itemId={stay.id} 
+                className="bg-white/10 hover:bg-white/20 text-white shadow-xl backdrop-blur-md p-3" 
+                size={24} 
+              />
+            </div>
             <div className="flex flex-wrap items-center gap-4 text-sm text-snow/70 mb-4">
               <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4 text-arctic-gold"/> {(stay as any).locations?.name || 'Vestland, Norway'}</span>
               <span>•</span>

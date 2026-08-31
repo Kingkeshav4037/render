@@ -57,6 +57,7 @@ vi.mock('../../store/useAuthStore', () => {
     hasPermission: vi.fn().mockReturnValue(false),
     signOut: vi.fn().mockResolvedValue(undefined),
     initialize: vi.fn(),
+    refreshProfile: vi.fn().mockResolvedValue(null),
   };
 
   const storeState = { current: { ...defaultState } };
@@ -84,6 +85,21 @@ vi.mock('@tanstack/react-query', async () => {
   const actual = await vi.importActual('@tanstack/react-query');
   return { ...actual };
 });
+
+// ─── Mock profileService ──────────────────────────────────────────────
+vi.mock('../../services/profile/profileService', () => ({
+  profileService: {
+    getProfile: vi.fn().mockResolvedValue({
+      id: 'usr-complete',
+      gender: 'Male',
+      dateOfBirth: '1990-01-01',
+      address: 'Karl Johans gate 1',
+      country: 'Norway',
+    }),
+    updateProfile: vi.fn().mockResolvedValue({}),
+    ensureProfileExists: vi.fn().mockResolvedValue({}),
+  },
+}));
 
 // ─── Mock sonner ──────────────────────────────────────────────────────
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() }, Toaster: () => null }));
@@ -157,13 +173,25 @@ describe('Authentication & Authorization', () => {
       fireEvent.change(screen.getByPlaceholderText(/^Password$/i), { target: { value: 'SecurePass123!' } });
       fireEvent.change(screen.getByPlaceholderText(/Confirm Password/i), { target: { value: 'SecurePass123!' } });
       fireEvent.change(screen.getByPlaceholderText(/Full Name/i), { target: { value: 'Test User' } });
-      fireEvent.click(screen.getByRole('button', { name: /Create Account/i }));
+      fireEvent.change(screen.getByLabelText(/Gender/i), { target: { value: 'Female' } });
+      fireEvent.change(screen.getByLabelText(/Date of Birth/i), { target: { value: '1995-05-15' } });
+      fireEvent.change(screen.getByPlaceholderText(/Street Address/i), { target: { value: 'Storgata 1' } });
+      fireEvent.click(screen.getByRole('button', { name: /Complete Registration|Create Account/i }));
 
       await waitFor(() => {
         expect(supabase.auth.signUp).toHaveBeenCalledWith({
           email: 'test@example.com',
           password: 'SecurePass123!',
-          options: { data: { full_name: 'Test User', role: 'USER' } },
+          options: {
+            data: expect.objectContaining({
+              full_name: 'Test User',
+              gender: 'Female',
+              date_of_birth: '1995-05-15',
+              address: 'Storgata 1',
+              country: 'Norway',
+              role: 'USER',
+            }),
+          },
         });
       });
     });
@@ -184,7 +212,10 @@ describe('Authentication & Authorization', () => {
       fireEvent.change(screen.getByPlaceholderText(/^Password$/i), { target: { value: 'SecurePass123!' } });
       fireEvent.change(screen.getByPlaceholderText(/Confirm Password/i), { target: { value: 'SecurePass123!' } });
       fireEvent.change(screen.getByPlaceholderText(/Full Name/i), { target: { value: 'Someone' } });
-      fireEvent.click(screen.getByRole('button', { name: /Create Account/i }));
+      fireEvent.change(screen.getByLabelText(/Gender/i), { target: { value: 'Male' } });
+      fireEvent.change(screen.getByLabelText(/Date of Birth/i), { target: { value: '1990-01-01' } });
+      fireEvent.change(screen.getByPlaceholderText(/Street Address/i), { target: { value: 'Storgata 1' } });
+      fireEvent.click(screen.getByRole('button', { name: /Complete Registration|Create Account/i }));
 
       await waitFor(() => {
         expect(screen.getByText(/Email already in use/i)).toBeTruthy();

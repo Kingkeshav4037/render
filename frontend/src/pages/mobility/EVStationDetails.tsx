@@ -116,7 +116,7 @@ export const EVStationDetails = () => {
         nights: 1,
         activities: 1,
         status: 'Upcoming',
-        image: '/images/road_trip_1786937012345.jpg',
+        image: '/images/infra_windfarm_1786938637138.jpg',
         weather: '12°C',
         summary: `EV charging stop at ${station.location}. Operator: ${station.operator}.`,
         destinations: [station.location]

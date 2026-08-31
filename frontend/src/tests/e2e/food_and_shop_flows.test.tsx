@@ -12,6 +12,7 @@ import { FoodItemModal } from '../../components/food/FoodItemModal';
 import { ProductDetailModal } from '../../components/marketplace/ProductDetailModal';
 import { CartDrawer } from '../../components/commerce/CartDrawer';
 import { useCartStore } from '../../store/useCartStore';
+import { useAuthStore } from '../../store/useAuthStore';
 import { foodService } from '../../services/foodService';
 import { shopService } from '../../services/shopService';
 import { supabase } from '../../lib/supabase';
@@ -169,6 +170,12 @@ describe('Food & Shop Connected Production-Hardened Flows', () => {
     });
     useCartStore.getState().clearCart();
     useCartStore.getState().setIsOpen(false);
+    useAuthStore.setState({
+      user: { id: 'test-user-1', email: 'test@norwaysmartlife.com' } as any,
+      profile: { id: 'test-user-1', fullName: 'Test User', gender: 'Female', dateOfBirth: '1995-01-01', address: 'Karl Johans gate 1', country: 'Norway' } as any,
+      loading: false,
+      initialized: true,
+    });
     mockNavigate.mockClear();
     vi.clearAllMocks();
   });

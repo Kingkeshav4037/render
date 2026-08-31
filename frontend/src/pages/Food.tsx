@@ -12,6 +12,7 @@ import { useCurrencyStore } from '../store/useCurrencyStore';
 import { useRequireAuth } from '../hooks/useRequireAuth';
 import { PageHeader } from '../components/ui/PageHeader';
 import { FoodItemModal } from '../components/food/FoodItemModal';
+import { FavoriteButton } from '../components/common/FavoriteButton';
 
 const CUISINES = [
   { id: 'all', label: 'All Experiences', icon: <Utensils className="w-4 h-4"/> },
@@ -377,6 +378,10 @@ export const Food = () => {
                                 </span>
                               </div>
                             )}
+
+                            <div className="absolute bottom-4 right-4 z-20">
+                              <FavoriteButton itemType="FOOD" itemId={food.id} />
+                            </div>
                           </div>
 
                           <div className="p-6 flex flex-col flex-grow relative z-20 justify-between">

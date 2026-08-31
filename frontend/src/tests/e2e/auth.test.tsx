@@ -18,6 +18,21 @@ vi.mock('../../lib/supabase', () => ({
   },
 }));
 
+// Mock profileService
+vi.mock('../../services/profile/profileService', () => ({
+  profileService: {
+    getProfile: vi.fn().mockResolvedValue({
+      id: 'test-user-id',
+      gender: 'Male',
+      dateOfBirth: '1990-01-01',
+      address: 'Karl Johans gate 1',
+      country: 'Norway',
+    }),
+    updateProfile: vi.fn().mockResolvedValue({}),
+    ensureProfileExists: vi.fn().mockResolvedValue({}),
+  },
+}));
+
 // Mock useNavigate
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
@@ -58,9 +73,18 @@ describe('E2E Journey 1: Authentication', () => {
     fireEvent.change(screen.getByPlaceholderText(/Full Name/i), {
       target: { value: 'Test User' },
     });
+    fireEvent.change(screen.getByLabelText(/Gender/i), {
+      target: { value: 'Female' },
+    });
+    fireEvent.change(screen.getByLabelText(/Date of Birth/i), {
+      target: { value: '1995-05-15' },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Street Address/i), {
+      target: { value: 'Storgata 1' },
+    });
 
     // Submit
-    fireEvent.click(screen.getByRole('button', { name: /Create Account/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Complete Registration|Create Account/i }));
 
     // Wait for Supabase call
     await waitFor(() => {
@@ -68,10 +92,14 @@ describe('E2E Journey 1: Authentication', () => {
         email: 'test@example.com',
         password: 'SecurePass123!',
         options: {
-          data: {
+          data: expect.objectContaining({
             full_name: 'Test User',
+            gender: 'Female',
+            date_of_birth: '1995-05-15',
+            address: 'Storgata 1',
+            country: 'Norway',
             role: 'USER',
-          },
+          }),
         },
       });
     });

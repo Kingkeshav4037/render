@@ -69,9 +69,13 @@ vi.mock('../../store/useAuthStore', () => {
   return { useAuthStore: mockHook };
 });
 
-vi.mock('../../store/useCurrencyStore', () => ({
-  useCurrencyStore: () => ({ currency: 'NOK', formatPrice: (n: number = 0) => `NOK ${n}`, setCurrency: vi.fn() }),
-}));
+vi.mock('../../store/useCurrencyStore', async (importOriginal) => {
+  const actual: any = await importOriginal();
+  return {
+    ...actual,
+    useCurrencyStore: () => ({ currency: 'NOK', formatPrice: (n: number = 0) => `NOK ${n}`, setCurrency: vi.fn() }),
+  };
+});
 
 vi.mock('sonner', () => {
   const t: any = vi.fn(); t.error = vi.fn(); t.success = vi.fn(); t.info = vi.fn();

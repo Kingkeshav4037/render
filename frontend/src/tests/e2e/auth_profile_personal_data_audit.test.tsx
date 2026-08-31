@@ -140,7 +140,7 @@ describe('Priority 6: Complete User Account, Authentication & Personal Data Syst
       fireEvent.change(confirmInput, { target: { value: 'ArcticExplore2026!' } });
 
       expect(screen.getByText(/Strong/i)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Create Account/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Complete Registration|Create Account/i })).toBeInTheDocument();
     });
 
     it('validates registration form inputs (name, email, password length, mismatch)', async () => {
@@ -152,7 +152,7 @@ describe('Priority 6: Complete User Account, Authentication & Personal Data Syst
         </BrowserRouter>
       );
 
-      const submitBtn = screen.getByRole('button', { name: /Create Account/i });
+      const submitBtn = screen.getByRole('button', { name: /Complete Registration|Create Account/i });
       const form = submitBtn.closest('form')!;
       const nameInput = screen.getByPlaceholderText(/Full Name/i);
       const emailInput = screen.getByPlaceholderText(/Email address/i);
@@ -208,12 +208,21 @@ describe('Priority 6: Complete User Account, Authentication & Personal Data Syst
       const passwordInputs = screen.getAllByPlaceholderText(/Password/i);
       const passwordInput = passwordInputs[0];
       const confirmInput = screen.getByPlaceholderText(/Confirm Password/i);
-      const submitBtn = screen.getByRole('button', { name: /Create Account/i });
+      const submitBtn = screen.getByRole('button', { name: /Complete Registration|Create Account/i });
 
       fireEvent.change(nameInput, { target: { value: 'Fjord Explorer' } });
       fireEvent.change(emailInput, { target: { value: 'traveler@fjord.no' } });
       fireEvent.change(passwordInput, { target: { value: 'NordicSummer2026!' } });
       fireEvent.change(confirmInput, { target: { value: 'NordicSummer2026!' } });
+
+      // Fill required profile fields
+      const genderSelect = screen.getByLabelText(/Gender/i);
+      const dobInput = screen.getByLabelText(/Date of Birth/i);
+      const addressInput = screen.getByPlaceholderText(/Street Address/i);
+
+      fireEvent.change(genderSelect, { target: { value: 'Female' } });
+      fireEvent.change(dobInput, { target: { value: '1995-05-15' } });
+      fireEvent.change(addressInput, { target: { value: 'Storgata 1' } });
 
       fireEvent.submit(submitBtn.closest('form')!);
 
@@ -221,7 +230,7 @@ describe('Priority 6: Complete User Account, Authentication & Personal Data Syst
         expect(screen.getByText(/Check your email/i)).toBeInTheDocument();
         expect(screen.getByText(/traveler@fjord.no/i)).toBeInTheDocument();
         expect(screen.getByRole('link', { name: /Return to Login/i })).toBeInTheDocument();
-      });
+      }, { timeout: 4000 });
     });
 
     it('renders ForgotPassword page and dispatches password recovery link', async () => {

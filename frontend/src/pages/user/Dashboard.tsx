@@ -14,6 +14,7 @@ import { OptimizedImage } from '../../components/shared/OptimizedImage';
 import { supabase } from '../../lib/supabase';
 import { invoiceService } from '../../services/invoice/invoiceService';
 import { motion, AnimatePresence } from 'framer-motion';
+import { RecentlyViewedSection } from '../../components/common/RecentlyViewedSection';
 
 // Curated Nordic Quotes
 const NORDIC_QUOTES = [
@@ -698,6 +699,14 @@ export const Dashboard = () => {
         </div>
 
       </div>
+
+      {/* ── RECENTLY VIEWED CAROUSEL ────────────────────────────────────────── */}
+      <RecentlyViewedSection
+        title="Recently Explored Places"
+        subtitle="Resume exploring your recently viewed destinations, hotels, and experiences"
+        className="mt-12 border-t border-white/10"
+      />
+
     </div>
   );
 };
