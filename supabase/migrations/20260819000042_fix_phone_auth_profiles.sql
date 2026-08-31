@@ -1,5 +1,7 @@
--- Function to handle secure profile creation automatically after Supabase auth signup
--- Ensure email in public.profiles can be nullable for phone-authenticated users
+-- Fix profiles table and handle_new_user trigger to support phone-only OTP authentication
+-- When a user signs in/up with Phone OTP, new.email is NULL and new.phone is set.
+
+-- 1. Ensure email column in public.profiles is nullable for phone-only travelers
 DO $$
 BEGIN
     ALTER TABLE public.profiles ALTER COLUMN email DROP NOT NULL;
@@ -8,6 +10,7 @@ EXCEPTION
         NULL;
 END $$;
 
+-- 2. Update handle_new_user trigger function to safely support phone OTP and OAuth
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -20,7 +23,7 @@ BEGIN
     -- Extract the requested role from user metadata
     requested_role := new.raw_user_meta_data->>'role';
     
-    -- Sanitize and assign role securely. Default to USER. 
+    -- Sanitize and assign role securely. Default to USER.
     -- Explicitly block any attempt to assign ADMIN or SUPERADMIN via client-side metadata.
     IF requested_role = 'PROVIDER' THEN
         assigned_role := 'PROVIDER'::public.user_role;
@@ -78,11 +81,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Trigger to execute the function on auth.users insert
+-- 3. Re-bind the trigger on auth.users
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
     FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
-
--- Revoke the insecure INSERT policy on public.profiles
-DROP POLICY IF EXISTS "Users can insert own profile." ON public.profiles;
