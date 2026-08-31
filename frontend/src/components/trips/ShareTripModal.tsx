@@ -21,6 +21,7 @@ export const ShareTripModal: React.FC<ShareTripModalProps> = ({
     trip.visibility || 'PRIVATE'
   );
   const [shareToken, setShareToken] = useState<string>(trip.share_token || '');
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const shareUrl = `${window.location.origin}/trips/share/${shareToken || trip.id}`;
 
@@ -114,8 +115,9 @@ export const ShareTripModal: React.FC<ShareTripModalProps> = ({
           <div className="grid grid-cols-3 gap-2">
             <button
               type="button"
+              disabled={isUpdating}
               onClick={() => handleVisibilityChange('PRIVATE')}
-              className={`p-3 rounded-xl border text-center transition-all flex flex-col items-center gap-1.5 ${
+              className={`p-3 rounded-xl border text-center transition-all flex flex-col items-center gap-1.5 disabled:opacity-50 ${
                 visibility === 'PRIVATE'
                   ? 'bg-arctic-gold/10 border-arctic-gold text-arctic-gold'
                   : 'bg-white/5 border-white/10 text-snow/60 hover:text-snow hover:border-white/20'
@@ -127,8 +129,9 @@ export const ShareTripModal: React.FC<ShareTripModalProps> = ({
 
             <button
               type="button"
+              disabled={isUpdating}
               onClick={() => handleVisibilityChange('SHARED_WITH_LINK')}
-              className={`p-3 rounded-xl border text-center transition-all flex flex-col items-center gap-1.5 ${
+              className={`p-3 rounded-xl border text-center transition-all flex flex-col items-center gap-1.5 disabled:opacity-50 ${
                 visibility === 'SHARED_WITH_LINK'
                   ? 'bg-fjord-teal/20 border-fjord-teal text-fjord-teal'
                   : 'bg-white/5 border-white/10 text-snow/60 hover:text-snow hover:border-white/20'
@@ -140,8 +143,9 @@ export const ShareTripModal: React.FC<ShareTripModalProps> = ({
 
             <button
               type="button"
+              disabled={isUpdating}
               onClick={() => handleVisibilityChange('PUBLIC')}
-              className={`p-3 rounded-xl border text-center transition-all flex flex-col items-center gap-1.5 ${
+              className={`p-3 rounded-xl border text-center transition-all flex flex-col items-center gap-1.5 disabled:opacity-50 ${
                 visibility === 'PUBLIC'
                   ? 'bg-aurora-violet/20 border-aurora-violet text-aurora-violet'
                   : 'bg-white/5 border-white/10 text-snow/60 hover:text-snow hover:border-white/20'
