@@ -1,14 +1,113 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Core Landing & Discovery -->
   <url>
     <loc>https://norway-smartlife.vercel.app/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://norway-smartlife.vercel.app/nature/plants-trees</loc>
+    <loc>https://norway-smartlife.vercel.app/home</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://norway-smartlife.vercel.app/explore</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>https://norway-smartlife.vercel.app/destinations</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+  </url>
+
+  <!-- Key Destination Deep Links -->
+  <url>
+    <loc>https://norway-smartlife.vercel.app/explore/geirangerfjord</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://norway-smartlife.vercel.app/explore/lofoten</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://norway-smartlife.vercel.app/explore/tromso</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://norway-smartlife.vercel.app/explore/bergen</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://norway-smartlife.vercel.app/explore/oslo</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://norway-smartlife.vercel.app/explore/flam</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://norway-smartlife.vercel.app/explore/svalbard</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Hospitality & Accommodations -->
+  <url>
+    <loc>https://norway-smartlife.vercel.app/stays</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://norway-smartlife.vercel.app/food</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://norway-smartlife.vercel.app/products</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Activities, Outdoor & Adventure -->
+  <url>
+    <loc>https://norway-smartlife.vercel.app/activities</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://norway-smartlife.vercel.app/trails</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://norway-smartlife.vercel.app/winter</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://norway-smartlife.vercel.app/road-trips</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://norway-smartlife.vercel.app/events</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Nature, Wildlife & Flora -->
+  <url>
+    <loc>https://norway-smartlife.vercel.app/nature/wildlife</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://norway-smartlife.vercel.app/nature/flora</loc>
@@ -16,53 +115,30 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://norway-smartlife.vercel.app/destinations</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://norway-smartlife.vercel.app/stays</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://norway-smartlife.vercel.app/activities</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://norway-smartlife.vercel.app/food</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://norway-smartlife.vercel.app/wildlife</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://norway-smartlife.vercel.app/explore</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://norway-smartlife.vercel.app/deals</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://norway-smartlife.vercel.app/events</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://norway-smartlife.vercel.app/smart-map</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://norway-smartlife.vercel.app/aurora-tracker</loc>
+    <loc>https://norway-smartlife.vercel.app/nature/aurora</loc>
     <changefreq>hourly</changefreq>
     <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://norway-smartlife.vercel.app/nature/weather</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Smart Tourism Tools -->
+  <url>
+    <loc>https://norway-smartlife.vercel.app/map</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://norway-smartlife.vercel.app/mobility/ev</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://norway-smartlife.vercel.app/mobility/ferry</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>
