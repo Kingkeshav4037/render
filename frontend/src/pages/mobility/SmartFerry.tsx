@@ -2,10 +2,15 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Container } from '../../components/layout/Container';
 import { Ship, Clock, Users, Activity, Wind, Navigation } from 'lucide-react';
+import { SEO } from '../../components/shared/SEO';
 
 export const SmartFerry = () => {
   return (
     <div className="min-h-screen bg-deep-night text-white pb-24 pt-32 font-sans relative overflow-hidden">
+      <SEO 
+        title="Electric Ferries & Fjord Transit | Norway SmartLife"
+        description="Live tracking, real-time schedules, and zero-emission fleet telemetry for electric ferries across Norway's fjords."
+      />
       <div className="absolute inset-0 pointer-events-none z-0">
          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-ocean-steel/10 blur-[150px] rounded-full mix-blend-screen" />
          <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-deep-night/80 blur-[150px] rounded-full mix-blend-screen" />

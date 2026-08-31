@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Activity, Search, Filter, CalendarDays, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { bookingService } from '../../services/bookingService';
 import { format, parseISO } from 'date-fns';
+import { SEO } from '../../components/shared/SEO';
 
 export const AdminBookings = () => {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -54,6 +55,10 @@ export const AdminBookings = () => {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
+      <SEO 
+        title="Admin Bookings & Reservations | Norway SmartLife"
+        description="Administrative management of platform reservations, stays, and activity bookings."
+      />
       
       <div>
         <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
