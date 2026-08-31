@@ -33,6 +33,37 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({
     ? 'min-h-screen bg-slate-950 flex items-center justify-center p-4'
     : 'min-h-[40vh] flex items-center justify-center p-4';
 
+  const isChunkError = React.useMemo(() => {
+    const msg = (error as Error)?.message || String(error || '');
+    return (
+      msg.includes('dynamically imported module') ||
+      msg.includes('Failed to load module script') ||
+      msg.includes('Loading chunk') ||
+      msg.includes('error loading dynamically imported module')
+    );
+  }, [error]);
+
+  // Auto-reload on stale chunk error to seamlessly recover on new deployments
+  React.useEffect(() => {
+    if (isChunkError && typeof window !== 'undefined') {
+      const key = `norway_chunk_error_reload_${window.location.pathname}`;
+      const lastReload = sessionStorage.getItem(key);
+      const now = Date.now();
+      if (!lastReload || now - parseInt(lastReload, 10) > 10000) {
+        sessionStorage.setItem(key, String(now));
+        window.location.reload();
+      }
+    }
+  }, [isChunkError]);
+
+  const handleRetry = () => {
+    if (isChunkError && typeof window !== 'undefined') {
+      window.location.reload();
+    } else {
+      resetErrorBoundary();
+    }
+  };
+
   return (
     <div className={wrapperClass} role="alert" data-testid="error-boundary-fallback">
       <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-xl p-6 text-center shadow-2xl">
@@ -43,13 +74,15 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({
 
         {/* Heading */}
         <h2 className="text-xl font-semibold text-white mb-2">
-          Something went wrong.
+          {isChunkError ? 'Application Update Available' : 'Something went wrong.'}
         </h2>
         <p className="text-slate-400 mb-6 text-sm leading-relaxed">
-          {groupName
+          {isChunkError
+            ? 'A newer version of Norway SmartLife has been published. Reload the page to load the latest version.'
+            : groupName
             ? `An unexpected error occurred in the ${groupName} section.`
             : 'An unexpected application error occurred.'}
-          {' '}You can retry or return to the home page.
+          {!isChunkError && ' You can retry or return to the home page.'}
         </p>
 
         {/* Dev-only error details */}
@@ -74,14 +107,14 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({
             Return Home
           </a>
 
-          {/* Retry — resets the error boundary and re-renders */}
+          {/* Retry / Reload — resets the error boundary or reloads the page */}
           <button
-            onClick={resetErrorBoundary}
+            onClick={handleRetry}
             data-testid="error-boundary-retry-btn"
             className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors text-sm font-medium"
           >
             <RefreshCcw className="w-4 h-4" aria-hidden="true" />
-            Retry
+            {isChunkError ? 'Reload Page' : 'Retry'}
           </button>
         </div>
       </div>

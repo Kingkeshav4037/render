@@ -1,4 +1,4 @@
-import { useEffect, useState, Suspense, lazy } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { ProtectedRoute } from "./components/layout/ProtectedRoute";
@@ -11,6 +11,7 @@ import { realtimeClient } from './services/realtime/realtimeClient';
 import { Activities } from './pages/Activities';
 import { ActivityDetails } from './pages/ActivityDetails';
 import { RouteErrorBoundary } from './components/layout/GlobalErrorBoundary';
+import { lazyWithRetry as lazy } from './utils/lazyWithRetry';
 
 import { PageLoadingSkeleton } from './components/ui/PageLoadingSkeleton';
 import { Compass, Home as HomeIcon, ArrowRight } from 'lucide-react';
