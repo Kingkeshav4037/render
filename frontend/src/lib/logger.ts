@@ -4,7 +4,7 @@
  * Guarantees zero leakage of passwords, tokens, API keys, OTPs, or payment card data.
  */
 
-type LogLevel = 'info' | 'warn' | 'error' | 'debug';
+export type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 
 const SENSITIVE_KEYS = [
   'password',

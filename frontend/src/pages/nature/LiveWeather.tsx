@@ -8,7 +8,6 @@ import {
   Sun, 
   Wind, 
   Droplets, 
-  Eye, 
   Thermometer, 
   CloudRain, 
   Sunrise, 
@@ -18,7 +17,6 @@ import {
   Snowflake,
   ShieldAlert,
   Compass,
-  Sparkles,
   ArrowRight
 } from 'lucide-react';
 import { weatherService, WeatherData } from '../../services/live/weatherService';
@@ -125,7 +123,6 @@ export const LiveWeather = () => {
     return CITIES[0];
   }, [cityParam, latParam, lonParam]);
 
-  const [activeLayer, setActiveLayer] = useState('Temperature');
   const [liveData, setLiveData] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(false);
 

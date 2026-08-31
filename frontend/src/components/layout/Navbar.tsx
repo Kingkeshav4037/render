@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { User, LogOut, Compass, ShoppingBag, Menu, Search, Globe, Check, ChevronDown } from 'lucide-react';
+import { User, LogOut, ShoppingBag, Menu, Search, Globe, Check, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useCartStore } from '../../store/useCartStore';

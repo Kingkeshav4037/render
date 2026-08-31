@@ -21,7 +21,7 @@ export const DestinationWeather = ({ name, lat }: DestinationWeatherProps) => {
 
   return (
     <div className="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm h-full">
-      <h3 className="text-2xl font-bold text-navy-900 mb-6">Climate & Best Time</h3>
+      <h3 className="text-2xl font-bold text-navy-900 mb-6">{name ? `${name} Climate & Best Time` : 'Climate & Best Time'}</h3>
       
       <div className="grid grid-cols-2 gap-6">
         <div className="bg-blue-50/50 p-4 rounded-2xl">

@@ -36,7 +36,7 @@ export type PersonalInfoForm = z.infer<typeof personalInfoSchema>;
 
 // ── Travel Preferences ──────────────────────────────────────────────
 
-const tripStyleOptions = [
+export const tripStyleOptions = [
   'adventurous', 'cultural', 'luxury', 'relaxed', 'romantic',
   'solo_explorer', 'family', 'backpacker', 'eco_traveler',
 ] as const;

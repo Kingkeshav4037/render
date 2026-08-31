@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Share2, Copy, Check, Lock, Globe, Link2, X, ExternalLink, ShieldCheck } from 'lucide-react';
 import { Trip, tripService } from '../../services/tripService';
 
@@ -21,7 +21,6 @@ export const ShareTripModal: React.FC<ShareTripModalProps> = ({
     trip.visibility || 'PRIVATE'
   );
   const [shareToken, setShareToken] = useState<string>(trip.share_token || '');
-  const [isUpdating, setIsUpdating] = useState(false);
 
   const shareUrl = `${window.location.origin}/trips/share/${shareToken || trip.id}`;
 

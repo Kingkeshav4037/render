@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CinematicBackground } from '../../design/backgrounds/CinematicBackground';
 import { Container } from '../../components/layout/Container';
-import { ArrowLeft, Camera, ShieldAlert, MapPin, Calendar, Heart, Eye, Loader2, Map } from 'lucide-react';
+import { ArrowLeft, Camera, ShieldAlert, MapPin, Calendar, Heart, Loader2, Map } from 'lucide-react';
 import { wildlifeService, WildlifeSpecies, getWildlifeImage } from '../../services/wildlifeService';
 import { OptimizedImage } from '../../components/shared/OptimizedImage';
 import { SEO } from '../../components/shared/SEO';
