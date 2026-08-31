@@ -49,9 +49,9 @@ export const Home = () => {
   return (
     <div className="w-full bg-deep-night text-snow selection:bg-arctic-gold/30">
       <SEO
-        title="Norway SmartLife – Discover Norway Differently"
-        description="Plan your perfect Norwegian adventure. Explore fjords, northern lights, hiking, wildlife, and world-class cuisine."
-        ogImage={HERO_IMAGE}
+        title="Norway SmartLife — Explore Norway Smarter"
+        description="Discover Norway with Norway SmartLife. Explore destinations, plan your trip, book stays, enjoy experiences, shop, and travel smarter across Norway."
+        ogImage="https://norway-smartlife.vercel.app/og-image.jpg"
       />
 
       {/* ── 1. CINEMATIC HERO ───────────────────────────────────────── */}
