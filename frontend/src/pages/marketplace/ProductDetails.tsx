@@ -389,7 +389,7 @@ export const ProductDetails: React.FC = () => {
               Technical Specifications
             </h3>
             <div className="space-y-3 pt-2">
-              {Object.entries(product.specs).map(([key, val]) => (
+              {Object.entries(product.specs || {}).map(([key, val]) => (
                 <div key={key} className="flex justify-between text-xs pb-2 border-b border-white/5 last:border-0">
                   <span className="text-snow/50 font-bold uppercase">{key}</span>
                   <span className="text-snow font-medium text-right">{val}</span>
@@ -405,7 +405,7 @@ export const ProductDetails: React.FC = () => {
               Key Features
             </h3>
             <ul className="space-y-2.5 pt-2">
-              {product.features.map((feat, idx) => (
+              {(product.features || []).map((feat, idx) => (
                 <li key={idx} className="flex items-start gap-2.5 text-xs text-snow/80">
                   <Check size={14} className="text-arctic-gold shrink-0 mt-0.5" />
                   <span>{feat}</span>

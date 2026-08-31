@@ -52,6 +52,26 @@ vi.mock('sonner', () => {
 describe('Admin Commerce Integration Tests (Requirement 23)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(supabase, 'from').mockImplementation((table: string) => {
+      if (table === 'orders') {
+        return {
+          select: () => ({
+            order: () => Promise.resolve({ data: null, error: new Error('Mock offline fallback') }),
+          }),
+          update: () => ({
+            eq: () => Promise.resolve({ error: null })
+          })
+        } as any;
+      }
+      return {
+        select: () => ({
+          eq: () => ({
+            maybeSingle: () => Promise.resolve({ data: null, error: null })
+          })
+        }),
+        insert: () => Promise.resolve({ error: null })
+      } as any;
+    });
   });
 
   describe('AdminOrders Component', () => {

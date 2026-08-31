@@ -221,6 +221,17 @@ async def add_process_time_header(request: Request, call_next):
     response.headers["X-Process-Time"] = str(process_time)
     return response
 
+@app.get("/")
+def root():
+    return {
+        "status": "ok",
+        "service": "norway-smartlife-ml",
+        "description": "Norway SmartLife AI & ML Prediction Backend",
+        "version": app.version,
+        "docs": "/docs",
+        "health": "/health"
+    }
+
 @app.get("/health")
 def health_check():
     return {

@@ -115,6 +115,69 @@ describe('UI/UX, Image & Button Comprehensive Audit (Req 24, 25, 26)', () => {
       ],
       count: 1
     });
+
+    vi.spyOn(shopService, 'getProducts').mockResolvedValue({
+      data: [
+        {
+          id: 'prod-thermostat-1',
+          name: 'Smart Eco Thermostat',
+          category: 'Smart Home',
+          price: 1890,
+          currency: 'NOK',
+          rating: 4.9,
+          stock: 24,
+          co2: -15.4,
+          img: '/images/product_thermostat.jpg',
+          gallery: ['/images/product_thermostat.jpg'],
+          description: 'Precision Nordic climate thermostat.',
+          specs: {},
+          features: [],
+          materials: 'Aluminium',
+          origin: 'Norway',
+          warranty: '5-Year',
+          tags: ['eco', 'smart-home']
+        } as any,
+        {
+          id: 'prod-sweater-2',
+          name: 'Nordic Merino Wool Sweater',
+          category: 'Apparel',
+          price: 1200,
+          currency: 'NOK',
+          rating: 4.8,
+          stock: 3,
+          co2: -5.0,
+          img: '/images/product_sweater.jpg',
+          gallery: ['/images/product_sweater.jpg'],
+          description: 'Handcrafted wool sweater.',
+          specs: {},
+          features: [],
+          materials: '100% Wool',
+          origin: 'Norway',
+          warranty: '2-Year',
+          tags: ['wool', 'apparel']
+        } as any
+      ],
+      error: null
+    });
+
+    vi.spyOn(shopService, 'getProductById').mockImplementation(async (id: string) => ({
+      id: id || 'prod-thermostat-1',
+      name: 'Smart Eco Thermostat',
+      category: 'Smart Home',
+      price: 1890,
+      currency: 'NOK',
+      rating: 4.9,
+      stock: 24,
+      co2: -15.4,
+      img: '/images/product_thermostat.jpg',
+      gallery: ['/images/product_thermostat.jpg'],
+      description: 'Precision Nordic climate thermostat.',
+      specs: { 'Connectivity': 'Zigbee 3.0', 'Power': '230V AC' },
+      features: ['Nord Pool dynamic hourly price optimization'],
+      materials: 'Aluminium',
+      origin: 'Norway',
+      warranty: '5-Year'
+    } as any));
   });
 
   const renderWithProviders = (ui: React.ReactElement, initialEntries = ['/']) => {

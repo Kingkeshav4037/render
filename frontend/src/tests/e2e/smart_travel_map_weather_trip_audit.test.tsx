@@ -61,10 +61,79 @@ const renderWithProviders = (ui: React.ReactElement, initialEntries: string[] = 
   );
 };
 
+import { transportService } from '../../services/transportService';
+
 describe('Priority 5: Smart Travel, Map, Weather, EV & Trip Planning System Audit', () => {
   beforeEach(() => {
     localStorage.clear();
     vi.clearAllMocks();
+
+    vi.spyOn(transportService, 'getRoutes').mockResolvedValue([
+      {
+        id: 'rt-flam',
+        name: 'The Flåm Railway (Flåmsbana)',
+        type: 'TRAIN',
+        origin_id: 'loc-flam',
+        destination_id: 'loc-myrdal',
+        duration_minutes: 55,
+        distance_km: 20.2,
+        co2_saved_kg: 18.5,
+        price_estimate: 490,
+        currency: 'NOK',
+        operator: 'Vy Tog',
+        status: 'PUBLISHED',
+        stops: [
+          { name: 'Flåm Station (Fjord Level)', time: '09:00', altitude: '2m' },
+          { name: 'Kjosfossen Waterfall Photo Stop', time: '09:35', altitude: '670m' }
+        ],
+        timetable: [{ departure: '09:00', arrival: '09:55', frequency: 'Daily' }],
+        alerts: [{ severity: 'INFO', message: 'Scenic waterfall photo stop at Kjosfossen.' }],
+        origin: { id: 'loc-flam', name: 'Flåm' } as any,
+        destination: { id: 'loc-myrdal', name: 'Myrdal' } as any
+      },
+      {
+        id: 'rt-bergen',
+        name: 'The Bergen Line (Bergensbanen)',
+        type: 'TRAIN',
+        origin_id: 'loc-oslo',
+        destination_id: 'loc-bergen',
+        duration_minutes: 415,
+        distance_km: 496.0,
+        co2_saved_kg: 84.2,
+        price_estimate: 820,
+        currency: 'NOK',
+        operator: 'Vy Tog',
+        status: 'PUBLISHED',
+        stops: [{ name: 'Oslo Central Station', time: '08:25' }],
+        timetable: [],
+        alerts: [],
+        origin: { id: 'loc-oslo', name: 'Oslo' } as any,
+        destination: { id: 'loc-bergen', name: 'Bergen' } as any
+      }
+    ]);
+
+    vi.spyOn(transportService, 'getRouteDetails').mockResolvedValue({
+      id: 'rt-flam',
+      name: 'The Flåm Railway (Flåmsbana)',
+      type: 'TRAIN',
+      origin_id: 'loc-flam',
+      destination_id: 'loc-myrdal',
+      duration_minutes: 55,
+      distance_km: 20.2,
+      co2_saved_kg: 18.5,
+      price_estimate: 490,
+      currency: 'NOK',
+      operator: 'Vy Tog',
+      status: 'PUBLISHED',
+      stops: [
+        { name: 'Flåm Station', time: '09:00', altitude: '2m' },
+        { name: 'Kjosfossen Waterfall', time: '09:35', altitude: '670m' }
+      ],
+      timetable: [{ departure: '09:00', arrival: '09:55', frequency: 'Daily' }],
+      alerts: [{ severity: 'INFO', message: '100% Zero-emission electric propulsion.' }],
+      origin: { id: 'loc-flam', name: 'Flåm' } as any,
+      destination: { id: 'loc-myrdal', name: 'Myrdal' } as any
+    });
   });
 
   describe('1. Smart Map Geospatial Layer (/map)', () => {

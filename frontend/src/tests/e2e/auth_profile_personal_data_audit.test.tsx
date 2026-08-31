@@ -312,6 +312,16 @@ describe('Priority 6: Complete User Account, Authentication & Personal Data Syst
   describe('2. Profile Management (/profile, /profile/overview, /profile/security, /profile/privacy)', () => {
     it('renders ProfileOverview with traveler stats, completion tracker, and edit modal', async () => {
       const updateProfileSpy = vi.spyOn(profileService, 'updateProfile').mockResolvedValue({} as any);
+      vi.spyOn(profileService, 'getProfile').mockResolvedValue({
+        id: 'test-user-id-42',
+        email: 'traveler@norway-smartlife.no',
+        fullName: 'Sigrid Undset',
+        phone: '+47 987 65 432',
+        country: 'Norway',
+        city: 'Tromsø',
+        role: 'USER',
+        permissions: []
+      } as any);
 
       render(
         <BrowserRouter>
