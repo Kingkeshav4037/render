@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Mail, Lock, ArrowRight, Phone, RefreshCw, KeyRound, Eye, EyeOff, ChevronDown, Sparkles, AlertCircle } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Phone, RefreshCw, KeyRound, Eye, EyeOff, ChevronDown, AlertCircle } from 'lucide-react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../lib/supabase';
@@ -72,7 +72,6 @@ export const Login = () => {
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
-  const [isDemoMode, setIsDemoMode] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const otpInputRef = useRef<HTMLInputElement>(null);
@@ -148,21 +147,6 @@ export const Login = () => {
     }
   };
 
-  const handleDemoGoogleLogin = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const { user } = await authService.loginWithDemoGoogle();
-      useAuthStore.getState().setUser(user);
-      toast.success('Signed in with Google Traveler profile!');
-      navigate(targetRedirect, { replace: true });
-    } catch (e: any) {
-      setError(e.message || 'Failed to sign in with demo Google account.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!cleanDigits || cleanDigits.length < 5) {
@@ -172,25 +156,15 @@ export const Login = () => {
     try {
       setLoading(true);
       setError(null);
-      const res: any = await authService.sendPhoneOtp(fullPhoneNumber);
+      await authService.sendPhoneOtp(fullPhoneNumber);
       setOtpSent(true);
       setResendTimer(60);
-      setLoading(false);
-
-      if (res?.data?.demoMode || res?.demoMode) {
-        setIsDemoMode(true);
-        toast.info(`Verification code sent. (Demo code: 123456)`);
-      } else {
-        toast.info(`Verification code dispatched to ${fullPhoneNumber}`);
-      }
+      toast.info(`Verification code sent via SMS to ${fullPhoneNumber}`);
     } catch (e: any) {
       console.warn('SMS dispatch error:', e);
-      // Graceful fallback so user is never blocked
-      setIsDemoMode(true);
-      setOtpSent(true);
-      setResendTimer(60);
+      setError(e.message || 'Failed to send SMS verification code. Please check your phone number and try again.');
+    } finally {
       setLoading(false);
-      toast.info('Verification code sent. (Demo code: 123456)');
     }
   };
 
@@ -199,18 +173,13 @@ export const Login = () => {
     try {
       setLoading(true);
       setError(null);
-      const res: any = await authService.sendPhoneOtp(fullPhoneNumber);
+      await authService.sendPhoneOtp(fullPhoneNumber);
       setResendTimer(60);
-      setLoading(false);
-      if (res?.data?.demoMode || res?.demoMode) {
-        setIsDemoMode(true);
-        toast.info('Verification code resent. (Demo code: 123456)');
-      } else {
-        toast.info('Verification code resent.');
-      }
+      toast.info(`Verification code resent to ${fullPhoneNumber}`);
     } catch (e: any) {
       console.warn('Resend error:', e);
       setError(e.message || 'Failed to resend code. Please try again in a few moments.');
+    } finally {
       setLoading(false);
     }
   };
@@ -246,6 +215,7 @@ export const Login = () => {
     } catch (e: any) {
       console.warn('OTP verification error:', e);
       setError(e.message || 'Invalid or expired verification code. Please request a new code.');
+    } finally {
       setLoading(false);
     }
   };
@@ -270,75 +240,71 @@ export const Login = () => {
       return;
     }
 
+    setLoading(true);
+    setError(null);
+
     try {
-      setLoading(true);
-      setError(null);
-      const { user: loggedInUser } = await authService.loginWithEmail(trimmedEmail, password);
-      toast.success('Signed in successfully. Welcome back!');
+      const data = await authService.loginWithEmail(trimmedEmail, password);
 
-      if (loggedInUser) {
-        await useAuthStore.getState().refreshProfile();
-        const profile = await profileService.getProfile(loggedInUser.id);
-        if (!isProfileComplete(profile)) {
-          navigate(`/complete-profile?returnTo=${encodeURIComponent(targetRedirect)}`, { replace: true });
-          return;
+      if (data?.user) {
+        const user = data.user;
+        useAuthStore.getState().setUser(user);
+
+        // Fetch user profile and determine redirect destination
+        try {
+          const profile = await profileService.getProfile(user.id);
+          const needsProfileCompletion = !isProfileComplete(profile);
+
+          if (needsProfileCompletion) {
+            toast.info('Please complete your profile to finish setting up your account.');
+            navigate(`/complete-profile?returnTo=${encodeURIComponent(targetRedirect)}`, { replace: true });
+            return;
+          }
+        } catch (profileError) {
+          console.warn('Could not verify profile completeness:', profileError);
         }
-      }
 
-      navigate(targetRedirect, { replace: true });
-    } catch (e: any) {
-      console.warn('Login failure:', e);
-      setError(e.message || 'Unable to sign in with these credentials. Please check your email and password.');
+        toast.success('Welcome back!');
+        navigate(targetRedirect, { replace: true });
+      }
+    } catch (err: any) {
+      const message = err.message || '';
+      if (message.includes('Invalid login credentials')) {
+        setError('Incorrect email or password. Please try again.');
+      } else if (message.includes('Email not confirmed')) {
+        setError('Please verify your email address before signing in. Check your inbox for the confirmation link.');
+      } else if (message.includes('Too many requests') || message.includes('rate limit')) {
+        setError('Too many login attempts. Please wait a moment before trying again.');
+      } else {
+        setError(message || 'Failed to sign in. Please check your credentials.');
+      }
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <AuthLayout 
-      title="Welcome back" 
-      subtitle="Sign in to your Norway SmartLife account"
-      bgImage="/images/northern_lights_1786935879330.jpg"
+    <AuthLayout
+      title="Welcome back"
+      subtitle={contextualMessage || "Sign in to your Norway SmartLife account"}
     >
-      {/* Contextual Action Prompt Banner */}
-      {contextualMessage && (
-        <motion.div
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-5 p-3.5 bg-aurora-green/10 border border-aurora-green/30 rounded-xl flex items-center gap-3 text-snow text-xs font-semibold shadow-[0_0_15px_rgba(0,255,135,0.1)]"
-        >
-          <div className="w-8 h-8 rounded-lg bg-aurora-green/20 text-aurora-green flex items-center justify-center shrink-0">
-            <Sparkles className="w-4 h-4" />
-          </div>
-          <div className="flex-1">
-            <p className="text-white font-bold">{contextualMessage}</p>
-            <p className="text-snow/60 text-[11px] font-normal">Your progress and destination will be restored immediately after sign-in.</p>
-          </div>
-        </motion.div>
-      )}
-
-      {/* Auth Method Switcher Tabs */}
-      <div className="flex bg-deep-night/50 p-1 rounded-xl border border-white/10 mb-6 backdrop-blur-sm">
+      {/* Method Switcher */}
+      <div className="flex bg-deep-night/60 p-1 rounded-2xl border border-white/10 mb-6 backdrop-blur-md">
         <button
           type="button"
           onClick={() => { setLoginMethod('email'); setError(null); }}
-          className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer ${
-            loginMethod === 'email' 
-              ? 'bg-aurora-green text-navy-900 shadow-[0_0_15px_rgba(0,255,135,0.2)]' 
-              : 'text-snow/70 hover:text-snow'
-          }`}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${loginMethod === 'email' ? 'bg-aurora-green text-navy-900 shadow-md' : 'text-snow/60 hover:text-snow'}`}
         >
-          <Mail className="w-4 h-4" /> Email
+          <Mail className="w-4 h-4" />
+          <span>EMAIL</span>
         </button>
         <button
           type="button"
           onClick={() => { setLoginMethod('phone'); setError(null); }}
-          className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer ${
-            loginMethod === 'phone' 
-              ? 'bg-aurora-green text-navy-900 shadow-[0_0_15px_rgba(0,255,135,0.2)]' 
-              : 'text-snow/70 hover:text-snow'
-          }`}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${loginMethod === 'phone' ? 'bg-aurora-green text-navy-900 shadow-md' : 'text-snow/60 hover:text-snow'}`}
         >
-          <Phone className="w-4 h-4" /> Phone OTP
+          <Phone className="w-4 h-4" />
+          <span>PHONE OTP</span>
         </button>
       </div>
 
@@ -542,19 +508,12 @@ export const Login = () => {
                 </div>
                 <button
                   type="button"
-                  onClick={() => { setOtpSent(false); setOtp(''); setIsDemoMode(false); }}
+                  onClick={() => { setOtpSent(false); setOtp(''); setError(null); }}
                   className="text-xs text-aurora-green hover:text-green-300 font-semibold px-3 py-1.5 rounded-lg hover:bg-aurora-green/10 transition-colors cursor-pointer"
                 >
                   Change
                 </button>
               </div>
-
-              {isDemoMode && (
-                <div className="bg-aurora-green/10 border border-aurora-green/30 rounded-xl p-3 flex items-center gap-2 text-xs text-aurora-green font-medium">
-                  <Sparkles className="w-4 h-4 flex-shrink-0 text-aurora-green" />
-                  <span>Demo Mode Active: Enter verification code <strong>123456</strong></span>
-                </div>
-              )}
 
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -615,4 +574,3 @@ export const Login = () => {
 };
 
 export default Login;
-
