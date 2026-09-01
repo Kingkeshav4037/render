@@ -44,29 +44,32 @@ export const Wildlife = () => {
   return (
     <div className="min-h-screen bg-nordic-sage/10 text-nordic-charcoal font-sans pb-24">
       <SEO 
-        title="Wildlife of Norway | SmartLife Nature Guide"
-        description="Discover the magnificent wildlife of Norway from Polar Bears and Arctic Foxes to Atlantic Puffins and Orcas."
+        title="Norwegian Wildlife & Arctic Fauna Field Guide | Norway SmartLife"
+        description="Comprehensive field guide to Norway's wildlife: Polar bears, Atlantic puffins, muskoxen, reindeer, and orcas with ethical sighting locations and seasons."
+        canonicalUrl="/wildlife"
+        ogType="website"
+        keywords="Norway wildlife, Arctic fauna, polar bear Svalbard, puffins Norway, muskox Dovrefjell, whale safari Norway"
       />
       {/* Documentary-style Hero */}
-      <div className="relative h-[70vh] min-h-[500px]">
+      <div className="relative h-[65vh] sm:h-[70vh] min-h-[460px]">
         <CinematicBackground 
           imageUrl="/images/wildlife_reindeer_1787013667019.jpg"
           overlayOpacity={0.6}
           theme="nordicSage"
         />
         
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center">
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-4">
           <Container>
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               className="flex flex-col items-center"
             >
-              <div className="w-16 h-1 bg-nordic-sage mb-8" />
-              <h1 className="text-5xl md:text-7xl font-display font-bold text-white mb-6 uppercase tracking-widest">
+              <div className="w-12 sm:w-16 h-1 bg-nordic-sage mb-6 sm:mb-8 rounded-full" />
+              <h1 className="text-3xl sm:text-5xl md:text-7xl font-display font-bold text-white mb-4 sm:mb-6 uppercase tracking-wider sm:tracking-widest">
                 Norway's Wildlife
               </h1>
-              <p className="text-lg md:text-2xl text-gray-200 font-light max-w-2xl font-serif italic mb-8">
+              <p className="text-sm sm:text-lg md:text-2xl text-gray-200 font-light max-w-2xl font-serif italic mb-6 sm:mb-8">
                 Meet the animals of Norway — from Arctic foxes and wild reindeer to whales, puffins and majestic birds of prey.
               </p>
 
@@ -75,10 +78,11 @@ export const Wildlife = () => {
                 <Search className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="Search species (e.g. Polar Bear, Puffin, Orca)..."
+                  placeholder="Search species (e.g. Polar Bear, Puffin)..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-white/95 backdrop-blur-md text-nordic-charcoal placeholder-gray-400 font-medium text-sm border-0 focus:ring-4 focus:ring-nordic-sage/50 outline-none transition-all"
+                  aria-label="Search wildlife species"
+                  className="w-full pl-12 pr-4 py-3 sm:py-3.5 rounded-2xl bg-white/95 backdrop-blur-md text-nordic-charcoal placeholder-gray-400 font-medium text-xs sm:text-sm border-0 focus:ring-4 focus:ring-nordic-sage/50 outline-none transition-all"
                 />
               </div>
             </motion.div>
@@ -86,44 +90,50 @@ export const Wildlife = () => {
         </div>
       </div>
 
-      {/* Discovery Filters */}
-      <div className="sticky top-20 z-40 bg-white/80 backdrop-blur-md border-y border-nordic-sage/20 py-4 shadow-sm">
+      {/* Discovery Filters (Mobile-optimized Horizontal Scroll / Pill Bar) */}
+      <div className="sticky top-16 sm:top-20 z-40 bg-white/90 backdrop-blur-md border-y border-nordic-sage/20 py-3 sm:py-4 shadow-sm">
         <Container>
-          <div className="flex flex-wrap items-center justify-center gap-6">
-            <div className="flex items-center gap-2">
-              <Leaf className="w-4 h-4 text-nordic-sage" />
+          <div className="flex items-center gap-3 sm:gap-6 overflow-x-auto pb-1 sm:pb-0 scrollbar-none sm:justify-center">
+            <div className="flex items-center gap-1.5 shrink-0 px-3 py-1.5 rounded-xl bg-nordic-sage/10 border border-nordic-sage/20">
+              <Leaf className="w-3.5 h-3.5 text-nordic-sage shrink-0" />
               <select 
                 value={selectedCategory} 
                 onChange={e => setSelectedCategory(e.target.value)}
-                className="bg-transparent border-none text-sm font-bold uppercase tracking-wider focus:ring-0 outline-none cursor-pointer"
+                aria-label="Filter by wildlife category"
+                className="bg-transparent border-none text-xs sm:text-sm font-bold uppercase tracking-wider focus:ring-0 outline-none cursor-pointer text-nordic-charcoal"
               >
                 {categories.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
-            <div className="flex items-center gap-2">
-              <Map className="w-4 h-4 text-nordic-sage" />
+            
+            <div className="flex items-center gap-1.5 shrink-0 px-3 py-1.5 rounded-xl bg-nordic-sage/10 border border-nordic-sage/20">
+              <Map className="w-3.5 h-3.5 text-nordic-sage shrink-0" />
               <select 
                 value={selectedRegion} 
                 onChange={e => setSelectedRegion(e.target.value)}
-                className="bg-transparent border-none text-sm font-bold uppercase tracking-wider focus:ring-0 outline-none cursor-pointer"
+                aria-label="Filter by region"
+                className="bg-transparent border-none text-xs sm:text-sm font-bold uppercase tracking-wider focus:ring-0 outline-none cursor-pointer text-nordic-charcoal"
               >
                 {regions.map(r => <option key={r} value={r}>{r}</option>)}
               </select>
             </div>
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-nordic-sage" />
+
+            <div className="flex items-center gap-1.5 shrink-0 px-3 py-1.5 rounded-xl bg-nordic-sage/10 border border-nordic-sage/20">
+              <Calendar className="w-3.5 h-3.5 text-nordic-sage shrink-0" />
               <select 
                 value={selectedSeason} 
                 onChange={e => setSelectedSeason(e.target.value)}
-                className="bg-transparent border-none text-sm font-bold uppercase tracking-wider focus:ring-0 outline-none cursor-pointer"
+                aria-label="Filter by season"
+                className="bg-transparent border-none text-xs sm:text-sm font-bold uppercase tracking-wider focus:ring-0 outline-none cursor-pointer text-nordic-charcoal"
               >
                 {seasons.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
+
             {(selectedCategory !== 'All' || selectedRegion !== 'All' || selectedSeason !== 'All' || searchTerm) && (
               <button 
                 onClick={() => { setSelectedCategory('All'); setSelectedRegion('All'); setSelectedSeason('All'); setSearchTerm(''); }}
-                className="text-xs font-bold uppercase tracking-widest text-red-600 hover:text-red-800 transition-colors cursor-pointer"
+                className="shrink-0 text-[11px] sm:text-xs font-bold uppercase tracking-widest text-red-600 hover:text-red-800 transition-colors cursor-pointer px-2 py-1"
               >
                 Clear Filters
               </button>

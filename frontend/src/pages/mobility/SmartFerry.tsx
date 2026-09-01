@@ -6,10 +6,13 @@ import { SEO } from '../../components/shared/SEO';
 
 export const SmartFerry = () => {
   return (
-    <div className="min-h-screen bg-deep-night text-white pb-24 pt-32 font-sans relative overflow-hidden">
+    <div className="min-h-screen bg-deep-night text-white pb-24 pt-28 sm:pt-32 font-sans relative overflow-hidden">
       <SEO 
-        title="Electric Ferries & Fjord Transit | Norway SmartLife"
-        description="Live tracking, real-time schedules, and zero-emission fleet telemetry for electric ferries across Norway's fjords."
+        title="Electric Ferries & Zero-Emission Fjord Transit | Norway SmartLife"
+        description="Real-time tracking, live departure schedules, marine weather conditions, and zero-emission fleet telemetry for electric ferries across Norway's fjords."
+        canonicalUrl="/mobility/ferry"
+        ogType="website"
+        keywords="Norway electric ferries, fjord ferry schedule, zero emission transit Norway, Sognefjord ferry, Flåm Gudvangen ferry, Lavik Oppedal"
       />
       <div className="absolute inset-0 pointer-events-none z-0">
          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-ocean-steel/10 blur-[150px] rounded-full mix-blend-screen" />
@@ -17,31 +20,31 @@ export const SmartFerry = () => {
       </div>
 
       <Container className="relative z-10 max-w-6xl">
-        <div className="mb-16 border-b border-ocean-steel/20 pb-12">
+        <div className="mb-12 sm:mb-16 border-b border-ocean-steel/20 pb-8 sm:pb-12">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-3 text-ocean-steel mb-6"
+            className="flex items-center gap-3 text-cyan-400 mb-4 sm:mb-6"
           >
-            <Ship className="w-6 h-6 animate-pulse" />
-            <span className="font-bold tracking-widest uppercase text-sm">Smart Mobility</span>
+            <Ship className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" />
+            <span className="font-bold tracking-widest uppercase text-xs sm:text-sm">Smart Mobility Network</span>
           </motion.div>
           
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-5xl md:text-7xl font-display font-bold mb-4"
+            className="text-3xl sm:text-5xl md:text-7xl font-display font-bold mb-3 sm:mb-4 tracking-tight"
           >
-            Electric <span className="text-ocean-steel italic">Ferries.</span>
+            Electric <span className="text-cyan-400 italic">Ferries.</span>
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-xl text-gray-400 font-light max-w-2xl"
+            className="text-sm sm:text-lg md:text-xl text-gray-400 font-light max-w-2xl"
           >
-            Live tracking of zero-emission vessels navigating the fjords.
+            Live tracking and real-time telemetry of zero-emission vessels navigating Norway's fjords.
           </motion.p>
         </div>
 
