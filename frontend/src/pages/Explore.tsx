@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Filter, MapPin, X, ArrowRight } from 'lucide-react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { useLocations } from '../hooks/useLocations';
 import { FavoriteButton } from '../components/common/FavoriteButton';
 import { CinematicBackground } from '../design/backgrounds/CinematicBackground';
@@ -46,6 +46,7 @@ const TYPES = ['CITY', 'REGION', 'NATIONAL_PARK', 'FJORD', 'ISLAND', 'BEACH', 'V
 
 export const Explore = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   
   const initialQuery = searchParams.get('q') || '';
   const initialType = searchParams.get('type');
@@ -233,11 +234,16 @@ export const Explore = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.05 }}
                   key={dest.id} 
-                  className="bg-midnight border border-white/5 hover:border-white/20 transition-all duration-500 flex flex-col group cursor-pointer relative h-[500px]"
+                  onClick={() => navigate(`/explore/${dest.slug}`)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/explore/${dest.slug}`); }}
+                  tabIndex={0}
+                  role="link"
+                  aria-label={`Discover ${dest.name}`}
+                  className="bg-midnight border border-white/5 hover:border-white/20 transition-all duration-500 flex flex-col group cursor-pointer relative h-[500px] select-none"
                 >
-                  <Link to={`/explore/${dest.slug}`} className="absolute inset-0 z-10" />
+                  <Link to={`/explore/${dest.slug}`} className="absolute inset-0 z-10" aria-label={`Discover ${dest.name}`} />
                   
-                  <div className="h-2/3 overflow-hidden relative bg-black">
+                  <div className="h-2/3 overflow-hidden relative bg-black pointer-events-none">
                     <OptimizedImage
                       src={dest.hero_image_url || getPlaceholderImage(dest.name)}
                       alt={dest.name}
@@ -249,19 +255,20 @@ export const Explore = () => {
                     <div className="absolute top-6 left-6 bg-deep-night/80 backdrop-blur-md px-4 py-1.5 text-[10px] font-sans font-bold uppercase tracking-widest text-arctic-gold border border-white/10">
                       {dest.type?.replace(/_/g, ' ') || 'DESTINATION'}
                     </div>
-                    <FavoriteButton 
-                      itemType="LOCATION" 
-                      itemId={dest.id} 
-                      className="absolute top-6 right-6 z-20 text-snow hover:text-nordic-red transition-colors" 
-                    />
                   </div>
 
-                  <div className="p-8 flex flex-col flex-grow relative z-20">
-                    <h4 className="font-display font-semibold text-2xl text-snow mb-3">{dest.name}</h4>
+                  <FavoriteButton 
+                    itemType="LOCATION" 
+                    itemId={dest.id} 
+                    className="absolute top-6 right-6 z-20 text-snow hover:text-nordic-red transition-colors pointer-events-auto" 
+                  />
+
+                  <div className="p-8 flex flex-col flex-grow relative z-10 pointer-events-none">
+                    <h4 className="font-display font-semibold text-2xl text-snow mb-3 group-hover:text-arctic-gold transition-colors">{dest.name}</h4>
                     <p className="font-sans text-sm text-snow/60 line-clamp-2 leading-relaxed flex-grow">{dest.description}</p>
                     
                     <div className="flex items-center gap-3 font-sans text-xs font-bold uppercase tracking-widest text-arctic-gold group/btn mt-auto">
-                      Discover
+                      <span>Discover</span>
                       <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-2 transition-transform" />
                     </div>
                   </div>
@@ -277,3 +284,4 @@ export const Explore = () => {
 };
 
 export default Explore;
+

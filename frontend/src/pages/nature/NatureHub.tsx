@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Trees, Mountain, Sparkles, Feather, Compass, ArrowRight, Shield, Sun, Snowflake, Leaf, Waves, Droplets, CheckCircle, Info } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLocations } from '../../hooks/useLocations';
 import { Location } from '../../services/map/mapService';
 import { FavoriteButton } from '../../components/common/FavoriteButton';
@@ -117,6 +117,7 @@ const ALLEMANNSRETTEN_RULES = [
 ];
 
 export const NatureHub = () => {
+  const navigate = useNavigate();
   const [selectedLandscape, setSelectedLandscape] = useState<string>('ALL');
 
   const { data: nationalParks, isLoading, error } = useLocations({
@@ -343,11 +344,16 @@ export const NatureHub = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.05 }}
-                  className="bg-midnight border border-white/10 hover:border-arctic-gold/50 transition-all duration-500 rounded-2xl overflow-hidden group flex flex-col relative shadow-lg"
+                  onClick={() => navigate(`/explore/${park.slug}`)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/explore/${park.slug}`); }}
+                  tabIndex={0}
+                  role="link"
+                  aria-label={`Explore ${park.name}`}
+                  className="bg-midnight border border-white/10 hover:border-arctic-gold/50 transition-all duration-500 rounded-2xl overflow-hidden group flex flex-col relative shadow-lg cursor-pointer select-none"
                 >
                   <Link to={`/explore/${park.slug}`} className="absolute inset-0 z-10" aria-label={park.name} />
 
-                  <div className="h-64 relative overflow-hidden bg-black/40">
+                  <div className="h-64 relative overflow-hidden bg-black/40 pointer-events-none">
                     <OptimizedImage
                       src={park.hero_image_url || park.image_url || '/images/besseggen_1786936349992.jpg'}
                       alt={park.name}
@@ -360,15 +366,15 @@ export const NatureHub = () => {
                     <div className="absolute top-4 left-4 bg-deep-night/80 backdrop-blur-md px-3 py-1 text-[10px] font-sans font-bold uppercase tracking-widest text-emerald-400 border border-white/10 rounded-lg">
                       {park.type?.replace(/_/g, ' ') || 'NATIONAL PARK'}
                     </div>
-
-                    <FavoriteButton
-                      itemType="LOCATION"
-                      itemId={park.id}
-                      className="absolute top-4 right-4 z-20 text-snow hover:text-nordic-red transition-colors"
-                    />
                   </div>
 
-                  <div className="p-6 flex flex-col flex-1">
+                  <FavoriteButton
+                    itemType="LOCATION"
+                    itemId={park.id}
+                    className="absolute top-4 right-4 z-20 text-snow hover:text-nordic-red transition-colors pointer-events-auto"
+                  />
+
+                  <div className="p-6 flex flex-col flex-1 relative z-10 pointer-events-none">
                     <h3 className="font-display font-bold text-2xl text-snow mb-3 group-hover:text-arctic-gold transition-colors">
                       {park.name}
                     </h3>

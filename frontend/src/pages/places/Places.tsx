@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Search, MapPin, Landmark, ArrowRight, Compass, History, BookOpen, Sparkles, Filter, Building2, Camera, ShieldCheck, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLocations } from '../../hooks/useLocations';
 import { Location } from '../../services/map/mapService';
 import { FavoriteButton } from '../../components/common/FavoriteButton';
@@ -67,6 +67,7 @@ const getPlaceholderImage = (name: string) => {
 };
 
 export const Places = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRegion, setSelectedRegion] = useState('ALL');
   const [selectedType, setSelectedType] = useState('ALL');
@@ -339,11 +340,16 @@ export const Places = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.05 }}
-                  className="bg-midnight border border-white/10 hover:border-arctic-gold/50 transition-all duration-500 rounded-2xl overflow-hidden group flex flex-col relative shadow-md"
+                  onClick={() => navigate(`/explore/${place.slug}`)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/explore/${place.slug}`); }}
+                  tabIndex={0}
+                  role="link"
+                  aria-label={`Explore ${place.name}`}
+                  className="bg-midnight border border-white/10 hover:border-arctic-gold/50 transition-all duration-500 rounded-2xl overflow-hidden group flex flex-col relative shadow-md cursor-pointer select-none"
                 >
                   <Link to={`/explore/${place.slug}`} className="absolute inset-0 z-10" aria-label={place.name} />
 
-                  <div className="h-64 relative overflow-hidden bg-black/40">
+                  <div className="h-64 relative overflow-hidden bg-black/40 pointer-events-none">
                     <OptimizedImage
                       src={place.hero_image_url || place.image_url || getPlaceholderImage(place.name)}
                       alt={place.name}
@@ -356,15 +362,15 @@ export const Places = () => {
                     <div className="absolute top-4 left-4 bg-deep-night/80 backdrop-blur-md px-3 py-1 text-[10px] font-sans font-bold uppercase tracking-widest text-arctic-gold border border-white/10 rounded-lg">
                       {place.type?.replace(/_/g, ' ') || 'LANDMARK'}
                     </div>
-
-                    <FavoriteButton
-                      itemType="LOCATION"
-                      itemId={place.id}
-                      className="absolute top-4 right-4 z-20 text-snow hover:text-nordic-red transition-colors"
-                    />
                   </div>
 
-                  <div className="p-6 flex flex-col flex-1">
+                  <FavoriteButton
+                    itemType="LOCATION"
+                    itemId={place.id}
+                    className="absolute top-4 right-4 z-20 text-snow hover:text-nordic-red transition-colors pointer-events-auto"
+                  />
+
+                  <div className="p-6 flex flex-col flex-1 relative z-10 pointer-events-none">
                     <div className="flex items-center gap-1.5 text-xs text-arctic-gold font-bold uppercase tracking-wider mb-2">
                       <MapPin size={13} />
                       <span>{place.region || 'Norway'}</span>

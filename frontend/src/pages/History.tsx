@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Clock, Shield } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLocations } from '../hooks/useLocations';
 import { FavoriteButton } from '../components/common/FavoriteButton';
 import { AsyncStateWrapper } from '../components/shared/AsyncStateWrapper';
@@ -92,6 +92,7 @@ const getHistoricalDescription = (name: string, description?: string | null) => 
 };
 
 export const History = () => {
+  const navigate = useNavigate();
   const [selectedEra, setSelectedEra] = useState<number | null>(null);
 
   // Fetch historical locations (museums and landmarks)
@@ -204,11 +205,16 @@ export const History = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
                 key={dest.id} 
-                className="bg-midnight border border-white/5 hover:border-white/20 transition-all duration-500 flex flex-col group cursor-pointer relative h-[500px] rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl"
+                onClick={() => navigate(`/explore/${dest.slug}`)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/explore/${dest.slug}`); }}
+                tabIndex={0}
+                role="link"
+                aria-label={`Explore ${dest.name}`}
+                className="bg-midnight border border-white/5 hover:border-white/20 transition-all duration-500 flex flex-col group cursor-pointer relative h-[500px] rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl select-none"
               >
-                <Link to={`/explore/${dest.slug}`} className="absolute inset-0 z-10" />
+                <Link to={`/explore/${dest.slug}`} className="absolute inset-0 z-10" aria-label={`Explore ${dest.name}`} />
                 
-                <div className="h-2/3 overflow-hidden relative bg-black">
+                <div className="h-2/3 overflow-hidden relative bg-black pointer-events-none">
                   <OptimizedImage
                     src={getHistoricalImage(dest.name, dest.hero_image_url)}
                     alt={dest.name}
@@ -221,19 +227,20 @@ export const History = () => {
                   <div className="absolute top-6 left-6 bg-deep-night/80 backdrop-blur-md px-4 py-1.5 text-[10px] font-sans font-bold uppercase tracking-widest text-arctic-gold border border-white/10 rounded-md">
                     {dest.type?.replace(/_/g, ' ') || 'HISTORY'}
                   </div>
-                  <FavoriteButton 
-                    itemType="LOCATION" 
-                    itemId={dest.id} 
-                    className="absolute top-6 right-6 z-20 text-snow hover:text-nordic-red transition-colors" 
-                  />
                 </div>
 
-                <div className="p-8 flex flex-col flex-grow relative z-20">
-                  <h4 className="font-display font-semibold text-2xl text-snow mb-3">{dest.name}</h4>
+                <FavoriteButton 
+                  itemType="LOCATION" 
+                  itemId={dest.id} 
+                  className="absolute top-6 right-6 z-20 text-snow hover:text-nordic-red transition-colors pointer-events-auto" 
+                />
+
+                <div className="p-8 flex flex-col flex-grow relative z-10 pointer-events-none">
+                  <h4 className="font-display font-semibold text-2xl text-snow mb-3 group-hover:text-arctic-gold transition-colors">{dest.name}</h4>
                   <p className="font-sans text-sm text-snow/70 line-clamp-3 leading-relaxed flex-grow">{getHistoricalDescription(dest.name, dest.description)}</p>
                   
                   <div className="flex items-center gap-3 font-sans text-xs font-bold uppercase tracking-widest text-arctic-gold group/btn mt-auto pt-4 border-t border-white/5">
-                    Explore History
+                    <span>Explore History</span>
                     <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-2 transition-transform" />
                   </div>
                 </div>
