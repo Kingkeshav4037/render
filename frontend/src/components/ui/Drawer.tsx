@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 
@@ -15,10 +16,16 @@ export const Drawer: React.FC<DrawerProps> = ({
   isOpen, 
   onClose, 
   title, 
-  children,
-  side = 'right',
+  children, 
+  side = 'right', 
   size = 'md' 
 }) => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -55,18 +62,22 @@ export const Drawer: React.FC<DrawerProps> = ({
     }
   };
 
-  return (
+  const drawerContent = (
     <AnimatePresence>
       {isOpen && (
-        <>
+        <div className="fixed inset-0 z-[100] pointer-events-auto">
+          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-navy-900/40 backdrop-blur-sm"
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black/75 backdrop-blur-md"
             onClick={onClose}
             aria-hidden="true"
           />
+
+          {/* Drawer Sheet */}
           <motion.div
             role="dialog"
             aria-modal="true"
@@ -74,35 +85,38 @@ export const Drawer: React.FC<DrawerProps> = ({
             initial={variants[side].initial}
             animate={variants[side].animate}
             exit={variants[side].exit}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className={`fixed inset-y-0 ${side}-0 z-50 flex flex-col bg-white dark:bg-navy-900 shadow-2xl ${sizes[size]}`}
+            transition={{ type: "spring", damping: 28, stiffness: 260 }}
+            className={`fixed inset-y-0 ${side === 'left' ? 'left-0 border-r' : 'right-0 border-l'} z-[101] flex flex-col bg-[#070D1A] text-white shadow-2xl border-white/10 ${sizes[size]} h-full`}
           >
             {title ? (
-              <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-white/10">
-                <h2 className="text-lg font-bold text-navy-900 dark:text-white">{title}</h2>
+              <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-[#030712]/90 backdrop-blur-xl shrink-0">
+                <h2 className="text-base sm:text-lg font-bold text-white tracking-wide">{title}</h2>
                 <button 
                   onClick={onClose}
                   aria-label="Close drawer"
-                  className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aurora-green"
+                  className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 cursor-pointer"
                 >
-                  <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
             ) : (
               <button 
                 onClick={onClose}
                 aria-label="Close drawer"
-                className="absolute top-4 right-4 p-2 z-10 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-aurora-green"
+                className="absolute top-4 right-4 p-2 z-10 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 cursor-pointer"
               >
-                <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                <X className="w-5 h-5" />
               </button>
             )}
-            <div className="flex-1 overflow-y-auto p-4">
+            <div className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-5">
               {children}
             </div>
           </motion.div>
-        </>
+        </div>
       )}
     </AnimatePresence>
   );
+
+  if (!mounted) return null;
+  return createPortal(drawerContent, document.body);
 };

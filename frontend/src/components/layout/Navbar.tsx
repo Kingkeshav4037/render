@@ -94,7 +94,7 @@ export const Navbar = () => {
           : "bg-[#030712]/80 backdrop-blur-xl border-b border-white/[0.08] py-4 lg:py-4.5"
       )}
     >
-      <div className="max-w-[1560px] mx-auto px-6 md:px-8 lg:px-12 flex justify-between items-center">
+      <div className="max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 flex justify-between items-center">
         
         {/* Official Brand Logo */}
         <div className="flex-shrink-0 flex items-center">
@@ -257,7 +257,7 @@ export const Navbar = () => {
         title="Norway SmartLife"
         side="right"
       >
-        <div className="flex flex-col space-y-5 p-3 max-h-[85vh] overflow-y-auto font-sans">
+        <div className="flex flex-col space-y-5 pb-6 font-sans">
           {/* Brand Logo in Mobile Drawer */}
           <div className="pb-3 border-b border-white/[0.08] flex justify-center">
             <BrandLogo size="md" showTagline linkTo="/" />

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { 
   Search, X, Compass, MapPin, Sparkles, Mountain, 
@@ -50,6 +51,11 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
   const [loading, setLoading] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Load recent searches when modal opens
   useEffect(() => {
@@ -125,9 +131,9 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
     setRecentSearches([]);
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
+  const modalContent = (
     <div 
       className="fixed inset-0 z-[100] flex items-start justify-center pt-14 md:pt-20 px-3 sm:px-6 bg-slate-950/85 backdrop-blur-xl animate-in fade-in duration-200"
       onClick={onClose}
@@ -158,146 +164,146 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
           {query && (
             <button
               onClick={() => {
-                setQuery('');
-                inputRef.current?.focus();
-              }}
-              aria-label="Clear search input"
-              className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
+              setQuery('');
+              inputRef.current?.focus();
+            }}
+            aria-label="Clear search input"
+            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
 
-          <div className="flex items-center gap-1.5 shrink-0">
-            <kbd className="hidden sm:inline-flex items-center px-2 py-0.5 rounded bg-slate-800 text-slate-400 text-[10px] font-mono border border-slate-700">
-              ESC
-            </kbd>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <kbd className="hidden sm:inline-flex items-center px-2 py-0.5 rounded bg-slate-800 text-slate-400 text-[10px] font-mono border border-slate-700">
+            ESC
+          </kbd>
+          <button
+            onClick={onClose}
+            aria-label="Close search dialog"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Category Tabs */}
+      <div className="flex items-center gap-1.5 px-4 sm:px-6 py-2.5 overflow-x-auto border-b border-slate-800/80 bg-slate-950/30 scrollbar-none">
+        {CATEGORY_TABS.map(tab => {
+          const Icon = tab.icon;
+          const isSelected = category === tab.id;
+          return (
             <button
-              onClick={onClose}
-              aria-label="Close search dialog"
-              className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+              key={tab.id}
+              onClick={() => setCategory(tab.id)}
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer",
+                isSelected
+                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 shadow-sm"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+              )}
             >
-              <X className="w-5 h-5" />
+              <Icon className="w-3.5 h-3.5" />
+              <span>{tab.label}</span>
             </button>
-          </div>
-        </div>
+          );
+        })}
+      </div>
 
-        {/* Category Tabs */}
-        <div className="flex items-center gap-1.5 px-4 sm:px-6 py-2.5 overflow-x-auto border-b border-slate-800/80 bg-slate-950/30 scrollbar-none">
-          {CATEGORY_TABS.map(tab => {
-            const Icon = tab.icon;
-            const isSelected = category === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setCategory(tab.id)}
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer",
-                  isSelected
-                    ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 shadow-sm"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
-                )}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Modal Body / Results Area */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 max-h-[60vh]">
-          
-          {/* 1. Results View (when query is entered) */}
-          {query.trim().length > 0 ? (
-            <div>
-              <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 px-1">
-                <span>Search Results ({results.length})</span>
-                {loading && <span className="text-cyan-400 animate-pulse">Searching...</span>}
-              </div>
-
-              {results.length > 0 ? (
-                <div className="space-y-2">
-                  {results.map((item, idx) => {
-                    const isSelected = idx === selectedIndex;
-                    return (
-                      <div
-                        key={item.id}
-                        onClick={() => handleSelectItem(item)}
-                        onMouseEnter={() => setSelectedIndex(idx)}
-                        className={cn(
-                          "flex items-center gap-3.5 p-3 sm:p-3.5 rounded-2xl transition-all cursor-pointer border group",
-                          isSelected
-                            ? "bg-slate-800/90 border-cyan-500/40 shadow-lg ring-1 ring-cyan-500/20"
-                            : "bg-slate-950/40 border-slate-800/60 hover:bg-slate-800/60 hover:border-slate-700"
-                        )}
-                      >
-                        {/* Thumbnail / Icon */}
-                        <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-800 shrink-0 border border-slate-700/80 relative">
-                          {item.imageUrl ? (
-                            <img
-                              src={item.imageUrl}
-                              alt={item.title}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                              loading="lazy"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-cyan-400 bg-slate-900">
-                              <Compass className="w-6 h-6" />
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Text Details */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-0.5">
-                            <span className="font-bold text-sm text-white truncate group-hover:text-cyan-300 transition-colors">
-                              {item.title}
-                            </span>
-                            {item.badge && (
-                              <span className="hidden sm:inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-500/20 shrink-0">
-                                {item.badge}
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-xs text-slate-400 line-clamp-1">
-                            {item.description}
-                          </p>
-                        </div>
-
-                        {/* Enter Indicator / Arrow */}
-                        <div className="shrink-0 flex items-center gap-1 text-slate-500 group-hover:text-cyan-400">
-                          {isSelected && (
-                            <span className="hidden md:flex items-center gap-1 text-[10px] font-mono text-cyan-400 mr-2 bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-800">
-                              Press <CornerDownLeft className="w-3 h-3" />
-                            </span>
-                          )}
-                          <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : !loading ? (
-                <div className="text-center py-12 px-4 bg-slate-950/30 rounded-2xl border border-slate-800/80">
-                  <Compass className="w-12 h-12 text-slate-600 mx-auto mb-3 animate-spin-slow" />
-                  <h4 className="text-base font-bold text-white mb-1">No matching results found</h4>
-                  <p className="text-xs text-slate-400 max-w-md mx-auto mb-4">
-                    We couldn’t find anything matching "{query}". Try checking your spelling or searching for another Norwegian destination, activity, or food.
-                  </p>
-                  <button
-                    onClick={() => {
-                      onClose();
-                      navigate('/explore');
-                    }}
-                    className="px-4 py-2 rounded-xl bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 text-xs font-bold hover:bg-cyan-500/25 transition-all cursor-pointer"
-                  >
-                    Browse All Destinations
-                  </button>
-                </div>
-              ) : null}
+      {/* Modal Body & Results Area */}
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 overscroll-contain">
+        
+        {/* 1. Results View (when query is entered) */}
+        {query.trim().length > 0 ? (
+          <div>
+            <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 px-1">
+              <span>Search Results ({results.length})</span>
+              {loading && <span className="text-cyan-400 animate-pulse">Searching...</span>}
             </div>
-          ) : (
+
+            {results.length > 0 ? (
+              <div className="space-y-2">
+                {results.map((item, idx) => {
+                  const isSelected = idx === selectedIndex;
+                  return (
+                    <div
+                      key={item.id}
+                      onClick={() => handleSelectItem(item)}
+                      onMouseEnter={() => setSelectedIndex(idx)}
+                      className={cn(
+                        "flex items-center gap-3.5 p-3 sm:p-3.5 rounded-2xl transition-all cursor-pointer border group",
+                        isSelected
+                          ? "bg-slate-800/90 border-cyan-500/40 shadow-lg ring-1 ring-cyan-500/20"
+                          : "bg-slate-950/40 border-slate-800/60 hover:bg-slate-800/60 hover:border-slate-700"
+                      )}
+                    >
+                      {/* Thumbnail / Icon */}
+                      <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-800 shrink-0 border border-slate-700/80 relative">
+                        {item.imageUrl ? (
+                          <img
+                            src={item.imageUrl}
+                            alt={item.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-cyan-400 bg-slate-900">
+                            <Compass className="w-6 h-6" />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Text Details */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className="font-bold text-sm text-white truncate group-hover:text-cyan-300 transition-colors">
+                            {item.title}
+                          </span>
+                          {item.badge && (
+                            <span className="hidden sm:inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-500/20 shrink-0">
+                              {item.badge}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-slate-400 line-clamp-1">
+                          {item.description}
+                        </p>
+                      </div>
+
+                      {/* Enter Indicator / Arrow */}
+                      <div className="shrink-0 flex items-center gap-1 text-slate-500 group-hover:text-cyan-400">
+                        {isSelected && (
+                          <span className="hidden md:flex items-center gap-1 text-[10px] font-mono text-cyan-400 mr-2 bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-800">
+                            Press <CornerDownLeft className="w-3 h-3" />
+                          </span>
+                        )}
+                        <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : !loading ? (
+              <div className="text-center py-12 px-4 bg-slate-950/30 rounded-2xl border border-slate-800/80">
+                <Compass className="w-12 h-12 text-slate-600 mx-auto mb-3 animate-spin-slow" />
+                <h4 className="text-base font-bold text-white mb-1">No matching results found</h4>
+                <p className="text-xs text-slate-400 max-w-md mx-auto mb-4">
+                  We couldn’t find anything matching "{query}". Try checking your spelling or searching for another Norwegian destination, activity, or food.
+                </p>
+                <button
+                  onClick={() => {
+                    onClose();
+                    navigate('/explore');
+                  }}
+                  className="px-4 py-2 rounded-xl bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 text-xs font-bold hover:bg-cyan-500/25 transition-all cursor-pointer"
+                >
+                  Browse All Destinations
+                </button>
+              </div>
+            ) : null}
+          </div>
+        ) : (
             /* 2. Default View (Recent & Trending Searches) */
             <div className="space-y-6">
               {/* Recent Searches */}
@@ -414,4 +420,6 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
