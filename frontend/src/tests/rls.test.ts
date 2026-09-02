@@ -1,9 +1,11 @@
+/// <reference types="node" />
 import { describe, it, expect } from 'vitest';
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'http://localhost:54321';
-const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || 'dummy_key';
-const SUPABASE_SERVICE_KEY = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const env = typeof process !== 'undefined' ? process.env : {};
+const SUPABASE_URL = env.VITE_SUPABASE_URL || 'http://localhost:54321';
+const SUPABASE_ANON_KEY = env.VITE_SUPABASE_ANON_KEY || 'dummy_key';
+const SUPABASE_SERVICE_KEY = env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 const hasServiceKey = !!SUPABASE_SERVICE_KEY;
 

@@ -1,5 +1,11 @@
 // Norway SmartLife V6.0 Design Tokens - Colors
 export const colors = {
+  // Standardized Core Colors (Phase 7 Design System)
+  nordicBlue: '#1D4ED8',
+  arcticWhite: '#FFFFFF',
+  fjordBlue: '#0F766E',
+  auroraGreen: '#10B981',
+
   // Global Base Colors
   snow: '#FFFFFF',
   arcticMist: '#F5F7FA',
@@ -11,6 +17,10 @@ export const colors = {
 
   // 24-Color Premium Page Themes
   themes: {
+    nordicBlue: '#1D4ED8',
+    arcticWhite: '#FFFFFF',
+    fjordBlue: '#0F766E',
+    auroraGreen: '#10B981',
     arcticGold: '#D4AF37',
     glacierBlue: '#7DD3FC',
     royalFjord: '#1D4ED8',

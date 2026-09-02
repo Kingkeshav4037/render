@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom/vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
@@ -53,7 +54,6 @@ vi.mock('@google/generative-ai', () => {
 describe('AI and ML Service Integration & Resilience Audit', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (import.meta.env as any).VITE_GEMINI_API_KEY = 'test-key-mock';
   });
 
   // ─── 1. AI Database Context Extraction ────────────────────────────

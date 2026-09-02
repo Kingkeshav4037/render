@@ -194,8 +194,8 @@ describe('Phase E: Production Quality & End-to-End User Journeys', () => {
     it('executes full flow: Stay -> Availability Check -> Hold -> Checkout -> Confirmation -> Invoice', async () => {
       // 1. Preflight check for dates
       const rules = availabilityService.validateBookingRules(
-        '2026-09-01',
-        '2026-09-05',
+        '2026-10-01',
+        '2026-10-05',
         2,
         {
           maxGuests: 4,
@@ -209,8 +209,8 @@ describe('Phase E: Production Quality & End-to-End User Journeys', () => {
       const isAvailable = await availabilityService.checkAvailability(
         'stay-juvet-landscape',
         'STAY',
-        '2026-09-01',
-        '2026-09-05'
+        '2026-10-01',
+        '2026-10-05'
       );
       expect(isAvailable.available).toBe(true);
 
@@ -219,8 +219,8 @@ describe('Phase E: Production Quality & End-to-End User Journeys', () => {
         'user-e2e-1',
         'STAY',
         'stay-juvet-landscape',
-        '2026-09-01',
-        '2026-09-05',
+        '2026-10-01',
+        '2026-10-05',
         2,
         1,
         15
@@ -240,8 +240,8 @@ describe('Phase E: Production Quality & End-to-End User Journeys', () => {
         id: 'book-juvet-001',
         item_type: 'ACCOMMODATION',
         item_name: 'Juvet Landscape Hotel',
-        start_time: '2026-09-01',
-        end_time: '2026-09-05',
+        start_time: '2026-10-01',
+        end_time: '2026-10-05',
         total_amount: 14800,
       }, { fullName: 'Astrid Lind', email: 'traveler@norway.no' });
       expect(invoice.invoiceNumber).toBeDefined();

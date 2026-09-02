@@ -36,7 +36,8 @@ export const AdminUsers = () => {
       </div>
 
       <div className="bg-slate-900/50 backdrop-blur-md rounded-2xl border border-slate-800 shadow-xl overflow-hidden">
-        <table className="w-full text-left text-sm text-slate-300">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px] text-left text-sm text-slate-300">
           <thead className="bg-slate-900/80 text-slate-400 uppercase text-xs border-b border-slate-800">
             <tr>
               <th className="px-6 py-4 font-medium">User</th>
@@ -103,6 +104,7 @@ export const AdminUsers = () => {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

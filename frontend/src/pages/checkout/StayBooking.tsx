@@ -7,7 +7,7 @@ import { useCurrencyStore } from '../../store/useCurrencyStore';
 import { useCartStore } from '../../store/useCartStore';
 import { 
   Calendar as CalendarIcon, Users, MapPin, ShieldCheck, ArrowLeft,
-  CheckCircle2, CreditCard, TreePine, Clock, AlertCircle, Sparkles, Lock, ShoppingBag
+  CreditCard, TreePine, AlertCircle, Lock, ShoppingBag
 } from 'lucide-react';
 import { OptimizedImage } from '../../components/shared/OptimizedImage';
 import { SEO } from '../../components/shared/SEO';

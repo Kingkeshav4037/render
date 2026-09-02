@@ -8,8 +8,6 @@ import { RoleGuard } from './components/layout/RoleGuard';
 import { ProviderGuard } from './components/layout/ProviderGuard';
 import { useAuthStore } from './store/useAuthStore';
 import { realtimeClient } from './services/realtime/realtimeClient';
-import { Activities } from './pages/Activities';
-import { ActivityDetails } from './pages/ActivityDetails';
 import { RouteErrorBoundary } from './components/layout/GlobalErrorBoundary';
 import { lazyWithRetry as lazy } from './utils/lazyWithRetry';
 
@@ -82,6 +80,8 @@ const NotFound = () => {
 // --- Lazy-loaded Pages ---
 const Home = lazy(() => import('./pages/Home').then(m => ({ default: m.Home })));
 const Explore = lazy(() => import('./pages/Explore').then(m => ({ default: m.Explore })));
+const Activities = lazy(() => import('./pages/Activities').then(m => ({ default: m.Activities })));
+const ActivityDetails = lazy(() => import('./pages/ActivityDetails').then(m => ({ default: m.ActivityDetails })));
 const DestinationDetails = lazy(() => import('./pages/DestinationDetails').then(m => ({ default: m.DestinationDetails })));
 const SmartMap = lazy(() => import('./pages/SmartMap')); // default export
 const TripPlanner = lazy(() => import('./pages/planner/TripPlanner').then(m => ({ default: m.TripPlanner })));

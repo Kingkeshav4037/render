@@ -52,5 +52,32 @@ export const notificationService = {
 
     if (error) throw error;
     return count || 0;
+  },
+
+  async createNotification(params: {
+    userId: string;
+    type: 'SYSTEM' | 'BOOKING' | 'TRIP' | 'PROMOTION' | 'SAFETY' | 'PAYMENT' | 'WEATHER' | 'AURORA' | 'TRANSPORT';
+    title: string;
+    message: string;
+    linkUrl?: string | null;
+  }): Promise<Notification | null> {
+    const { data, error } = await supabase
+      .from('notifications')
+      .insert({
+        user_id: params.userId,
+        type: params.type,
+        title: params.title,
+        message: params.message,
+        link_url: params.linkUrl || null,
+        is_read: false,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.warn('Could not create notification:', error);
+      return null;
+    }
+    return data as Notification;
   }
 };

@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
 import { edgeLogger } from '../_shared/logger.ts'
+import { checkRateLimit } from '../_shared/rateLimiter.ts'
 
 // Razorpay signature verifier
 async function verifyRazorpaySignature(payload: string, sigHeader: string, secret: string) {
@@ -20,7 +21,7 @@ async function verifyRazorpaySignature(payload: string, sigHeader: string, secre
     .map(b => b.toString(16).padStart(2, '0')).join('')
 
   if (expectedHex !== sigHeader) {
-    edgeLogger.error('Razorpay signature verification failed', 'Signature mismatch');
+    edgeLogger.error('Razorpay webhook signature verification failed: signature mismatch');
     throw new Error('Signature mismatch');
   }
 }
@@ -30,12 +31,23 @@ serve(async (req) => {
     return new Response('Method Not Allowed', { status: 405 })
   }
 
+  const clientIp = req.headers.get('x-forwarded-for') || 'anonymous';
+  const rateLimit = checkRateLimit(clientIp, {
+    maxRequests: 100,
+    windowMs: 60000,
+    keyPrefix: 'webhook-razorpay',
+  });
+
+  if (!rateLimit.allowed) {
+    return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), {
+      status: 429,
+      headers: { ...rateLimit.headers, 'Content-Type': 'application/json' },
+    });
+  }
+
   try {
     const rawBody = await req.text()
-    
-    // Gateway routing
     let gatewayOrderId = '';
-    
     const razorpaySig = req.headers.get('x-razorpay-signature')
 
     if (razorpaySig) {
@@ -71,7 +83,7 @@ serve(async (req) => {
           Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
         )
 
-        // 2. Call RPC to handle the entire transaction atomically
+        // Call RPC to handle the entire transaction atomically
         const { data: success, error: rpcError } = await supabaseAdmin
           .rpc('process_payment_webhook', {
             p_gateway_order_id: gatewayOrderId

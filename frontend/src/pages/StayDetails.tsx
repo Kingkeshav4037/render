@@ -243,7 +243,7 @@ export const StayDetails = () => {
         <div className="absolute top-24 left-6 md:left-12 text-snow/70 text-xs font-bold tracking-widest flex items-center gap-2 drop-shadow-md z-10">
           <Link to="/stay" className="hover:text-arctic-gold transition-colors">STAYS</Link> 
           <ChevronRight className="w-3.5 h-3.5" /> 
-          <span className="text-snow">{stay.name.toUpperCase()}</span>
+          <span className="text-snow">{(stay.name || (stay as any).title || 'STAY DETAILS').toUpperCase()}</span>
         </div>
       </div>
 
@@ -258,7 +258,7 @@ export const StayDetails = () => {
               <TreePine className="w-4 h-4" /> {stay.eco_certified ? 'Eco-Certified Nordic Property' : 'Certified Hospitality Partner'}
             </div>
             <div className="flex items-start justify-between gap-4 mb-4">
-              <h1 className="text-3xl md:text-5xl font-display font-bold">{stay.name}</h1>
+              <h1 className="text-3xl md:text-5xl font-display font-bold">{stay.name || (stay as any).title || 'Nordic Stay'}</h1>
               <FavoriteButton 
                 itemType="STAY" 
                 itemId={stay.id} 

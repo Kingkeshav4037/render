@@ -42,6 +42,7 @@ interface OptimizedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 
   category?: ImageCategory;
   fallbackSrc?: string;
   webpSrc?: string;
+  avifSrc?: string;
   containerClassName?: string;
 }
 
@@ -51,6 +52,7 @@ export const OptimizedImage = ({
   category = 'default',
   fallbackSrc, 
   webpSrc,
+  avifSrc,
   className,
   containerClassName,
   ...props 
@@ -91,6 +93,7 @@ export const OptimizedImage = ({
   return (
     <div className={`relative overflow-hidden w-full h-full ${containerClassName || ''}`}>
       <picture className="w-full h-full block" style={{ display: 'block', width: '100%', height: '100%' }}>
+        {errorCount === 0 && avifSrc && <source srcSet={avifSrc} type="image/avif" />}
         {errorCount === 0 && webpSrc && <source srcSet={webpSrc} type="image/webp" />}
         <img
           ref={imgRef}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useCurrencyStore } from '../../store/useCurrencyStore';
 import { 
@@ -61,9 +62,6 @@ export const Dashboard = () => {
   const navigate = useNavigate();
   
   const [greeting, setGreeting] = useState('Welcome back');
-  const [loading, setLoading] = useState(false);
-  const [bookings, setBookings] = useState<any[]>([]);
-  const [invoicesCount, setInvoicesCount] = useState(0);
   const [quoteIndex, setQuoteIndex] = useState(0);
 
   // Time-aware greeting
@@ -74,46 +72,39 @@ export const Dashboard = () => {
     else setGreeting('God kveld (Good evening)');
   }, []);
 
-  // Fetch real user data with resilient fallback
-  useEffect(() => {
-    let isMounted = true;
-    const fetchUserData = async () => {
-      if (!user) {
-        if (isMounted) setLoading(false);
-        return;
-      }
+  // Batched, cached user telemetry using React Query (5 min fresh cache window)
+  const { data: telemetry, isLoading: loading } = useQuery({
+    queryKey: ['dashboard-user-telemetry', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return { bookings: [], invoicesCount: 0 };
+      const bookingsPromise = (supabase as any)
+        .from('bookings')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
 
-      try {
-        const bookingsPromise = (supabase as any)
-          .from('bookings')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
+      const invoicesCountPromise = (supabase as any)
+        .from('invoices')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id);
 
-        const invoicesCountPromise = (supabase as any)
-          .from('invoices')
-          .select('id', { count: 'exact', head: true })
-          .eq('user_id', user.id);
+      const [{ data: bookingsData }, { count: invCount }] = await Promise.all([
+        bookingsPromise,
+        invoicesCountPromise
+      ]);
 
-        const [
-          { data: bookingsData, error: bErr },
-          { count: invCount, error: iErr }
-        ] = await Promise.all([bookingsPromise, invoicesCountPromise]);
+      return {
+        bookings: bookingsData || [],
+        invoicesCount: typeof invCount === 'number' ? invCount : 0
+      };
+    },
+    enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
+  });
 
-        if (isMounted) {
-          if (!bErr && bookingsData) setBookings(bookingsData);
-          if (!iErr && typeof invCount === 'number') setInvoicesCount(invCount);
-        }
-      } catch (err) {
-        console.warn('Dashboard user telemetry notice:', err);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
-
-    fetchUserData();
-    return () => { isMounted = false; };
-  }, [user]);
+  const bookings = telemetry?.bookings || [];
+  const invoicesCount = telemetry?.invoicesCount || 0;
 
   // Cycle inspiring quotes
   const nextQuote = () => {
@@ -137,7 +128,7 @@ export const Dashboard = () => {
   const upcomingBooking = useMemo(() => {
     if (!bookings || bookings.length === 0) return null;
     const now = new Date();
-    return bookings.find(b => {
+    return bookings.find((b: any) => {
       const start = new Date(b.start_time || b.created_at);
       const end = new Date(b.end_time || b.start_time || b.created_at);
       return b.status === 'CONFIRMED' && (end >= now || start >= now);
@@ -566,7 +557,7 @@ export const Dashboard = () => {
               </div>
 
               <div className="divide-y divide-white/10">
-                {bookings.slice(0, 3).map((b) => (
+                {bookings.slice(0, 3).map((b: any) => (
                   <div key={b.id} className="py-4 flex flex-col sm:flex-row justify-between sm:items-center gap-4 hover:bg-white/5 px-3 rounded-xl transition-colors">
                     <div>
                       <div className="font-bold text-snow text-sm">

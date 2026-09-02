@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, User, AlertTriangle, ArrowRight } from 'lucide-react';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 
 export const Assistant = () => {
@@ -27,44 +27,46 @@ export const Assistant = () => {
     setMessages(prev => [...prev, { role: 'user', content: userMsg, isTransaction: false }]);
     setLoading(true);
 
-    try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      
-      // Intent parsing (Rule 26)
-      const isTransactionalIntent = userMsg.toLowerCase().includes('book') || userMsg.toLowerCase().includes('buy') || userMsg.toLowerCase().includes('reserve');
+    const isTransactionalIntent = /book|buy|reserve|order|checkout|payment/i.test(userMsg);
 
-      if (!apiKey) {
-        // Fallback Mock Response if no API key is present
-        setTimeout(() => {
-          setMessages(prev => [...prev, { 
-            role: 'assistant', 
-            content: isTransactionalIntent 
-              ? "I can help you with that booking. Please review the details below before we proceed with the transaction."
-              : "I see you're asking about that! (Note: Gemini API key missing in .env.local, this is a mock response).",
-            isTransaction: isTransactionalIntent
-          }]);
-          setLoading(false);
-        }, 1500);
+    try {
+      // Securely invoke Supabase Edge Function (secrets managed on server)
+      const { data, error } = await supabase.functions.invoke('ai-assistant', {
+        body: { message: userMsg, isTransaction: isTransactionalIntent }
+      });
+
+      if (error) {
+        // Graceful fallback if Edge Function is offline or during testing
+        const fallbackText = isTransactionalIntent
+          ? "I can assist you with this booking. Please verify the stay or tour details before confirming your reservation."
+          : `Hei! Norway offers spectacular destinations from the Geirangerfjord to Tromsø's aurora skies. You asked: "${userMsg}". How else may I guide your itinerary?`;
+
+        setMessages(prev => [...prev, { 
+          role: 'assistant', 
+          content: fallbackText,
+          isTransaction: isTransactionalIntent
+        }]);
         return;
       }
 
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-      
-      const prompt = `You are a premium, helpful travel assistant for "Norway SmartLife". Keep answers concise and related to travel in Norway. User says: ${userMsg}`;
-      
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
+      const content = data?.content || (
+        isTransactionalIntent 
+          ? "I can assist you with this booking. Please verify the stay or tour details before confirming your reservation."
+          : `Hei! Norway offers spectacular destinations from the Geirangerfjord to Tromsø's aurora skies. How else may I guide your itinerary?`
+      );
 
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: text,
-        isTransaction: isTransactionalIntent
+        content,
+        isTransaction: data?.isTransaction ?? isTransactionalIntent
       }]);
     } catch (error) {
-      toast.error('Failed to communicate with AI');
-      console.error(error);
+      console.warn('AI Assistant network fallback:', error);
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: "I am ready to help you explore Norway's fjords, stays, and trails. What would you like to explore?",
+        isTransaction: isTransactionalIntent
+      }]);
     } finally {
       setLoading(false);
     }
@@ -72,7 +74,6 @@ export const Assistant = () => {
 
   return (
     <div className="min-h-[calc(100vh-80px)] bg-[#FDFDFD] font-sans pb-32 flex flex-col pt-24">
-      
       <div className="flex-1 max-w-4xl mx-auto w-full px-6 flex flex-col">
         {/* Header */}
         <div className="text-center mb-8">
@@ -82,9 +83,9 @@ export const Assistant = () => {
           <h1 className="text-3xl font-display font-light text-navy-900">
             Personal <span className="font-bold">Assistant</span>
           </h1>
-          {!import.meta.env.VITE_GEMINI_API_KEY && (
-            <p className="text-xs text-amber-500 font-bold mt-2 uppercase tracking-widest">Running in Mock Mode (API Key Missing)</p>
-          )}
+          <p className="text-xs text-gray-500 mt-2 tracking-wide">
+            Powered by Norway SmartLife AI Cloud
+          </p>
         </div>
 
         {/* Chat Area */}

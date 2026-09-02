@@ -2,6 +2,12 @@
 @import "tailwindcss";
 
 @theme {
+  /* Standardized Core Design System Colors */
+  --color-nordic-blue: #1D4ED8;
+  --color-arctic-white: #FFFFFF;
+  --color-fjord-blue: #0F766E;
+  --color-aurora-green: #10B981;
+
   --color-snow: #FFFFFF;
   --color-arctic-mist: #F5F7FA;
   --color-glacier: #E8EEF4;

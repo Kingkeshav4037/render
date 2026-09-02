@@ -19,7 +19,7 @@ function cn(...inputs: ClassValue[]) {
 }
 
 export const Navbar = () => {
-  const { user, signOut, profile } = useAuthStore();
+  const { user, signOut, profile, isAdmin, isProvider } = useAuthStore();
   const { items, setIsOpen } = useCartStore();
   const { currency, setCurrency } = useCurrencyStore();
   const { t, i18n } = useTranslation();
@@ -184,6 +184,18 @@ export const Navbar = () => {
                     <Link to="/profile" role="menuitem" className="px-3 py-2 hover:bg-white/[0.07] hover:text-white rounded-lg font-medium text-xs text-slate-300 transition-colors">
                       {t('nav.profile', 'Profile & Settings')}
                     </Link>
+                    {(isAdmin || profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN') && (
+                      <Link to="/admin" role="menuitem" className="px-3 py-2 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 hover:text-cyan-200 rounded-lg font-bold text-xs transition-colors flex items-center justify-between my-0.5">
+                        <span>🛡️ Admin Portal</span>
+                        <span className="text-[10px] uppercase tracking-widest px-1.5 py-0.5 rounded bg-cyan-400/20 text-cyan-300">Admin</span>
+                      </Link>
+                    )}
+                    {(isProvider || profile?.role === 'PROVIDER') && (
+                      <Link to="/provider" role="menuitem" className="px-3 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 hover:text-emerald-200 rounded-lg font-bold text-xs transition-colors flex items-center justify-between my-0.5">
+                        <span>⚡ Provider Hub</span>
+                        <span className="text-[10px] uppercase tracking-widest px-1.5 py-0.5 rounded bg-emerald-400/20 text-emerald-300">Partner</span>
+                      </Link>
+                    )}
                     <div className="h-px bg-white/[0.08] my-1"></div>
                     <button onClick={handleLogout} role="menuitem" className="flex items-center gap-2 px-3 py-2 hover:bg-red-500/15 rounded-lg text-red-400 font-medium text-xs transition-colors text-left w-full cursor-pointer">
                       <LogOut className="w-3.5 h-3.5" /> {t('nav.sign_out', 'Sign Out')}
