@@ -65,10 +65,10 @@ const FALLBACK_ACTIVITIES: HomeActivity[] = [
 ];
 
 const FALLBACK_FOODS: HomeFood[] = [
-  { id: 'fo-01', name: 'Fårikål', category: 'Traditional', origin_region: 'Nationwide', short_description: "Norway's national dish: lamb slow-cooked with cabbage and black pepper.", image: '/images/norwegian_dessert.jpg' },
-  { id: 'fo-02', name: 'Gravlaks', category: 'Seafood', origin_region: 'Coastal Norway', short_description: 'Cold-cured salmon with dill, mustard, and aquavit — an iconic Nordic starter.', image: '/images/food_salmon_1787013684123.jpg' },
-  { id: 'fo-03', name: 'Brunost', category: 'Traditional', origin_region: 'Gudbrandsdalen', short_description: 'Caramelised brown whey cheese — utterly unique and deeply Norwegian.', image: '/images/cloudberry_dessert.jpg' },
-  { id: 'fo-04', name: 'Pinnekjøtt', category: 'Land Food', origin_region: 'Western Norway', short_description: 'Salted dried lamb ribs steamed over birch twigs — the Christmas centrepiece.', image: '/images/lingonberry_cream.jpg' },
+  { id: 'fo-01', name: 'Fårikål', category: 'Traditional', origin_region: 'Nationwide', short_description: "Norway's national dish: lamb slow-cooked with cabbage and black pepper.", image: '/images/dish_farikal.jpg' },
+  { id: 'fo-02', name: 'Gravlaks', category: 'Seafood', origin_region: 'Coastal Norway', short_description: 'Cold-cured salmon with dill, mustard, and aquavit — an iconic Nordic starter.', image: '/images/dish_gravlaks.jpg' },
+  { id: 'fo-03', name: 'Brunost', category: 'Traditional', origin_region: 'Gudbrandsdalen', short_description: 'Caramelised brown whey cheese — utterly unique and deeply Norwegian.', image: '/images/dish_brunost.jpg' },
+  { id: 'fo-04', name: 'Pinnekjøtt', category: 'Land Food', origin_region: 'Western Norway', short_description: 'Salted dried lamb ribs steamed over birch twigs — the Christmas centrepiece.', image: '/images/dish_pinnekjott.jpg' },
 ];
 
 const FALLBACK_WILDLIFE: HomeAnimal[] = [
