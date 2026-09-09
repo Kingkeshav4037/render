@@ -49,12 +49,14 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product,
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
   const [activeTab, setActiveTab] = useState<'specs' | 'features' | 'sustainability'>('specs');
+  const [activeImage, setActiveImage] = useState<string>(product?.img || '');
 
   // Reset state on new product
   useEffect(() => {
     setQuantity(1);
     setIsAdded(false);
     setActiveTab('specs');
+    setActiveImage(product?.img || '');
   }, [product]);
 
   useEffect(() => {
@@ -141,7 +143,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product,
           {/* Left Column: Image & Badges */}
           <div className="relative bg-black h-72 md:h-full min-h-[320px] overflow-hidden flex items-center justify-center p-6 border-b md:border-b-0 md:border-r border-white/10">
             <OptimizedImage
-              src={product.img}
+              src={activeImage || product.img}
               alt={product.name}
               category="product"
               className="w-full h-full object-cover rounded-2xl"
@@ -159,6 +161,32 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product,
                 <span className="text-[10px] text-snow/50">(128 reviews)</span>
               </div>
             </div>
+
+            {/* Gallery Thumbnail Switcher */}
+            {product.gallery && product.gallery.length > 1 && (
+              <div className="absolute top-6 right-6 z-20 flex flex-col gap-1.5">
+                {product.gallery.map((gImg: string, idx: number) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setActiveImage(gImg)}
+                    aria-label={`View photo ${idx + 1}`}
+                    className={`w-9 h-9 rounded-lg overflow-hidden border transition-all cursor-pointer ${
+                      (activeImage || product.img) === gImg
+                        ? 'border-arctic-gold ring-2 ring-arctic-gold/60 scale-105'
+                        : 'border-white/20 opacity-70 hover:opacity-100'
+                    }`}
+                  >
+                    <OptimizedImage
+                      src={gImg}
+                      alt={`Thumbnail ${idx + 1}`}
+                      category="product"
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
 
             <div className="absolute bottom-6 left-6 right-6 z-10">
               <div className="bg-emerald-500/20 border border-emerald-500/30 backdrop-blur-md p-3 rounded-xl flex items-center gap-3">

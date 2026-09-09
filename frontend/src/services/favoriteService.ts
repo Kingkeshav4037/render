@@ -323,7 +323,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'prod-knife-002': {
     title: 'Helle Viking Hand-Forged Carbon Knife',
     region: 'Holmedal Workshop',
-    image: '/images/chrome_travel_backpack.jpg',
+    image: '/images/norwegian_gift.jpg',
     url: '/shop/prod-knife-002',
     description: 'Triple laminated carbon steel blade with curly birch handle and genuine leather sheath.',
     price: 1650,
