@@ -368,11 +368,13 @@ export const NatureHub = () => {
                     </div>
                   </div>
 
-                  <FavoriteButton
-                    itemType="LOCATION"
-                    itemId={park.id}
-                    className="absolute top-4 right-4 z-20 text-snow hover:text-nordic-red transition-colors pointer-events-auto"
-                  />
+                  <div className="absolute top-4 right-4 z-20 pointer-events-auto">
+                    <FavoriteButton
+                      itemType="LOCATION"
+                      itemId={park.id}
+                      className="w-9 h-9 text-snow hover:text-nordic-red transition-colors shadow-lg"
+                    />
+                  </div>
 
                   <div className="p-6 flex flex-col flex-1 relative z-10 pointer-events-none">
                     <h3 className="font-display font-bold text-2xl text-snow mb-3 group-hover:text-arctic-gold transition-colors">

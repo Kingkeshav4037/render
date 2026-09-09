@@ -257,11 +257,13 @@ export const Explore = () => {
                     </div>
                   </div>
 
-                  <FavoriteButton 
-                    itemType="LOCATION" 
-                    itemId={dest.id} 
-                    className="absolute top-6 right-6 z-20 text-snow hover:text-nordic-red transition-colors pointer-events-auto" 
-                  />
+                  <div className="absolute top-6 right-6 z-20 pointer-events-auto">
+                    <FavoriteButton 
+                      itemType="LOCATION" 
+                      itemId={dest.id} 
+                      className="w-10 h-10 text-snow hover:text-nordic-red transition-colors shadow-lg" 
+                    />
+                  </div>
 
                   <div className="p-8 flex flex-col flex-grow relative z-10 pointer-events-none">
                     <h4 className="font-display font-semibold text-2xl text-snow mb-3 group-hover:text-arctic-gold transition-colors">{dest.name}</h4>

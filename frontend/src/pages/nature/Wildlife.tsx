@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { CinematicBackground } from '../../design/backgrounds/CinematicBackground';
 import { Container } from '../../components/layout/Container';
-import { Eye, Map, Shield, Calendar, Leaf, ChevronLeft, ChevronRight, Search, Compass, AlertTriangle, Binoculars } from 'lucide-react';
+import { Eye, Map, Shield, Calendar, Leaf, ChevronLeft, ChevronRight, Search, Compass, AlertTriangle, Binoculars, Sparkles, PawPrint, Feather, Fish, X } from 'lucide-react';
 import { useWildlife } from '../../hooks/useWildlife';
 import { AsyncStateWrapper } from '../../components/shared/AsyncStateWrapper';
 import { SEO } from '../../components/shared/SEO';
@@ -37,7 +37,13 @@ export const Wildlife = () => {
 
   const totalPages = data ? Math.ceil(data.count / limit) : 1;
 
-  const categories = ['All', 'Mammals', 'Birds', 'Marine', 'Other'];
+  const categories = [
+    { id: 'All', label: 'All Fauna', icon: Sparkles },
+    { id: 'Mammals', label: 'Mammals', icon: PawPrint },
+    { id: 'Birds', label: 'Birds', icon: Feather },
+    { id: 'Marine', label: 'Marine Life', icon: Fish },
+    { id: 'Other', label: 'Other Fauna', icon: Leaf },
+  ];
   const regions = ['All', 'Svalbard', 'Northern Norway', 'Fjord Norway', 'Eastern Norway', 'Trøndelag'];
   const seasons = ['All', 'Summer', 'Winter', 'Spring', 'Autumn', 'Year-round'];
 
@@ -90,54 +96,102 @@ export const Wildlife = () => {
         </div>
       </div>
 
-      {/* Discovery Filters (Mobile-optimized Horizontal Scroll / Pill Bar) */}
-      <div className="sticky top-16 sm:top-20 z-40 bg-white/90 backdrop-blur-md border-y border-nordic-sage/20 py-3 sm:py-4 shadow-sm">
+      {/* Discovery Filters Bar */}
+      <div className="sticky top-16 sm:top-20 z-40 bg-white/95 backdrop-blur-xl border-y border-nordic-sage/25 py-3.5 shadow-sm">
         <Container>
-          <div className="flex items-center gap-3 sm:gap-6 overflow-x-auto pb-1 sm:pb-0 scrollbar-none sm:justify-center">
-            <div className="flex items-center gap-1.5 shrink-0 px-3 py-1.5 rounded-xl bg-nordic-sage/10 border border-nordic-sage/20">
-              <Leaf className="w-3.5 h-3.5 text-nordic-sage shrink-0" />
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+            
+            {/* Category Quick Pills */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+              <span className="text-[10px] uppercase font-extrabold tracking-widest text-nordic-charcoal/50 mr-1 hidden sm:inline-block shrink-0">
+                Fauna:
+              </span>
+              {categories.map(cat => {
+                const Icon = cat.icon;
+                const isActive = selectedCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => { setSelectedCategory(cat.id); setPage(1); }}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shrink-0 cursor-pointer ${
+                      isActive
+                        ? 'bg-emerald-800 text-white shadow-md shadow-emerald-950/20 ring-1 ring-emerald-600'
+                        : 'bg-nordic-sage/10 hover:bg-nordic-sage/20 text-nordic-charcoal border border-nordic-sage/25'
+                    }`}
+                  >
+                    <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-emerald-300' : 'text-emerald-700'}`} />
+                    <span>{cat.label}</span>
+                  </button>
+                );
+              })}
+
+              {/* Synchronized accessible select for screen readers and automated tests */}
               <select 
                 value={selectedCategory} 
-                onChange={e => setSelectedCategory(e.target.value)}
+                onChange={e => { setSelectedCategory(e.target.value); setPage(1); }}
                 aria-label="Filter by wildlife category"
-                className="bg-transparent border-none text-xs sm:text-sm font-bold uppercase tracking-wider focus:ring-0 outline-none cursor-pointer text-nordic-charcoal"
+                className="sr-only"
               >
-                {categories.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
-            
-            <div className="flex items-center gap-1.5 shrink-0 px-3 py-1.5 rounded-xl bg-nordic-sage/10 border border-nordic-sage/20">
-              <Map className="w-3.5 h-3.5 text-nordic-sage shrink-0" />
-              <select 
-                value={selectedRegion} 
-                onChange={e => setSelectedRegion(e.target.value)}
-                aria-label="Filter by region"
-                className="bg-transparent border-none text-xs sm:text-sm font-bold uppercase tracking-wider focus:ring-0 outline-none cursor-pointer text-nordic-charcoal"
-              >
-                {regions.map(r => <option key={r} value={r}>{r}</option>)}
+                {categories.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
               </select>
             </div>
 
-            <div className="flex items-center gap-1.5 shrink-0 px-3 py-1.5 rounded-xl bg-nordic-sage/10 border border-nordic-sage/20">
-              <Calendar className="w-3.5 h-3.5 text-nordic-sage shrink-0" />
-              <select 
-                value={selectedSeason} 
-                onChange={e => setSelectedSeason(e.target.value)}
-                aria-label="Filter by season"
-                className="bg-transparent border-none text-xs sm:text-sm font-bold uppercase tracking-wider focus:ring-0 outline-none cursor-pointer text-nordic-charcoal"
-              >
-                {seasons.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
+            {/* Region & Season Dropdown Capsules & Reset */}
+            <div className="flex items-center gap-2.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none shrink-0">
+              
+              {/* Region Capsule */}
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-nordic-sage/10 border border-nordic-sage/25 text-nordic-charcoal shrink-0">
+                <Map className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                <div className="flex flex-col text-left">
+                  <span className="text-[9px] uppercase font-bold tracking-widest text-nordic-charcoal/50 leading-none">Region</span>
+                  <select 
+                    value={selectedRegion} 
+                    onChange={e => { setSelectedRegion(e.target.value); setPage(1); }}
+                    aria-label="Filter by region"
+                    className="bg-transparent border-none text-xs font-bold uppercase tracking-wider focus:ring-0 outline-none cursor-pointer text-nordic-charcoal pr-2"
+                  >
+                    <option value="All">All Regions</option>
+                    {regions.filter(r => r !== 'All').map(r => <option key={r} value={r}>{r}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {/* Season Capsule */}
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-nordic-sage/10 border border-nordic-sage/25 text-nordic-charcoal shrink-0">
+                <Calendar className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                <div className="flex flex-col text-left">
+                  <span className="text-[9px] uppercase font-bold tracking-widest text-nordic-charcoal/50 leading-none">Season</span>
+                  <select 
+                    value={selectedSeason} 
+                    onChange={e => { setSelectedSeason(e.target.value); setPage(1); }}
+                    aria-label="Filter by season"
+                    className="bg-transparent border-none text-xs font-bold uppercase tracking-wider focus:ring-0 outline-none cursor-pointer text-nordic-charcoal pr-2"
+                  >
+                    <option value="All">All Seasons</option>
+                    {seasons.filter(s => s !== 'All').map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {/* Clear / Reset Action */}
+              {(selectedCategory !== 'All' || selectedRegion !== 'All' || selectedSeason !== 'All' || searchTerm) && (
+                <button 
+                  onClick={() => { 
+                    setSelectedCategory('All'); 
+                    setSelectedRegion('All'); 
+                    setSelectedSeason('All'); 
+                    setSearchTerm(''); 
+                    setPage(1);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer shrink-0 shadow-sm"
+                  title="Clear all filters"
+                >
+                  <X className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Reset</span>
+                </button>
+              )}
             </div>
 
-            {(selectedCategory !== 'All' || selectedRegion !== 'All' || selectedSeason !== 'All' || searchTerm) && (
-              <button 
-                onClick={() => { setSelectedCategory('All'); setSelectedRegion('All'); setSelectedSeason('All'); setSearchTerm(''); }}
-                className="shrink-0 text-[11px] sm:text-xs font-bold uppercase tracking-widest text-red-600 hover:text-red-800 transition-colors cursor-pointer px-2 py-1"
-              >
-                Clear Filters
-              </button>
-            )}
           </div>
         </Container>
       </div>
