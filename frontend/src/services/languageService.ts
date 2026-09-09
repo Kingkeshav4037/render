@@ -191,7 +191,7 @@ class LanguageService {
     if (!document.getElementById('google_translate_element')) {
       const div = document.createElement('div');
       div.id = 'google_translate_element';
-      div.style.display = 'none';
+      div.setAttribute('aria-hidden', 'true');
       document.body.appendChild(div);
     }
 
