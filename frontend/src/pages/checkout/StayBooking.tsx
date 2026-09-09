@@ -138,6 +138,15 @@ export const StayBooking = () => {
     return null as any;
   }, [stay, room]);
 
+  // Target accommodation UUID for database orders & bookings
+  const targetAccommodationId = useMemo(() => {
+    let rawId = activeStay?.id || room?.accommodation_id || id || '';
+    if (typeof rawId === 'string' && rawId.includes('-room-')) {
+      rawId = rawId.split('-room-')[0];
+    }
+    return rawId;
+  }, [activeStay?.id, room?.accommodation_id, id]);
+
   // Calculate nights and price
   const nights = useMemo(() => {
     if (!checkIn || !checkOut) return 0;
@@ -150,6 +159,19 @@ export const StayBooking = () => {
   const pricePerNight = Number(room?.price_per_night || activeStay?.price_per_night || 2400);
   const totalAmount = nights * pricePerNight;
   const vatAmount = Math.round(totalAmount * 0.20); // 25% MVA included
+
+  const loadRazorpayScript = () => {
+    return new Promise<boolean>((resolve) => {
+      if (typeof window !== 'undefined' && (window as any).Razorpay) {
+        return resolve(true);
+      }
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
 
   const handleAddToCart = () => {
     if (!room || !activeStay) {
@@ -164,7 +186,7 @@ export const StayBooking = () => {
 
     addItem({
       item_type: 'ACCOMMODATION',
-      item_id: room.id,
+      item_id: targetAccommodationId,
       name: `${activeStay.name} - ${room.name}`,
       description: `${nights} nights (${checkIn} to ${checkOut}) for ${guests} guests. ${room.bed || ''}`,
       unit_price: pricePerNight,
@@ -197,7 +219,7 @@ export const StayBooking = () => {
   useEffect(() => {
     let isSubscribed = true;
     const checkLiveAvailability = async () => {
-      if (!room?.id || !checkIn || !checkOut) return;
+      if (!targetAccommodationId || !checkIn || !checkOut) return;
 
       const ruleCheck = availabilityService.validateBookingRules(checkIn, checkOut, guests, {
         minNights: 1,
@@ -214,7 +236,7 @@ export const StayBooking = () => {
       }
 
       try {
-        const res = await availabilityService.checkAvailability('ACCOMMODATION', room.id, checkIn, checkOut);
+        const res = await availabilityService.checkAvailability('ACCOMMODATION', targetAccommodationId, checkIn, checkOut);
         if (isSubscribed) {
           setDateAvailability({
             checked: true,
@@ -231,7 +253,7 @@ export const StayBooking = () => {
 
     checkLiveAvailability();
     return () => { isSubscribed = false; };
-  }, [room?.id, checkIn, checkOut, guests]);
+  }, [targetAccommodationId, checkIn, checkOut, guests]);
 
   const handleConfirmAndPay = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -282,7 +304,7 @@ export const StayBooking = () => {
       const holdRes = await availabilityService.validateAndHoldInventory(
         user.id,
         'ACCOMMODATION',
-        room.id,
+        targetAccommodationId,
         checkIn,
         checkOut,
         guests,
@@ -300,9 +322,9 @@ export const StayBooking = () => {
 
       const bookingItems = [
         {
-          id: room.id,
+          id: targetAccommodationId,
           item_type: 'ACCOMMODATION' as const,
-          item_id: room.id,
+          item_id: targetAccommodationId,
           name: `${activeStay.name} - ${room.name}`,
           description: `${nights} nights (${checkIn} to ${checkOut}) for ${guests} guests. ${specialRequests ? `Special request: ${specialRequests}` : ''}`,
           unit_price: pricePerNight,
@@ -315,7 +337,10 @@ export const StayBooking = () => {
       ];
 
       // 3. Process Checkout
-      const orderId = await checkoutService.processCheckout(user.id, bookingItems, 'NOK');
+      const checkoutRes = await checkoutService.processCheckout(user.id, bookingItems, 'NOK');
+      const orderId = (typeof checkoutRes === 'object' && checkoutRes !== null)
+        ? ((checkoutRes as any).orderId || (checkoutRes as any).id)
+        : checkoutRes;
       
       if (!orderId) {
         throw new Error('Failed to generate reservation order');
@@ -325,6 +350,7 @@ export const StayBooking = () => {
       const paymentIntent = await checkoutService.createPaymentIntent(orderId, 'Razorpay');
 
       // 5. Handle Payment Gateways (Razorpay checkout)
+      await loadRazorpayScript();
       if (typeof window !== 'undefined' && (window as any).Razorpay && paymentIntent?.gateway_order_id) {
         const options = {
           key: paymentIntent.keyId || (import.meta as any).env.VITE_RAZORPAY_KEY_ID || 'rzp_test_placeholder',
@@ -348,10 +374,11 @@ export const StayBooking = () => {
               });
               toast.success('Reservation confirmed!');
               navigate(`/payment-success?order_id=${orderId}`);
-            } catch (verErr) {
+            } catch (verErr: any) {
               console.error('Payment verification failed:', verErr);
               if (holdId) availabilityService.releaseInventoryHold(holdId, user.id);
-              navigate(`/payment-failure?order_id=${orderId}`);
+              toast.error(verErr?.message || 'Payment verification failed.');
+              navigate(`/payment-failure?order_id=${orderId}&reason=VERIFICATION_FAILED&description=${encodeURIComponent(verErr?.message || 'Verification mismatch')}`);
             }
           },
           modal: {
@@ -364,6 +391,12 @@ export const StayBooking = () => {
         };
 
         const rzp = new (window as any).Razorpay(options);
+        rzp.on?.('payment.failed', function (resp: any) {
+          if (holdId) availabilityService.releaseInventoryHold(holdId, user.id);
+          const errMsg = resp?.error?.description || resp?.error?.reason || 'Payment was declined.';
+          toast.error(errMsg);
+          navigate(`/payment-failure?order_id=${orderId}&reason=DECLINED&description=${encodeURIComponent(errMsg)}`);
+        });
         rzp.open();
       } else {
         // Fallback for test/simulation

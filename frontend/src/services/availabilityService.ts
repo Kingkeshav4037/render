@@ -103,9 +103,14 @@ export const availabilityService = {
     endDate: string
   ): Promise<AvailabilityCheckResult> {
     try {
+      let cleanItemId = itemId;
+      if (itemType === 'ACCOMMODATION' && typeof cleanItemId === 'string' && cleanItemId.includes('-room-')) {
+        cleanItemId = cleanItemId.split('-room-')[0];
+      }
+
       const { data, error } = await (supabase.rpc as any)('check_availability', {
         p_item_type: itemType,
-        p_item_id: itemId,
+        p_item_id: cleanItemId,
         p_start_date: new Date(startDate).toISOString(),
         p_end_date: new Date(endDate).toISOString(),
       });
@@ -115,7 +120,7 @@ export const availabilityService = {
         // Fallback direct check
         const { data: bookings, error: bkgErr } = await (supabase.from('bookings') as any)
           .select('id')
-          .eq('item_id', itemId)
+          .eq('item_id', cleanItemId)
           .in('status', ['PAID', 'PENDING_PAYMENT', 'CONFIRMED'])
           .lt('start_time', new Date(endDate).toISOString())
           .gt('end_time', new Date(startDate).toISOString());
@@ -158,10 +163,15 @@ export const availabilityService = {
     holdDurationMinutes: number = 15
   ): Promise<InventoryHoldResult> {
     try {
+      let cleanItemId = itemId;
+      if (itemType === 'ACCOMMODATION' && typeof cleanItemId === 'string' && cleanItemId.includes('-room-')) {
+        cleanItemId = cleanItemId.split('-room-')[0];
+      }
+
       const { data, error } = await (supabase.rpc as any)('validate_and_hold_inventory', {
         p_user_id: userId,
         p_item_type: itemType,
-        p_item_id: itemId,
+        p_item_id: cleanItemId,
         p_start_time: new Date(startTime).toISOString(),
         p_end_time: new Date(endTime).toISOString(),
         p_pax: pax,

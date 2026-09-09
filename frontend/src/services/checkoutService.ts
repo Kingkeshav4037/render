@@ -4,15 +4,21 @@ import { CartItem } from '../store/useCartStore';
 export const checkoutService = {
   async processCheckout(userId: string, items: CartItem[], currency: string = 'NOK') {
     // 1. Prepare payload for RPC
-    const payloadItems = items.map(item => ({
-      item_type: item.item_type,
-      item_id: item.item_id,
-      quantity: item.quantity,
-      description: item.name,
-      start_time: item.start_time || null,
-      end_time: item.end_time || null,
-      pax: item.pax || 1
-    }));
+    const payloadItems = items.map(item => {
+      let cleanItemId = item.item_id;
+      if (item.item_type === 'ACCOMMODATION' && typeof cleanItemId === 'string' && cleanItemId.includes('-room-')) {
+        cleanItemId = cleanItemId.split('-room-')[0];
+      }
+      return {
+        item_type: item.item_type,
+        item_id: cleanItemId,
+        quantity: item.quantity,
+        description: item.name,
+        start_time: item.start_time || null,
+        end_time: item.end_time || null,
+        pax: item.pax || 1
+      };
+    });
 
     // 2. Call the RPC (backend calculates total)
     const { data: orderId, error } = await supabase.rpc('process_checkout' as any, {

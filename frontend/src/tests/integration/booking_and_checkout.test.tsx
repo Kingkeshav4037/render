@@ -11,6 +11,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { checkoutService } from '../../services/checkoutService';
+import { availabilityService } from '../../services/availabilityService';
 import { supabase } from '../../lib/supabase';
 import { CartItem } from '../../store/useCartStore';
 
@@ -124,6 +125,93 @@ describe('Integration Tests: Booking Creation & Checkout Flow', () => {
       expect(supabase.rpc).toHaveBeenCalledWith(
         'process_checkout',
         expect.objectContaining({ p_currency: 'EUR' })
+      );
+    });
+
+    it('sanitizes composite room IDs for ACCOMMODATION items to raw accommodation UUIDs', async () => {
+      (supabase.rpc as any).mockResolvedValueOnce({
+        data: 'order-clean-uuid-1',
+        error: null,
+      });
+
+      const compoundItem: CartItem = {
+        id: 'cart-compound',
+        item_type: 'ACCOMMODATION',
+        item_id: 'fbe2a4a9-6841-4099-a139-9ff5f8b38b97-room-suite',
+        name: 'Juvet Landscape Hotel - Landscape Suite',
+        unit_price: 3400,
+        quantity: 2,
+        start_time: '2026-09-01T14:00:00Z',
+        end_time: '2026-09-03T11:00:00Z',
+        pax: 2,
+      };
+
+      const orderId = await checkoutService.processCheckout('user-123', [compoundItem], 'NOK');
+      expect(orderId).toBe('order-clean-uuid-1');
+      expect(supabase.rpc).toHaveBeenCalledWith(
+        'process_checkout',
+        expect.objectContaining({
+          p_items: [
+            expect.objectContaining({
+              item_type: 'ACCOMMODATION',
+              item_id: 'fbe2a4a9-6841-4099-a139-9ff5f8b38b97',
+              quantity: 2,
+            })
+          ]
+        })
+      );
+    });
+  });
+
+  // ─── 2. availabilityService Integration ────────────────────────────────────
+  describe('availabilityService sanitization & holds', () => {
+    it('sanitizes composite room IDs when checking availability', async () => {
+      (supabase.rpc as any).mockResolvedValueOnce({
+        data: true,
+        error: null,
+      });
+
+      const res = await availabilityService.checkAvailability(
+        'ACCOMMODATION',
+        'fbe2a4a9-6841-4099-a139-9ff5f8b38b97-room-suite',
+        '2026-09-10',
+        '2026-09-14'
+      );
+
+      expect(res.available).toBe(true);
+      expect(supabase.rpc).toHaveBeenCalledWith(
+        'check_availability',
+        expect.objectContaining({
+          p_item_type: 'ACCOMMODATION',
+          p_item_id: 'fbe2a4a9-6841-4099-a139-9ff5f8b38b97',
+        })
+      );
+    });
+
+    it('sanitizes composite room IDs when placing inventory holds', async () => {
+      (supabase.rpc as any).mockResolvedValueOnce({
+        data: { success: true, hold_id: 'hold-123' },
+        error: null,
+      });
+
+      const res = await availabilityService.validateAndHoldInventory(
+        'user-123',
+        'ACCOMMODATION',
+        'fbe2a4a9-6841-4099-a139-9ff5f8b38b97-room-suite',
+        '2026-09-10',
+        '2026-09-14',
+        2,
+        1,
+        15
+      );
+
+      expect(res.success).toBe(true);
+      expect(supabase.rpc).toHaveBeenCalledWith(
+        'validate_and_hold_inventory',
+        expect.objectContaining({
+          p_item_type: 'ACCOMMODATION',
+          p_item_id: 'fbe2a4a9-6841-4099-a139-9ff5f8b38b97',
+        })
       );
     });
   });
