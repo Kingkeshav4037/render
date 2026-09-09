@@ -44,8 +44,8 @@ const DEFAULT_ACTIVITIES: Activity[] = [
     difficulty_level: 'EASY',
     price: 1400,
     currency: 'NOK',
-    image_url: '/images/fjords_1786935800026.jpg',
-    tags: ['Wildlife', 'Fjords', 'Boat', 'Eco-certified'],
+    image_url: '/images/whale_safari.jpg',
+    tags: ['Wildlife', 'Whales', 'Boat', 'Eco-certified'],
     equipment_needed: ['Warm windproof layers', 'Binoculars'],
     featured: true,
     lat: 69.6492,
@@ -62,7 +62,7 @@ const DEFAULT_ACTIVITIES: Activity[] = [
     difficulty_level: 'MODERATE',
     price: 2100,
     currency: 'NOK',
-    image_url: '/images/northern_lights_1786935879330.jpg',
+    image_url: '/images/aurora_dogsled.jpg',
     tags: ['Aurora', 'Dogsledding', 'Winter', 'Arctic'],
     equipment_needed: ['Thermal suit provided', 'Winter boots'],
     featured: true,
@@ -80,7 +80,7 @@ const DEFAULT_ACTIVITIES: Activity[] = [
     difficulty_level: 'MODERATE',
     price: 1300,
     currency: 'NOK',
-    image_url: '/images/preikestolen_1786936002797.jpg',
+    image_url: '/images/preikestolen_hikers.jpg',
     tags: ['Hiking', 'Sunrise', 'Panoramic Views', 'Iconic'],
     equipment_needed: ['Hiking boots', 'Headlamp', 'Water bottle'],
     featured: true,
@@ -98,7 +98,7 @@ const DEFAULT_ACTIVITIES: Activity[] = [
     difficulty_level: 'EASY',
     price: 1050,
     currency: 'NOK',
-    image_url: '/images/trollfjord_safari.jpg',
+    image_url: '/images/sea_eagle_safari.jpg',
     tags: ['Eagles', 'RIB Boat', 'Lofoten', 'Birdwatching'],
     equipment_needed: ['Warm layers provided'],
     featured: true,
@@ -134,7 +134,7 @@ const DEFAULT_ACTIVITIES: Activity[] = [
     difficulty_level: 'HARD',
     price: 1850,
     currency: 'NOK',
-    image_url: '/images/trolltunga_1786936111320.jpg',
+    image_url: '/images/arctic_hikers.jpg',
     tags: ['Trolltunga', 'Bucket List', 'Challenging', 'Mountain'],
     equipment_needed: ['Sturdy hiking boots', 'Packed lunch', 'Windproof gear'],
     featured: true,
@@ -152,7 +152,7 @@ const DEFAULT_ACTIVITIES: Activity[] = [
     difficulty_level: 'EASY',
     price: 950,
     currency: 'NOK',
-    image_url: '/images/fjord_naeroyfjord.jpg',
+    image_url: '/images/luxury_fjord_cruise.jpg',
     tags: ['Fjord Cruise', 'UNESCO', 'Scenic', 'Relaxed'],
     equipment_needed: ['Camera', 'Warm windproof jacket'],
     featured: false,
@@ -170,12 +170,120 @@ const DEFAULT_ACTIVITIES: Activity[] = [
     difficulty_level: 'HARD',
     price: 800,
     currency: 'NOK',
-    image_url: '/images/reinebringen_twilight.jpg',
+    image_url: '/images/svalbard_trek.jpg',
     tags: ['Views', 'Stairs', 'Photography', 'Lofoten'],
     equipment_needed: ['Trekking poles optional', 'Water bottle'],
     featured: false,
     lat: 67.9272,
     lng: 13.0841
+  },
+  {
+    id: 'act-009',
+    location_id: 'loc-oslo',
+    name: 'Holmenkollen & Nordmarka Nordic Skiing',
+    type: 'SKIING',
+    description: 'Glide across world-class groomed cross-country ski trails through the magical snow-covered pine forests of Oslo Nordmarka.',
+    duration_minutes: 180,
+    difficulty: 'MODERATE',
+    difficulty_level: 'MODERATE',
+    price: 850,
+    currency: 'NOK',
+    image_url: '/images/cross_country_skiing.jpg',
+    tags: ['Skiing', 'Cross-Country', 'Oslo', 'Winter'],
+    equipment_needed: ['Thermal clothing', 'Skis and poles provided'],
+    featured: true,
+    lat: 59.9639,
+    lng: 10.6672
+  },
+  {
+    id: 'act-010',
+    location_id: 'loc-svalbard',
+    name: 'Svalbard Arctic Walrus & Glacier Safari',
+    type: 'WILDLIFE',
+    description: 'Boat safari along the icy shores of Isfjorden to observe colonies of giant Atlantic walruses resting on coastal ice floes.',
+    duration_minutes: 420,
+    difficulty: 'EASY',
+    difficulty_level: 'EASY',
+    price: 2400,
+    currency: 'NOK',
+    image_url: '/images/walrus_safari.jpg',
+    tags: ['Walrus', 'Glaciers', 'Arctic', 'Boat Tour'],
+    equipment_needed: ['Extreme thermal suit provided'],
+    featured: true,
+    lat: 78.2232,
+    lng: 15.6267
+  },
+  {
+    id: 'act-011',
+    location_id: 'loc-hardanger',
+    name: 'Hardangerfjord High-Speed RIB Safari',
+    type: 'CRUISE',
+    description: 'Skim across the deep blue waters of Hardangerfjord on an exhilarating 50-knot RIB adventure beneath sheer orchards and cascades.',
+    duration_minutes: 90,
+    difficulty: 'EASY',
+    difficulty_level: 'EASY',
+    price: 990,
+    currency: 'NOK',
+    image_url: '/images/hardangerfjord_rib_safari.jpg',
+    tags: ['RIB Safari', 'Fjord', 'Adrenaline', 'Scenic'],
+    equipment_needed: ['Waterproof flotation suit provided'],
+    featured: true,
+    lat: 60.3689,
+    lng: 6.2014
+  },
+  {
+    id: 'act-012',
+    location_id: 'loc-trondheim',
+    name: 'Nidelva & Historic Wharves Kayak Tour',
+    type: 'KAYAK',
+    description: 'Paddle peacefully along the Nidelva river right between Trondheim’s iconic 18th-century wooden wharves and beneath the Old Town Bridge.',
+    duration_minutes: 120,
+    difficulty: 'EASY',
+    difficulty_level: 'EASY',
+    price: 750,
+    currency: 'NOK',
+    image_url: '/images/trondheim_wharves_kayak.jpg',
+    tags: ['Kayaking', 'Heritage', 'Trondheim', 'Canals'],
+    equipment_needed: ['Life vest provided', 'Waterproof pouch for phone'],
+    featured: false,
+    lat: 63.4305,
+    lng: 10.3951
+  },
+  {
+    id: 'act-013',
+    location_id: 'loc-tromso',
+    name: 'Traditional Sámi Reindeer Sledding Camp',
+    type: 'WILDLIFE',
+    description: 'Sit bundled in reindeer pelts on a wooden sled pulled by reindeer through the Arctic night, followed by hot bidos in a traditional lavvu.',
+    duration_minutes: 240,
+    difficulty: 'EASY',
+    difficulty_level: 'EASY',
+    price: 1850,
+    currency: 'NOK',
+    image_url: '/images/reindeer_sledding.jpg',
+    tags: ['Sámi Culture', 'Reindeer', 'Aurora', 'Campfire'],
+    equipment_needed: ['Warm base layers'],
+    featured: true,
+    lat: 69.6492,
+    lng: 18.9553
+  },
+  {
+    id: 'act-014',
+    location_id: 'loc-svalbard',
+    name: 'Arctic Snowmobile Wilderness Expedition',
+    type: 'AURORA',
+    description: 'Power across vast frozen valleys and glacier passes on modern snowmobiles into the silent polar night in search of the Aurora Borealis.',
+    duration_minutes: 360,
+    difficulty: 'MODERATE',
+    difficulty_level: 'MODERATE',
+    price: 2900,
+    currency: 'NOK',
+    image_url: '/images/snowmobile_safari.jpg',
+    tags: ['Snowmobile', 'Glaciers', 'Aurora', 'Wilderness'],
+    equipment_needed: ['Valid driving licence required', 'Balaclava provided'],
+    featured: true,
+    lat: 78.2232,
+    lng: 15.6267
   }
 ];
 
@@ -214,8 +322,8 @@ export const activityService = {
       
       return { data: data.map((a: any) => ({
         ...a,
-        // Apply category-aware image fallback for any DB records with missing images
-        image_url: getActivityImage(a.type, a.image_url),
+        // Apply category and name-aware image fallback for any DB records with missing/generic images
+        image_url: getActivityImage(a.type, a.image_url, a.name),
       })) as unknown as Activity[], count: count || data.length };
     } catch (e) {
       console.error('Error fetching activities:', e);
@@ -237,7 +345,10 @@ export const activityService = {
       if (error || !data || data.length === 0) {
         return DEFAULT_ACTIVITIES.filter(a => a.featured);
       }
-      return data as unknown as Activity[];
+      return data.map((a: any) => ({
+        ...a,
+        image_url: getActivityImage(a.type, a.image_url, a.name),
+      })) as unknown as Activity[];
     } catch {
       return DEFAULT_ACTIVITIES.filter(a => a.featured);
     }
@@ -257,13 +368,13 @@ export const activityService = {
         if (!found) return null;
         return {
           ...found,
-          image_url: getActivityImage(found.type, found.image_url)
+          image_url: getActivityImage(found.type, found.image_url, found.name)
         };
       }
 
       return {
         ...(data as Activity),
-        image_url: getActivityImage(data.type, data.image_url)
+        image_url: getActivityImage(data.type, data.image_url, data.name)
       };
     } catch {
       const found = DEFAULT_ACTIVITIES.find(a => a.id === id);

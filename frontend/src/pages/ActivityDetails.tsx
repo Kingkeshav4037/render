@@ -72,7 +72,7 @@ export const ActivityDetails = () => {
     );
   }
 
-  const actImage = getActivityImage(activity.type, activity.image_url);
+  const actImage = getActivityImage(activity.type, activity.image_url, activity.name);
   const durationText = activity.duration_minutes 
     ? `${Math.floor(activity.duration_minutes / 60)}h ${activity.duration_minutes % 60 ? (activity.duration_minutes % 60) + 'm' : ''}`.trim() 
     : '3 hours';

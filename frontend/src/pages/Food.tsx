@@ -357,7 +357,7 @@ export const Food = () => {
                               src={foodImage} 
                               alt={food.name}
                               category="food"
-                              fallbackSrc="/images/food_market_hall.jpg"
+                              fallbackSrc="/images/food_salmon_1787013684123.jpg"
                               className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-90 group-hover:opacity-100"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-midnight via-transparent to-transparent pointer-events-none" />

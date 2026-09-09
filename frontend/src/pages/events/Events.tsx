@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { eventService, Event, getEventFallbackDescription } from '../../services/eventService';
+import { eventService, Event, getEventFallbackDescription, getEventImage } from '../../services/eventService';
 import { Calendar, MapPin, Search, Sparkles, X, Info, Ticket, ChevronRight, Share2, Check } from 'lucide-react';
 import { useCartStore } from '../../store/useCartStore';
 import { useRequireAuth } from '../../hooks/useRequireAuth';
@@ -57,7 +57,7 @@ export const Events = () => {
         name: event.name,
         unit_price: event.ticket_price,
         quantity: 1,
-        image: event.image_url
+        image: getEventImage(event.name, event.category, event.image_url)
       });
       toast.success(`Added ticket for ${event.name} to cart`);
     }, { message: 'Sign in to book event tickets.' });
@@ -165,7 +165,7 @@ export const Events = () => {
                   {/* Thumbnail / Date Badge */}
                   <div className="md:w-5/12 lg:w-4/12 h-60 md:h-auto min-h-[220px] relative overflow-hidden shrink-0">
                     <OptimizedImage 
-                      src={event.image_url} 
+                      src={getEventImage(event.name, event.category, event.image_url)} 
                       alt={event.name}
                       category="aurora"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -287,7 +287,7 @@ export const Events = () => {
             >
               <div className="relative h-48 sm:h-64">
                 <OptimizedImage 
-                  src={selectedEvent.image_url} 
+                  src={getEventImage(selectedEvent.name, selectedEvent.category, selectedEvent.image_url)} 
                   alt={selectedEvent.name}
                   category="aurora"
                   className="w-full h-full object-cover"

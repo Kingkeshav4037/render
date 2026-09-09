@@ -184,7 +184,7 @@ export const FoodItemModal: React.FC<FoodItemModalProps> = ({ food, onClose }) =
             src={foodImage}
             alt={food.name}
             category="food"
-            fallbackSrc="/images/food_market_hall.jpg"
+            fallbackSrc="/images/food_salmon_1787013684123.jpg"
             className="w-full h-full object-cover"
             containerClassName="w-full h-full"
           />

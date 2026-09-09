@@ -291,7 +291,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'food-1': {
     title: 'Arctic Reinsdyrgryte',
     region: 'Troms & Finnmark',
-    image: '/images/food_market_hall.jpg',
+    image: '/images/lingonberry_cream.jpg',
     url: '/food/food-1',
     description: 'Slow-simmered reindeer stew with lingonberries and creamy mashed potatoes.',
     price: 320,
@@ -562,8 +562,8 @@ function getFallbackImage(type: FavoriteCategory): string {
     case 'DESTINATION': return '/images/tromso_winter.jpg';
     case 'PLACE': return '/images/fjords_1786935800026.jpg';
     case 'STAY': return '/images/hotel_historic.jpg';
-    case 'ACTIVITY': return '/images/trolltunga_1786936111320.jpg';
-    case 'FOOD': return '/images/food_market_hall.jpg';
+    case 'ACTIVITY': return '/images/preikestolen_hikers.jpg';
+    case 'FOOD': return '/images/food_salmon_1787013684123.jpg';
     case 'PRODUCT': return '/images/merino_wool_top.jpg';
     case 'GUIDE': return '/images/flamsbana.jpg';
     default: return '/images/geirangerfjord.jpg';

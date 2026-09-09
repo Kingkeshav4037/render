@@ -18,7 +18,7 @@ import { OptimizedImage } from './OptimizedImage';
 export const ImageCard = ({ imageUrl, title, subtitle, linkTo, badges, itemType, itemId }: ImageCardProps) => {
   // Determine fallback based on itemType
   let fallback = '/images/fjords_1786935800026.jpg';
-  if (itemType === 'food' || itemType === 'restaurant') fallback = '/images/food_market_hall.jpg';
+  if (itemType === 'food' || itemType === 'restaurant') fallback = '/images/food_salmon_1787013684123.jpg';
   if (itemType === 'wildlife') fallback = '/images/wildlife_reindeer_1787013667019.jpg';
   if (itemType === 'accommodation') fallback = '/images/hotel_juvet_1787013813000.jpg';
   if (itemType === 'event') fallback = '/images/northern_lights_1786935879330.jpg';

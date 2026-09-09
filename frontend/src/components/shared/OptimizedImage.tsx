@@ -22,7 +22,7 @@ const CATEGORY_FALLBACKS: Record<ImageCategory, string> = {
   landscape: '/images/fjords_1786935800026.jpg',
   wildlife: '/images/wildlife_reindeer_1787013667019.jpg',
   flora: '/images/cloudberry.jpg',
-  food: '/images/food_market_hall.jpg',
+  food: '/images/food_salmon_1787013684123.jpg',
   stay: '/images/hotel_juvet_1787013813000.jpg',
   trail: '/images/besseggen_1786936349992.jpg',
   winter: '/images/skiing_norway.jpg',

@@ -56,7 +56,7 @@ export const Activities = () => {
       />
       {/* Pine Theme Hero */}
       <CinematicBackground 
-        imageUrl="/images/lofoten_1787013505867.jpg"
+        imageUrl="/images/fjord_rib_safari.jpg"
         gradient="dark"
         overlayOpacity={0.6}
         className="h-[60vh] flex items-center"
@@ -169,9 +169,9 @@ export const Activities = () => {
                     
                     <div className="h-64 relative overflow-hidden">
                       <OptimizedImage 
-                        src={getActivityImage(activity.type, activity.image_url)} 
+                        src={getActivityImage(activity.type, activity.image_url, activity.name)} 
                         alt={activity.name}
-                        fallbackSrc={getActivityImage(activity.type)}
+                        fallbackSrc={getActivityImage(activity.type, null, activity.name)}
                         className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                       />
                       <div className="absolute top-4 left-4 z-20 bg-deep-night/80 backdrop-blur-md px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-snow border border-white/10">

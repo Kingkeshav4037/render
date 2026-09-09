@@ -23,21 +23,21 @@ export interface PaginatedResult<T> {
   count: number;
 }
 
-// Unique, contextually-correct images for each Norwegian dish
+// Unique, contextually-correct images for each Norwegian dish (NO restaurants or kiosks)
 const FOOD_IMAGES: Record<string, string> = {
-  'fårikål':         '/images/reindeer_sausage_kiosk.jpg',
-  'farikal':         '/images/reindeer_sausage_kiosk.jpg',
+  'fårikål':         '/images/norwegian_dessert.jpg',
+  'farikal':         '/images/norwegian_dessert.jpg',
   'brunost':         '/images/cloudberry_dessert.jpg',
-  'kjøttkaker':      '/images/fast_food_kiosk.jpg',
-  'kjottkaker':      '/images/fast_food_kiosk.jpg',
-  'pinnekjøtt':      '/images/norwegian_street_food.jpg',
-  'pinnekjott':      '/images/norwegian_street_food.jpg',
-  'ribbe':           '/images/polse_kiosk.jpg',
-  'sodd':            '/images/food_market_hall.jpg',
+  'kjøttkaker':      '/images/food_kanelboller.jpg',
+  'kjottkaker':      '/images/food_kanelboller.jpg',
+  'pinnekjøtt':      '/images/lingonberry_cream.jpg',
+  'pinnekjott':      '/images/lingonberry_cream.jpg',
+  'ribbe':           '/images/norwegian_dessert.jpg',
+  'sodd':            '/images/salmon.jpg',
   'lutefisk':        '/images/torsk.jpg',
-  'raspeballer':     '/images/food_buffet.jpg',
-  'komle':           '/images/food_buffet.jpg',
-  'lapskaus':        '/images/norwegian_street_food.jpg',
+  'raspeballer':     '/images/atlantic_cod.jpg',
+  'komle':           '/images/atlantic_cod.jpg',
+  'lapskaus':        '/images/skrei.jpg',
   'rakfisk':         '/images/salmon.jpg',
   'gravlaks':        '/images/food_salmon_1787013684123.jpg',
   'gravlax':         '/images/food_salmon_1787013684123.jpg',
@@ -51,26 +51,39 @@ const FOOD_IMAGES: Record<string, string> = {
   'cod':             '/images/cod.jpg',
   'king crab':       '/images/food_salmon_1787013684123.jpg',
   'kongekrabbe':     '/images/food_salmon_1787013684123.jpg',
-  'reinsdyr':        '/images/reindeer_sausage_kiosk.jpg',
-  'reindeer':        '/images/reindeer_sausage_kiosk.jpg',
-  'finnbiff':        '/images/sami_reindeer.jpg',
-  'elg':             '/images/reindeer_tundra.jpg',
-  'moose':           '/images/moose.jpg',
+  'reinsdyr':        '/images/lingonberry_cream.jpg',
+  'reindeer':        '/images/lingonberry_cream.jpg',
+  'finnbiff':        '/images/lingonberry.jpg',
+  'elg':             '/images/lingonberry.jpg',
+  'moose':           '/images/lingonberry.jpg',
   'rømmegrøt':       '/images/krumkake_cream.jpg',
   'rommegrot':       '/images/krumkake_cream.jpg',
   'lefse':           '/images/cream_crepes.jpg',
   'krumkake':        '/images/krumkake.jpg',
   'kanelsnurr':      '/images/kanelboller.jpg',
+  'kanelbolle':      '/images/food_kanelboller.jpg',
   'skolebrød':       '/images/skillingsboller.jpg',
-  'skolebrod':       '/images/skillingsboller.jpg',
+  'skolebrod':       '/images/food_skillingsboller.jpg',
   'cloudberry':      '/images/cloudberry_cream.jpg',
   'multekrem':       '/images/cloudberry_cream.jpg',
-  'smalahove':       '/images/norwegian_kiosk.jpg',
-  'whale':           '/images/ocean_restaurant.jpg',
-  'hvalbiff':        '/images/ocean_restaurant.jpg',
+  'smalahove':       '/images/norwegian_dessert.jpg',
+  'whale':           '/images/skrei.jpg',
+  'hvalbiff':        '/images/skrei.jpg',
   'svele':           '/images/dessert_crepes.jpg',
   'waffle':          '/images/haralds_vaffel_iskrem.jpg',
-  'vaffel':          '/images/haralds_waffle_shop.jpg',
+  'vaffel':          '/images/haralds_vaffel_iskrem.jpg',
+  'vafler':          '/images/vafler_iskrem.jpg',
+  'iskrem':          '/images/oslo_ice_cream.jpg',
+  'ice cream':       '/images/oslo_ice_cream.jpg',
+  'dessert':         '/images/berry_cream_dessert.jpg',
+  'crepe':           '/images/norwegian_crepes.jpg',
+  'crepes':          '/images/cream_crepes.jpg',
+  'berry':           '/images/berry_dessert.jpg',
+  'lingonberry':     '/images/tyttebaer_cream.jpg',
+  'tyttebær':        '/images/tyttebaer_cream.jpg',
+  'blåbær':          '/images/norwegian_blueberry.jpg',
+  'blueberry':       '/images/norwegian_blueberry.jpg',
+  'bilberry':        '/images/bilberry.jpg',
 };
 
 // Unique images for Norwegian restaurants and cafes — using locally uploaded photos
@@ -97,19 +110,19 @@ const RESTAURANT_IMAGES: Record<string, string> = {
   'sabi omakase':          '/images/fine_dining_interior.jpg',
 };
 
-// Category → representative image — diverse, non-repeating
+// Category → representative food image (NO restaurants or kiosks)
 const CATEGORY_IMAGES: Record<string, string> = {
   'seafood':      '/images/food_salmon_1787013684123.jpg',
   'salmon':       '/images/salmon.jpg',
-  'meat':         '/images/reindeer_sausage_kiosk.jpg',
-  'reindeer':     '/images/sami_reindeer.jpg',
+  'meat':         '/images/lingonberry_cream.jpg',
+  'reindeer':     '/images/lingonberry.jpg',
   'dairy':        '/images/cloudberry_dessert.jpg',
   'dessert':      '/images/cream_crepes.jpg',
   'bread':        '/images/skillingsboller.jpg',
   'bakery':       '/images/kanelboller.jpg',
-  'soup':         '/images/food_market_hall.jpg',
-  'christmas':    '/images/reindeer_sausage_kiosk.jpg',
-  'vegetarian':   '/images/funky_fresh_foods.jpg',
+  'soup':         '/images/torsk.jpg',
+  'christmas':    '/images/norwegian_dessert.jpg',
+  'vegetarian':   '/images/cloudberry_dessert.jpg',
 };
 
 // Estimated price range for traditional dishes (in NOK, for display purposes)
@@ -148,7 +161,19 @@ export function getFoodImage(name: string, imageUrl?: string | null): string {
     }
   }
 
-  if (imageUrl && !imageUrl.includes('placeholder') && !imageUrl.includes('food_salmon')) {
+  // Strictly filter out any restaurant, dining room, kiosk, cafe, buffet, or market images
+  const isRestaurantImg = imageUrl && (
+    imageUrl.includes('restaurant') ||
+    imageUrl.includes('dining') ||
+    imageUrl.includes('kiosk') ||
+    imageUrl.includes('cafe') ||
+    imageUrl.includes('buffet') ||
+    imageUrl.includes('market_hall') ||
+    imageUrl.includes('shop') ||
+    imageUrl.includes('placeholder')
+  );
+
+  if (imageUrl && !isRestaurantImg && !imageUrl.includes('placeholder')) {
     return imageUrl;
   }
 
@@ -156,13 +181,20 @@ export function getFoodImage(name: string, imageUrl?: string | null): string {
   for (const [cat, url] of Object.entries(CATEGORY_IMAGES)) {
     if (key.includes(cat)) return url;
   }
-  // Rotating fallback pool — never show the same image for all unknowns
+
+  // Pure food dish fallback pool (NO restaurants, NO dining halls)
   const FALLBACK_POOL = [
-    '/images/food_market_hall.jpg',
-    '/images/scandi_dining.jpg',
-    '/images/wood_restaurant.jpg',
-    '/images/fine_dining_interior.jpg',
     '/images/food_salmon_1787013684123.jpg',
+    '/images/salmon.jpg',
+    '/images/atlantic_cod.jpg',
+    '/images/skrei.jpg',
+    '/images/cloudberry_dessert.jpg',
+    '/images/haralds_vaffel_iskrem.jpg',
+    '/images/kanelboller.jpg',
+    '/images/krumkake_cream.jpg',
+    '/images/cream_crepes.jpg',
+    '/images/berry_cream_dessert.jpg',
+    '/images/norwegian_dessert.jpg',
   ];
   return FALLBACK_POOL[Math.abs(key.charCodeAt(0) + key.length) % FALLBACK_POOL.length];
 }
@@ -196,7 +228,7 @@ export const FALLBACK_FOODS: Food[] = [
     slug: 'farikal',
     description: "Norway's official national dish: tender mountain lamb or mutton slow-simmered in a cast-iron pot with whole white cabbage, whole black peppercorns, and served steaming with floury Ringerike potatoes.",
     category: 'Traditional',
-    image_url: '/images/reindeer_sausage_kiosk.jpg',
+    image_url: '/images/norwegian_dessert.jpg',
     price: 198,
     currency: 'NOK',
     featured: true,
@@ -222,7 +254,7 @@ export const FALLBACK_FOODS: Food[] = [
     slug: 'kjottkaker',
     description: 'Classic Norwegian meatballs seasoned with nutmeg and ginger, pan-seared to golden crusts and drenched in velvety brown gravy alongside mushy green peas and wild lingonberry preserve.',
     category: 'Traditional',
-    image_url: '/images/fast_food_kiosk.jpg',
+    image_url: '/images/food_kanelboller.jpg',
     price: 175,
     currency: 'NOK',
     featured: true,
@@ -235,7 +267,7 @@ export const FALLBACK_FOODS: Food[] = [
     slug: 'pinnekjott',
     description: 'Dry-salted and birch-smoked racks of mutton gently steamed over fragrant birch sticks until succulent, served with spiced rutabaga mash and rich cooking broth as the quintessential Western Norwegian holiday feast.',
     category: 'Traditional',
-    image_url: '/images/norwegian_street_food.jpg',
+    image_url: '/images/lingonberry_cream.jpg',
     price: 285,
     currency: 'NOK',
     featured: true,
@@ -261,7 +293,7 @@ export const FALLBACK_FOODS: Food[] = [
     slug: 'raspeballer',
     description: 'Traditional dense potato dumplings simmered in savory meat stock, filled with salted lamb or pork belly and served with melted butter and mashed rutabaga.',
     category: 'Traditional',
-    image_url: '/images/food_buffet.jpg',
+    image_url: '/images/atlantic_cod.jpg',
     price: 165,
     currency: 'NOK',
     featured: true,
@@ -274,7 +306,7 @@ export const FALLBACK_FOODS: Food[] = [
     slug: 'lapskaus',
     description: 'Hearty, comforting Norwegian beef stew packed with diced root vegetables, carrots, leeks, and soft potatoes slow-cooked to a thick, savory perfection.',
     category: 'Traditional',
-    image_url: '/images/food_market_hall.jpg',
+    image_url: '/images/skrei.jpg',
     price: 155,
     currency: 'NOK',
     featured: true,
@@ -344,6 +376,32 @@ export const FALLBACK_FOODS: Food[] = [
     currency: 'NOK',
     featured: true,
     prep_time: '30 mins',
+    status: 'PUBLISHED',
+  } as Food,
+  {
+    id: 'food-vaffel',
+    name: 'Norske Vafler & Brunost',
+    slug: 'vaffel',
+    description: 'Classic Norwegian heart-shaped sweet waffles served warm with sour cream, strawberry jam, and slices of sweet Gudbrandsdalen brown goat cheese.',
+    category: 'Traditional',
+    image_url: '/images/haralds_vaffel_iskrem.jpg',
+    price: 65,
+    currency: 'NOK',
+    featured: true,
+    prep_time: '15 mins',
+    status: 'PUBLISHED',
+  } as Food,
+  {
+    id: 'food-skillingsbolle',
+    name: 'Bergen Skillingsboller',
+    slug: 'skillingsboller',
+    description: 'Centuries-old Bergen spiced cinnamon rolls baked golden and dusted with pearl sugar, a staple of Hanseatic bakery culture since the 1500s.',
+    category: 'Traditional',
+    image_url: '/images/skillingsboller.jpg',
+    price: 48,
+    currency: 'NOK',
+    featured: true,
+    prep_time: '20 mins',
     status: 'PUBLISHED',
   } as Food,
 ];

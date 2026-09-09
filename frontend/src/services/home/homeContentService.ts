@@ -10,24 +10,38 @@ import {
 } from '../../types/home';
 import { getFoodImage } from '../foodService';
 import { getWildlifeImage } from '../wildlifeService';
+import { getEventImage } from '../eventService';
 
 // ─── ACTIVITY IMAGE MAP (category → local image) ────────────────────────────
 // Each category gets a distinct, contextually accurate local image.
 export const ACTIVITY_CATEGORY_IMAGES: Record<string, string> = {
-  HIKING:    '/images/preikestolen_1786936002797.jpg',
-  AURORA:    '/images/northern_lights_1786935879330.jpg',
+  HIKING:    '/images/preikestolen_hikers.jpg',
+  AURORA:    '/images/aurora_dogsled.jpg',
   KAYAK:     '/images/geirangerfjord_kayak.jpg',
-  WILDLIFE:  '/images/wildlife_reindeer_1787013667019.jpg',
-  CRUISE:    '/images/fjord_naeroyfjord.jpg',
-  CLIMBING:  '/images/kjeragbolten_1786936275605.jpg',
-  MOUNTAIN:  '/images/galdhopiggen_1786936412055.jpg',
-  SKIING:    '/images/skiing_norway.jpg',
-  DEFAULT:   '/images/fjords_1786935800026.jpg',
+  WILDLIFE:  '/images/sea_eagle_safari.jpg',
+  CRUISE:    '/images/luxury_fjord_cruise.jpg',
+  CLIMBING:  '/images/svalbard_trek.jpg',
+  MOUNTAIN:  '/images/arctic_hikers.jpg',
+  SKIING:    '/images/cross_country_skiing.jpg',
+  DEFAULT:   '/images/fjord_rib_safari.jpg',
 };
 
-/** Returns the best local image for an activity given its category and an optional DB url. */
-export function getActivityImage(category: string, dbImageUrl?: string | null): string {
-  if (dbImageUrl && dbImageUrl.trim() && !dbImageUrl.includes('placeholder')) return dbImageUrl;
+/** Returns the best local image for an activity given its category, optional DB url, or activity name. */
+export function getActivityImage(category: string, dbImageUrl?: string | null, name?: string): string {
+  const title = (name || '').toLowerCase();
+  if (title.includes('ski') || title.includes('snow')) return '/images/cross_country_skiing.jpg';
+  if (title.includes('sled') || title.includes('husky')) return '/images/dog_sledding.jpg';
+  if (title.includes('kayak')) return '/images/geirangerfjord_kayak.jpg';
+  if (title.includes('eagle')) return '/images/sea_eagle_safari.jpg';
+  if (title.includes('whale')) return '/images/whale_safari.jpg';
+  if (title.includes('walrus')) return '/images/walrus_safari.jpg';
+  if (title.includes('cruise') || title.includes('boat')) return '/images/luxury_fjord_cruise.jpg';
+  if (title.includes('rib')) return '/images/fjord_rib_safari.jpg';
+  if (title.includes('hike') || title.includes('trek') || title.includes('pulpit') || title.includes('preikestolen')) return '/images/preikestolen_hikers.jpg';
+
+  if (dbImageUrl && dbImageUrl.trim() && !dbImageUrl.includes('placeholder') && !dbImageUrl.includes('unsplash')) {
+    return dbImageUrl;
+  }
   const key = (category || '').toUpperCase();
   return ACTIVITY_CATEGORY_IMAGES[key] || ACTIVITY_CATEGORY_IMAGES.DEFAULT;
 }
@@ -44,17 +58,17 @@ const FALLBACK_DESTINATIONS: HomePlace[] = [
 ];
 
 const FALLBACK_ACTIVITIES: HomeActivity[] = [
-  { id: 'a-01', name: 'Preikestolen Sunrise Trek',      category: 'HIKING',   region: 'Rogaland',        duration: '6 hrs', price: 1300, rating: 4.9, image: ACTIVITY_CATEGORY_IMAGES.HIKING },
-  { id: 'a-02', name: 'Northern Lights Dog Sledding',   category: 'AURORA',   region: 'Tromsø',          duration: '4 hrs', price: 2100, rating: 4.9, image: ACTIVITY_CATEGORY_IMAGES.AURORA },
-  { id: 'a-03', name: 'Geirangerfjord Waterfall Kayak', category: 'KAYAK',    region: 'Møre og Romsdal', duration: '3 hrs', price: 1200, rating: 4.8, image: ACTIVITY_CATEGORY_IMAGES.KAYAK },
-  { id: 'a-04', name: 'Trollfjord Sea Eagle Safari',    category: 'WILDLIFE', region: 'Lofoten',         duration: '2 hrs', price: 1050, rating: 4.8, image: ACTIVITY_CATEGORY_IMAGES.WILDLIFE },
+  { id: 'a-01', name: 'Preikestolen Sunrise Trek',      category: 'HIKING',   region: 'Rogaland',        duration: '6 hrs', price: 1300, rating: 4.9, image: '/images/preikestolen_hikers.jpg' },
+  { id: 'a-02', name: 'Northern Lights Dog Sledding',   category: 'AURORA',   region: 'Tromsø',          duration: '4 hrs', price: 2100, rating: 4.9, image: '/images/aurora_dogsled.jpg' },
+  { id: 'a-03', name: 'Geirangerfjord Waterfall Kayak', category: 'KAYAK',    region: 'Møre og Romsdal', duration: '3 hrs', price: 1200, rating: 4.8, image: '/images/geirangerfjord_kayak.jpg' },
+  { id: 'a-04', name: 'Trollfjord Sea Eagle Safari',    category: 'WILDLIFE', region: 'Lofoten',         duration: '2 hrs', price: 1050, rating: 4.8, image: '/images/sea_eagle_safari.jpg' },
 ];
 
 const FALLBACK_FOODS: HomeFood[] = [
-  { id: 'fo-01', name: 'Fårikål', category: 'Traditional', origin_region: 'Nationwide', short_description: "Norway's national dish: lamb slow-cooked with cabbage and black pepper.", image: '/images/reindeer_sausage_kiosk.jpg' },
-  { id: 'fo-02', name: 'Gravlaks', category: 'Seafood', origin_region: 'Coastal Norway', short_description: 'Cold-cured salmon with dill, mustard, and aquavit — an iconic Nordic starter.', image: '/images/salmon.jpg' },
-  { id: 'fo-03', name: 'Brunost', category: 'Traditional', origin_region: 'Gudbrandsdalen', short_description: 'Caramelised brown whey cheese — utterly unique and deeply Norwegian.', image: '/images/cloudberry_cream.jpg' },
-  { id: 'fo-04', name: 'Pinnekjøtt', category: 'Land Food', origin_region: 'Western Norway', short_description: 'Salted dried lamb ribs steamed over birch twigs — the Christmas centrepiece.', image: '/images/reindeer_sausage_kiosk.jpg' },
+  { id: 'fo-01', name: 'Fårikål', category: 'Traditional', origin_region: 'Nationwide', short_description: "Norway's national dish: lamb slow-cooked with cabbage and black pepper.", image: '/images/norwegian_dessert.jpg' },
+  { id: 'fo-02', name: 'Gravlaks', category: 'Seafood', origin_region: 'Coastal Norway', short_description: 'Cold-cured salmon with dill, mustard, and aquavit — an iconic Nordic starter.', image: '/images/food_salmon_1787013684123.jpg' },
+  { id: 'fo-03', name: 'Brunost', category: 'Traditional', origin_region: 'Gudbrandsdalen', short_description: 'Caramelised brown whey cheese — utterly unique and deeply Norwegian.', image: '/images/cloudberry_dessert.jpg' },
+  { id: 'fo-04', name: 'Pinnekjøtt', category: 'Land Food', origin_region: 'Western Norway', short_description: 'Salted dried lamb ribs steamed over birch twigs — the Christmas centrepiece.', image: '/images/lingonberry_cream.jpg' },
 ];
 
 const FALLBACK_WILDLIFE: HomeAnimal[] = [
@@ -77,9 +91,9 @@ const FALLBACK_RESTAURANTS = [
 ];
 
 const FALLBACK_EVENTS: HomeEvent[] = [
-  { id: 'ev-01', name: 'Bergen International Festival', date: 'May 21 – Jun 1', location: 'Bergen', category: 'Culture', image: '/images/festspillene_bergen.jpg' },
-  { id: 'ev-02', name: 'Tromsø International Film Festival', date: 'Jan 17–22', location: 'Tromsø', category: 'Film', image: '/images/tromso_winter.jpg' },
-  { id: 'ev-03', name: 'Midnight Sun Marathon', date: 'Jun 21', location: 'Tromsø', category: 'Sport', image: '/images/midnight_sun_marathon.jpg' },
+  { id: 'ev-01', name: 'Bergen International Festival', date: 'May 21 – Jun 1', location: 'Bergen', category: 'Festival', image: '/images/event_festspillene.jpg' },
+  { id: 'ev-02', name: 'Midnight Sun Marathon', date: 'Jun 21', location: 'Tromsø', category: 'Sports', image: '/images/event_midnight_sun_marathon.jpg' },
+  { id: 'ev-03', name: 'Holmenkollen Ski Festival', date: 'Mar 7–9', location: 'Oslo', category: 'Sports', image: '/images/event_holmenkollen.jpg' },
 ];
 
 // ─── SERVICE ──────────────────────────────────────────────────────────────────
@@ -116,8 +130,8 @@ export const homeContentService = {
         duration: d.duration_minutes ? `${Math.floor(d.duration_minutes / 60)}h ${d.duration_minutes % 60 ? (d.duration_minutes % 60) + 'm' : ''}`.trim() : '2h',
         price: d.price || 0,
         rating: 4.8,
-        // Use category-specific local image when DB image is missing/broken
-        image: getActivityImage(d.type, d.image_url),
+        // Use category & title specific local image when DB image is missing/broken
+        image: getActivityImage(d.type, d.image_url, d.name),
       }));
     } catch { return FALLBACK_ACTIVITIES; }
   },
@@ -250,7 +264,7 @@ export const homeContentService = {
         date: d.start_date ? new Date(d.start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : 'TBD',
         location: 'Norway',
         category: d.category || 'Event',
-        image: d.image_url || FALLBACK_EVENTS[0].image,
+        image: getEventImage(d.name, d.category, d.image_url),
       }));
     } catch { return FALLBACK_EVENTS; }
   },
