@@ -36,15 +36,20 @@ vi.mock('../../lib/supabase', () => {
 });
 
 // Mock services
-vi.mock('../../services/foodService', () => ({
-  foodService: {
-    getRestaurants: vi.fn(),
-    getRestaurantById: vi.fn(),
-    getFoods: vi.fn(),
-  },
-  getFoodImage: (name: string, img?: string) => img || '/images/food_salmon_1787013684123.jpg',
-  getFoodPrice: (name: string) => 249,
-}));
+vi.mock('../../services/foodService', async (importOriginal) => {
+  const actual = await importOriginal<any>();
+  return {
+    ...actual,
+    foodService: {
+      ...actual.foodService,
+      getRestaurants: vi.fn(),
+      getRestaurantById: vi.fn(),
+      getFoods: vi.fn().mockResolvedValue({ data: actual.FALLBACK_FOODS || [], count: (actual.FALLBACK_FOODS || []).length }),
+    },
+    getFoodImage: (name: string, img?: string) => img || '/images/food_salmon_1787013684123.jpg',
+    getFoodPrice: (name: string) => 249,
+  };
+});
 
 vi.mock('../../services/stay/staysService', () => ({
   staysService: {

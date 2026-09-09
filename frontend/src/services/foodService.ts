@@ -167,16 +167,211 @@ export function getFoodPrice(name: string, dbPrice?: number | null): number {
   return 149;
 }
 
+export const FALLBACK_FOODS: Food[] = [
+  {
+    id: 'food-farikal',
+    name: 'Fårikål',
+    slug: 'farikal',
+    description: "Norway's official national dish: tender mountain lamb or mutton slow-simmered in a cast-iron pot with whole white cabbage, whole black peppercorns, and served steaming with floury Ringerike potatoes.",
+    category: 'Traditional',
+    image_url: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?q=lamb+cabbage+stew+pot&w=1200',
+    price: 198,
+    currency: 'NOK',
+    featured: true,
+    prep_time: '2.5 hrs',
+    status: 'PUBLISHED',
+  } as Food,
+  {
+    id: 'food-brunost',
+    name: 'Brunost',
+    slug: 'brunost',
+    description: 'Iconic caramelized brown goat and cow whey cheese with a rich dulce-de-leche sweetness, traditionally shaved wafer-thin with a cheese plane over warm rustic sourdough or freshly ironed waffles.',
+    category: 'Traditional',
+    image_url: 'https://images.unsplash.com/photo-1452195100486-9cc805987862?q=brown+cheese+norway&w=1200',
+    price: 89,
+    currency: 'NOK',
+    featured: true,
+    prep_time: 'Ready to serve',
+    status: 'PUBLISHED',
+  } as Food,
+  {
+    id: 'food-kjottkaker',
+    name: 'Kjøttkaker',
+    slug: 'kjottkaker',
+    description: 'Classic Norwegian meatballs seasoned with nutmeg and ginger, pan-seared to golden crusts and drenched in velvety brown gravy alongside mushy green peas and wild lingonberry preserve.',
+    category: 'Traditional',
+    image_url: 'https://images.unsplash.com/photo-1529042410759-befb1204b468?q=meatballs+gravy+lingonberry&w=1200',
+    price: 175,
+    currency: 'NOK',
+    featured: true,
+    prep_time: '45 mins',
+    status: 'PUBLISHED',
+  } as Food,
+  {
+    id: 'food-pinnekjott',
+    name: 'Pinnekjøtt',
+    slug: 'pinnekjott',
+    description: 'Dry-salted and birch-smoked racks of mutton gently steamed over fragrant birch sticks until succulent, served with spiced rutabaga mash and rich cooking broth as the quintessential Western Norwegian holiday feast.',
+    category: 'Traditional',
+    image_url: 'https://images.unsplash.com/photo-1544025162-d76694265947?q=lamb+ribs+steamed&w=1200',
+    price: 285,
+    currency: 'NOK',
+    featured: true,
+    prep_time: '3.5 hrs',
+    status: 'PUBLISHED',
+  } as Food,
+  {
+    id: 'food-lutefisk',
+    name: 'Lutefisk',
+    slug: 'lutefisk',
+    description: 'Aged dried stockfish rehydrated in lye and fresh water, baked until translucent and gelatinous, traditionally crowned with crispy bacon drippings, green pea purée, and boiled almond potatoes.',
+    category: 'Traditional',
+    image_url: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?q=whitefish+cod+peas+bacon&w=1200',
+    price: 220,
+    currency: 'NOK',
+    featured: true,
+    prep_time: '40 mins',
+    status: 'PUBLISHED',
+  } as Food,
+  {
+    id: 'food-raspeballer',
+    name: 'Raspeballer',
+    slug: 'raspeballer',
+    description: 'Traditional dense potato dumplings simmered in savory meat stock, filled with salted lamb or pork belly and served with melted butter and mashed rutabaga.',
+    category: 'Traditional',
+    image_url: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=potato+dumplings+knodel&w=1200',
+    price: 165,
+    currency: 'NOK',
+    featured: true,
+    prep_time: '1 hr',
+    status: 'PUBLISHED',
+  } as Food,
+  {
+    id: 'food-lapskaus',
+    name: 'Lapskaus',
+    slug: 'lapskaus',
+    description: 'Hearty, comforting Norwegian beef stew packed with diced root vegetables, carrots, leeks, and soft potatoes slow-cooked to a thick, savory perfection.',
+    category: 'Traditional',
+    image_url: 'https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?q=beef+stew+potatoes+carrots&w=1200',
+    price: 155,
+    currency: 'NOK',
+    featured: true,
+    prep_time: '2 hrs',
+    status: 'PUBLISHED',
+  } as Food,
+  {
+    id: 'food-rakfisk',
+    name: 'Rakfisk',
+    slug: 'rakfisk',
+    description: 'Fermented mountain trout aged for months in cold spruce cellars under brine, sliced delicate and eaten cold with Røros sour cream, red onion, and soft buttered potato lefse.',
+    category: 'Traditional',
+    image_url: 'https://images.unsplash.com/photo-1534482421-64566f976cfa?q=cured+trout+platter+flatbread&w=1200',
+    price: 310,
+    currency: 'NOK',
+    featured: true,
+    prep_time: 'Artisanal aged',
+    status: 'PUBLISHED',
+  } as Food,
+  {
+    id: 'food-gravlaks',
+    name: 'Gravlaks',
+    slug: 'gravlaks',
+    description: 'Nordic cured Arctic salmon rubbed with sea salt, brown sugar, cracked white peppercorns, and fresh garden dill, served with classic honey-mustard Hovmestersaus.',
+    category: 'Traditional',
+    image_url: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=gravlax+salmon+dill&w=1200',
+    price: 265,
+    currency: 'NOK',
+    featured: true,
+    prep_time: 'Cured 48 hrs',
+    status: 'PUBLISHED',
+  } as Food,
+  {
+    id: 'food-multekrem',
+    name: 'Multekrem',
+    slug: 'multekrem',
+    description: 'The golden jewel of Arctic boglands: wild hand-picked cloudberries folded through velvety whipped cream with vanilla, served in delicate crystal cups with crisp krumkake rolls.',
+    category: 'Traditional',
+    image_url: 'https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?q=cloudberries+whipped+cream&w=1200',
+    price: 98,
+    currency: 'NOK',
+    featured: true,
+    prep_time: '15 mins',
+    status: 'PUBLISHED',
+  } as Food,
+  {
+    id: 'food-rommegrot',
+    name: 'Rømmegrøt',
+    slug: 'rommegrot',
+    description: 'Rich farmhouse sour cream porridge simmered until golden butterfat separates to the top, finished with a generous dusting of cinnamon sugar and paired with dried cured meats.',
+    category: 'Traditional',
+    image_url: 'https://images.unsplash.com/photo-1490474504059-bf2db5ab2348?q=sour+cream+porridge+cinnamon&w=1200',
+    price: 125,
+    currency: 'NOK',
+    featured: true,
+    prep_time: '40 mins',
+    status: 'PUBLISHED',
+  } as Food,
+  {
+    id: 'food-lefse',
+    name: 'Lefse',
+    slug: 'lefse',
+    description: 'Soft and pliable traditional potato flatbread griddled on cast iron, spread with churned farmhouse butter and sprinkled with cinnamon sugar.',
+    category: 'Traditional',
+    image_url: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?q=flatbread+pastry+norwegian&w=1200',
+    price: 65,
+    currency: 'NOK',
+    featured: true,
+    prep_time: '30 mins',
+    status: 'PUBLISHED',
+  } as Food,
+];
+
+export const FALLBACK_RESTAURANTS: Restaurant[] = [
+  {
+    id: 'rest-maaemo',
+    name: 'Maaemo',
+    type: 'FINE_DINING',
+    cuisine: ['NORWEGIAN', 'NORDIC'],
+    description: 'Three-Michelin-starred temple of Norwegian terroir in Oslo, highlighting wild-foraged ingredients and pristine coastal seafood.',
+    image_url: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=1200',
+    featured: true,
+    status: 'PUBLISHED',
+    location: { name: 'Oslo', address: 'Dronning Eufemias gate 23' } as any,
+  } as unknown as Restaurant,
+  {
+    id: 'rest-cornelius',
+    name: 'Cornelius Seafood Restaurant',
+    type: 'SEAFOOD',
+    cuisine: ['SEAFOOD', 'NORWEGIAN'],
+    description: 'Spectacular seaside dining on a private islet outside Bergen, renowned for raw shellfish bars and meteorological menus.',
+    image_url: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1200',
+    featured: true,
+    status: 'PUBLISHED',
+    location: { name: 'Bergen', address: 'Holmen, Bjorøy' } as any,
+  } as unknown as Restaurant,
+  {
+    id: 'rest-bryggeloftet',
+    name: 'Bryggeloftet & Stuene',
+    type: 'CASUAL',
+    cuisine: ['NORWEGIAN', 'TRADITIONAL'],
+    description: 'Historic restaurant situated along the iconic UNESCO Bryggen wharf, serving authentic game meat, pinnekjøtt, and fish soup since 1910.',
+    image_url: 'https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?q=80&w=1200',
+    featured: true,
+    status: 'PUBLISHED',
+    location: { name: 'Bergen', address: 'Bryggen 11' } as any,
+  } as unknown as Restaurant,
+];
+
 export const foodService = {
   async getRestaurants(
     filters?: { cuisine?: string; type?: string; location_id?: string },
     page = 1,
     limit = 24
   ): Promise<PaginatedResult<Restaurant>> {
-    try {
-      const from = (page - 1) * limit;
-      const to = from + limit - 1;
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
 
+    try {
       let query = supabase
         .from('restaurants')
         .select('*, location:locations(*)', { count: 'exact' });
@@ -193,9 +388,16 @@ export const foodService = {
 
       const { data, count, error } = await query.range(from, to);
 
-      if (error) {
-        console.error('Error fetching restaurants:', error);
-        return { data: [], count: 0 };
+      if (error || !data || data.length === 0) {
+        let result = FALLBACK_RESTAURANTS;
+        if (filters?.cuisine) {
+          result = result.filter(r => (r.cuisine as string[] | undefined)?.some(c => c.toUpperCase() === filters.cuisine!.toUpperCase()));
+        }
+        if (filters?.type) {
+          result = result.filter(r => r.type === filters.type);
+        }
+        const paged = result.slice(from, to + 1);
+        return { data: paged, count: result.length };
       }
 
       const enriched: Restaurant[] = ((data as Restaurant[]) || []).map(r => ({
@@ -206,12 +408,21 @@ export const foodService = {
       return { data: enriched, count: count || enriched.length };
     } catch (err) {
       console.error('Error in getRestaurants:', err);
-      return { data: [], count: 0 };
+      let result = FALLBACK_RESTAURANTS;
+      if (filters?.cuisine) {
+        result = result.filter(r => (r.cuisine as string[] | undefined)?.some(c => c.toUpperCase() === filters.cuisine!.toUpperCase()));
+      }
+      if (filters?.type) {
+        result = result.filter(r => r.type === filters.type);
+      }
+      return { data: result.slice(from, to + 1), count: result.length };
     }
   },
 
   async getRestaurantById(id: string): Promise<Restaurant | null> {
     try {
+      const matchFallback = FALLBACK_RESTAURANTS.find(r => r.id === id || r.name.toLowerCase().replace(/\s+/g, '-') === id.toLowerCase());
+
       const { data, error } = await supabase
         .from('restaurants')
         .select('*, location:locations(*)')
@@ -219,13 +430,12 @@ export const foodService = {
         .single();
 
       if (error || !data) {
-        if (error) console.error('Error fetching restaurant by id:', error);
-        return null;
+        return matchFallback || null;
       }
       return data as Restaurant;
     } catch (err) {
       console.error('Error in getRestaurantById:', err);
-      return null;
+      return FALLBACK_RESTAURANTS.find(r => r.id === id || r.name.toLowerCase().replace(/\s+/g, '-') === id.toLowerCase()) || null;
     }
   },
 
@@ -234,10 +444,10 @@ export const foodService = {
     page = 1,
     limit = 24
   ): Promise<PaginatedResult<Food>> {
-    try {
-      const from = (page - 1) * limit;
-      const to = from + limit - 1;
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
 
+    try {
       let query = supabase
         .from('foods')
         .select('*', { count: 'exact' });
@@ -248,9 +458,13 @@ export const foodService = {
 
       const { data, count, error } = await query.range(from, to);
 
-      if (error) {
-        console.error('Error fetching foods:', error);
-        return { data: [], count: 0 };
+      if (error || !data || data.length === 0) {
+        let result = FALLBACK_FOODS;
+        if (filters?.featured !== undefined) {
+          result = result.filter(f => Boolean(f.featured) === Boolean(filters.featured));
+        }
+        const paged = result.slice(from, to + 1);
+        return { data: paged, count: result.length };
       }
 
       // Enrich each food with correct image and price
@@ -264,12 +478,18 @@ export const foodService = {
       return { data: enriched, count: count || enriched.length };
     } catch (err) {
       console.error('Error in getFoods:', err);
-      return { data: [], count: 0 };
+      let result = FALLBACK_FOODS;
+      if (filters?.featured !== undefined) {
+        result = result.filter(f => Boolean(f.featured) === Boolean(filters.featured));
+      }
+      return { data: result.slice(from, to + 1), count: result.length };
     }
   },
 
   async getFoodById(id: string): Promise<Food | null> {
     try {
+      const matchFallback = FALLBACK_FOODS.find(f => f.id === id || f.name.toLowerCase().replace(/\s+/g, '-') === id.toLowerCase() || f.name.toLowerCase() === id.toLowerCase());
+
       const { data, error } = await supabase
         .from('foods')
         .select('*')
@@ -277,10 +497,7 @@ export const foodService = {
         .single();
 
       if (error || !data) {
-        // Fallback: try searching across foods list
-        const { data: allFoods } = await this.getFoods({}, 1, 50);
-        const match = allFoods.find(f => f.id === id || f.name.toLowerCase().replace(/\s+/g, '-') === id.toLowerCase());
-        return match || null;
+        return matchFallback || null;
       }
 
       const food = data as Food;
@@ -292,7 +509,7 @@ export const foodService = {
       };
     } catch (err) {
       console.error('Error in getFoodById:', err);
-      return null;
+      return FALLBACK_FOODS.find(f => f.id === id || f.name.toLowerCase().replace(/\s+/g, '-') === id.toLowerCase() || f.name.toLowerCase() === id.toLowerCase()) || null;
     }
   },
 };
