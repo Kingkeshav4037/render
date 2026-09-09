@@ -158,7 +158,7 @@ export const StayDetails = () => {
     requireAuth(() => {
       addItem({
         item_type: 'ACCOMMODATION',
-        item_id: stay.id || activeRoom.accommodation_id || id || '',
+        item_id: activeRoom.id,
         name: `${stay.name} - ${activeRoom.name}`,
         description: `${nights} nights (${checkIn} to ${checkOut}) for ${guests} guests. ${activeRoom.bed}`,
         unit_price: activePricePerNight,

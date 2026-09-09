@@ -119,7 +119,7 @@ export const StayBooking = () => {
     if (stay) return stay;
     if (room) {
       return {
-        id: room.accommodation_id || 'stay-default',
+        id: room.accommodation_id || (room.id?.includes('-room-') ? room.id.split('-room-')[0] : room.id) || id || 'stay-default',
         location_id: 'loc-default',
         name: 'Norwegian Fjord Lodge',
         type: 'HOTEL',
@@ -136,16 +136,13 @@ export const StayBooking = () => {
       };
     }
     return null as any;
-  }, [stay, room]);
+  }, [stay, room, id]);
 
   // Target accommodation UUID for database orders & bookings
   const targetAccommodationId = useMemo(() => {
-    let rawId = activeStay?.id || room?.accommodation_id || id || '';
-    if (typeof rawId === 'string' && rawId.includes('-room-')) {
-      rawId = rawId.split('-room-')[0];
-    }
+    let rawId = (stay && stay.id) || room?.accommodation_id || (room?.id?.includes('-room-') ? room.id.split('-room-')[0] : room?.id) || id || '';
     return rawId;
-  }, [activeStay?.id, room?.accommodation_id, id]);
+  }, [stay, room?.accommodation_id, room?.id, id]);
 
   // Calculate nights and price
   const nights = useMemo(() => {
@@ -186,7 +183,7 @@ export const StayBooking = () => {
 
     addItem({
       item_type: 'ACCOMMODATION',
-      item_id: targetAccommodationId,
+      item_id: room.id,
       name: `${activeStay.name} - ${room.name}`,
       description: `${nights} nights (${checkIn} to ${checkOut}) for ${guests} guests. ${room.bed || ''}`,
       unit_price: pricePerNight,
@@ -322,9 +319,9 @@ export const StayBooking = () => {
 
       const bookingItems = [
         {
-          id: targetAccommodationId,
+          id: room.id,
           item_type: 'ACCOMMODATION' as const,
-          item_id: targetAccommodationId,
+          item_id: room.id,
           name: `${activeStay.name} - ${room.name}`,
           description: `${nights} nights (${checkIn} to ${checkOut}) for ${guests} guests. ${specialRequests ? `Special request: ${specialRequests}` : ''}`,
           unit_price: pricePerNight,
