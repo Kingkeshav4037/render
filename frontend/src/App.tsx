@@ -1,5 +1,5 @@
 import { useEffect, useState, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { ProtectedRoute } from "./components/layout/ProtectedRoute";
 import { GlobalOfflineBanner } from "./components/GlobalOfflineBanner";
@@ -10,6 +10,7 @@ import { useAuthStore } from './store/useAuthStore';
 import { realtimeClient } from './services/realtime/realtimeClient';
 import { RouteErrorBoundary } from './components/layout/GlobalErrorBoundary';
 import { lazyWithRetry as lazy } from './utils/lazyWithRetry';
+import { languageService } from './services/languageService';
 
 import { PageLoadingSkeleton } from './components/ui/PageLoadingSkeleton';
 import { Compass, Home as HomeIcon, ArrowRight } from 'lucide-react';
@@ -220,6 +221,15 @@ const Sitemap = lazy(() => import('./pages/Sitemap').then(m => ({ default: m.Sit
 
 import { ToastContainer } from './components/ui/ToastContainer';
 
+// Syncs page translation across all client-side route navigations
+const LanguageRouteSync = () => {
+  const location = useLocation();
+  useEffect(() => {
+    languageService.syncPageTranslation();
+  }, [location.pathname, location.search]);
+  return null;
+};
+
 function App() {
   useEffect(() => {
     realtimeClient.initialize();
@@ -230,6 +240,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <LanguageRouteSync />
       <GlobalOfflineBanner />
       <ToastContainer />
       <Toaster position="top-right" richColors />

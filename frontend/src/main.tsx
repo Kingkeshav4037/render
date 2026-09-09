@@ -9,6 +9,7 @@ import { AuthInitializer } from './components/layout/AuthInitializer'
 import './index.css'
 import App from './App.tsx'
 import './i18n.ts'
+import './services/languageService'
 
 // Handle new deployment chunk hash changes gracefully
 if (typeof window !== 'undefined') {

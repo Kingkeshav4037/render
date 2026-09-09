@@ -6,6 +6,7 @@ import { useAuthStore } from '../../store/useAuthStore';
 import { useCartStore } from '../../store/useCartStore';
 import { useCurrencyStore, Currency, CURRENCIES } from '../../store/useCurrencyStore';
 import { LANGUAGES, LanguageOption } from '../../i18n';
+import { languageService } from '../../services/languageService';
 import { NotificationDropdown } from '../common/NotificationDropdown';
 import { BrandLogo } from '../shared/BrandLogo';
 import { GlobalSearchModal } from '../shared/GlobalSearchModal';
@@ -39,11 +40,7 @@ export const Navbar = () => {
   const currentCurrencyObj = CURRENCIES[currency] || CURRENCIES.NOK;
 
   const handleLangChange = (langCode: string) => {
-    i18n.changeLanguage(langCode.toLowerCase());
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('norway_preferred_lang', langCode.toLowerCase());
-      document.documentElement.lang = langCode.toLowerCase();
-    }
+    languageService.setLanguage(langCode);
   };
 
   const cartItemCount = items.reduce((total, item) => total + item.quantity, 0);
