@@ -5,6 +5,20 @@
 # ==============================================================================
 
 services:
+  # ── Node.js Production Web Service (Frontend SPA & Static Engine) ───────────
+  - type: web
+    name: norway-smartlife-web
+    runtime: node
+    region: frankfurt
+    plan: free
+    buildCommand: npm run build
+    startCommand: node index.js
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 22.22.0
+
   # ── Python FastAPI ML & AI Prediction Backend ──────────────────────────────
   - type: web
     name: norway-smartlife-ml
