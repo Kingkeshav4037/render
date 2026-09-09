@@ -7,11 +7,13 @@
     "node": "22.x"
   },
   "scripts": {
+    "start": "node index.js",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run --fileParallelism=false",
+    "postinstall": "npm run build",
     "db:types": "npx supabase gen types typescript --local > src/lib/database.types.ts"
   },
   "dependencies": {

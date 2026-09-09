@@ -7,9 +7,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const PORT = parseInt(process.env.PORT || '3000', 10);
-const DIST_DIR = fs.existsSync(path.resolve(__dirname, 'frontend', 'dist'))
-  ? path.resolve(__dirname, 'frontend', 'dist')
-  : path.resolve(__dirname, 'dist');
+// Check if dist is right here (./dist) or in ./frontend/dist
+const DIST_DIR = fs.existsSync(path.resolve(__dirname, 'dist'))
+  ? path.resolve(__dirname, 'dist')
+  : path.resolve(__dirname, 'frontend', 'dist');
 const INDEX_HTML = path.join(DIST_DIR, 'index.html');
 
 const MIME_TYPES = {
