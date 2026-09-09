@@ -9,8 +9,10 @@
   },
   "scripts": {
     "start": "node index.js",
+    "start ": "node index.js",
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build ": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run --fileParallelism=false",
