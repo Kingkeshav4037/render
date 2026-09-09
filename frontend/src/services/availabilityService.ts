@@ -100,7 +100,8 @@ export const availabilityService = {
     itemType: string,
     itemId: string,
     startDate: string,
-    endDate: string
+    endDate: string,
+    userId?: string
   ): Promise<AvailabilityCheckResult> {
     try {
       let cleanItemId = itemId;
@@ -115,29 +116,70 @@ export const availabilityService = {
         p_end_date: new Date(endDate).toISOString(),
       });
 
-      if (error) {
-        console.warn('RPC check_availability error, using direct query fallback:', error);
-        // Fallback direct check
-        const { data: bookings, error: bkgErr } = await (supabase.from('bookings') as any)
-          .select('id')
-          .eq('item_id', cleanItemId)
-          .in('status', ['PAID', 'PENDING_PAYMENT', 'CONFIRMED'])
-          .lt('start_time', new Date(endDate).toISOString())
-          .gt('end_time', new Date(startDate).toISOString());
-
-        if (bkgErr) throw bkgErr;
-        const available = !bookings || bookings.length === 0;
-        return {
-          available,
-          message: available ? undefined : 'Selected dates are unavailable. Please choose different dates.',
-          errorCode: available ? undefined : 'ERR_DATES_UNAVAILABLE'
-        };
+      // If RPC returned true and no error, dates are definitely available
+      if (data && !error) {
+        return { available: true };
       }
 
+      // If RPC returned false or errored, verify whether the conflict is a genuine confirmed/paid
+      // booking, or merely an uncompleted PENDING_PAYMENT booking by the same user or expired session.
+      let realBookingConflicts: any[] = [];
+      let realHoldConflicts: any[] = [];
+
+      try {
+        const bkgFrom = (supabase.from as any)?.('bookings');
+        if (bkgFrom && typeof bkgFrom.select === 'function') {
+          const { data: bookings } = await bkgFrom
+            .select('id, user_id, status, created_at')
+            .eq('item_id', cleanItemId)
+            .in('status', ['PAID', 'CONFIRMED', 'PENDING_PAYMENT'])
+            .lt('start_time', new Date(endDate).toISOString())
+            .gt('end_time', new Date(startDate).toISOString());
+
+          const now = Date.now();
+          realBookingConflicts = (bookings || []).filter((b: any) => {
+            if (b.status === 'PAID' || b.status === 'CONFIRMED') return true;
+            if (b.status === 'PENDING_PAYMENT') {
+              // If the pending booking belongs to the current user, it should not block them from continuing/retrying
+              if (userId && b.user_id === userId) return false;
+              // If created more than 15 minutes ago, it's an abandoned checkout session
+              const createdAtMs = new Date(b.created_at).getTime();
+              if (now - createdAtMs > 15 * 60 * 1000) return false;
+              return true;
+            }
+            return false;
+          });
+        }
+      } catch (e) {
+        console.warn('Booking conflict check notice:', e);
+      }
+
+      try {
+        const holdFrom = (supabase.from as any)?.('inventory_holds');
+        if (holdFrom && typeof holdFrom.select === 'function') {
+          const { data: holds } = await holdFrom
+            .select('id, user_id, status, expires_at')
+            .eq('item_id', cleanItemId)
+            .eq('status', 'ACTIVE')
+            .gt('expires_at', new Date().toISOString())
+            .lt('start_time', new Date(endDate).toISOString())
+            .gt('end_time', new Date(startDate).toISOString());
+
+          realHoldConflicts = (holds || []).filter((h: any) => {
+            if (userId && h.user_id === userId) return false;
+            return true;
+          });
+        }
+      } catch (e) {
+        console.warn('Hold conflict check notice:', e);
+      }
+
+      const isUnavailable = realBookingConflicts.length > 0 || realHoldConflicts.length > 0;
+
       return {
-        available: !!data,
-        message: data ? undefined : 'Selected dates are unavailable. Please choose different dates.',
-        errorCode: data ? undefined : 'ERR_DATES_UNAVAILABLE'
+        available: !isUnavailable,
+        message: isUnavailable ? 'Selected dates are unavailable. Please choose different dates.' : undefined,
+        errorCode: isUnavailable ? 'ERR_DATES_UNAVAILABLE' : undefined
       };
     } catch (err: any) {
       console.error('Error checking availability:', err);
@@ -166,6 +208,20 @@ export const availabilityService = {
       let cleanItemId = itemId;
       if (itemType === 'ACCOMMODATION' && typeof cleanItemId === 'string' && cleanItemId.includes('-room-')) {
         cleanItemId = cleanItemId.split('-room-')[0];
+      }
+
+      // Pre-clean any previous pending payment bookings by this same user on this property to prevent self-collision
+      try {
+        const bkgFrom = (supabase.from as any)?.('bookings');
+        if (bkgFrom && typeof bkgFrom.update === 'function') {
+          await bkgFrom
+            .update({ status: 'CANCELLED' })
+            .eq('user_id', userId)
+            .eq('item_id', cleanItemId)
+            .eq('status', 'PENDING_PAYMENT');
+        }
+      } catch (cleanErr) {
+        console.warn('Pre-hold pending booking cleanup warning:', cleanErr);
       }
 
       const { data, error } = await (supabase.rpc as any)('validate_and_hold_inventory', {
