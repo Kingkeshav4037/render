@@ -85,6 +85,7 @@ class LanguageService {
     if (this.isInitialized || typeof window === 'undefined') return;
     this.isInitialized = true;
     patchDOMForTranslation();
+    this.setupBannerSuppressionObserver();
 
     const savedLang = this.getSavedLanguage();
     document.documentElement.lang = savedLang;
@@ -220,6 +221,113 @@ class LanguageService {
       script.async = true;
       script.defer = true;
       document.head.appendChild(script);
+    }
+  }
+
+  private setupBannerSuppressionObserver() {
+    if (typeof document === 'undefined') return;
+
+    const suppressElements = () => {
+      // 1. Reset document body & html top margin/offset
+      if (document.body) {
+        if (document.body.style.top && document.body.style.top !== '0px') {
+          document.body.style.top = '0px';
+        }
+        if (document.body.style.position === 'relative') {
+          document.body.style.position = 'static';
+        }
+      }
+      if (document.documentElement) {
+        if (document.documentElement.style.top && document.documentElement.style.top !== '0px') {
+          document.documentElement.style.top = '0px';
+        }
+      }
+
+      // 2. Hide all known Google Translate banner selectors
+      const selectors = [
+        '.goog-te-banner-frame',
+        'iframe.skiptranslate',
+        'iframe[id*=".container"]',
+        'div[id*=".container"]',
+        '[class*="VIpgJd-ZVi9od"]',
+        '#goog-gt-tt',
+        '.goog-te-balloon-frame',
+        '.goog-tooltip'
+      ];
+
+      selectors.forEach(sel => {
+        try {
+          const els = document.querySelectorAll(sel);
+          els.forEach(el => {
+            const hEl = el as HTMLElement;
+            hEl.style.setProperty('display', 'none', 'important');
+            hEl.style.setProperty('visibility', 'hidden', 'important');
+            hEl.style.setProperty('height', '0px', 'important');
+            hEl.style.setProperty('max-height', '0px', 'important');
+            hEl.style.setProperty('position', 'absolute', 'important');
+            hEl.style.setProperty('top', '-99999px', 'important');
+            hEl.style.setProperty('pointer-events', 'none', 'important');
+          });
+        } catch (e) {}
+      });
+
+      // 3. Scan body direct children for any injected banner container
+      if (document.body?.children) {
+        const children = document.body.children;
+        for (let i = 0; i < children.length; i++) {
+          const child = children[i] as HTMLElement;
+          if (!child || child.id === 'root' || child.id === 'google_translate_element') continue;
+          if (
+            child.classList.contains('skiptranslate') ||
+            child.classList.contains('goog-te-banner-frame') ||
+            child.id.includes('.container') ||
+            (child.className && typeof child.className === 'string' && child.className.includes('VIpgJd'))
+          ) {
+            child.style.setProperty('display', 'none', 'important');
+            child.style.setProperty('visibility', 'hidden', 'important');
+            child.style.setProperty('height', '0px', 'important');
+            child.style.setProperty('max-height', '0px', 'important');
+            child.style.setProperty('position', 'absolute', 'important');
+            child.style.setProperty('top', '-99999px', 'important');
+            child.style.setProperty('pointer-events', 'none', 'important');
+          }
+        }
+      }
+
+      // 4. Anti-undo safeguard: prevent unintended language rollback
+      const saved = this.getSavedLanguage();
+      if (saved !== 'en') {
+        const expected = `/en/${saved}`;
+        if (!document.cookie.includes(`googtrans=${expected}`)) {
+          setCookie(COOKIE_NAME, expected);
+        }
+      }
+    };
+
+    // Run immediately
+    suppressElements();
+
+    // Attach MutationObserver to continuously keep the banner suppressed without triggering restore()
+    if (typeof MutationObserver !== 'undefined') {
+      try {
+        const observer = new MutationObserver(() => {
+          suppressElements();
+        });
+
+        if (document.body) {
+          observer.observe(document.body, {
+            childList: true,
+            attributes: true,
+            attributeFilter: ['style', 'class']
+          });
+        }
+        if (document.documentElement) {
+          observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['style', 'class']
+          });
+        }
+      } catch (e) {}
     }
   }
 }
