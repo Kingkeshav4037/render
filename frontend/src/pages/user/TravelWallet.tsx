@@ -1,5 +1,5 @@
 import React from 'react';
-import { Wallet, QrCode, Train, Ticket, CreditCard } from 'lucide-react';
+import { Wallet, QrCode, Train, Ticket } from 'lucide-react';
 
 export const TravelWallet = () => {
   return (

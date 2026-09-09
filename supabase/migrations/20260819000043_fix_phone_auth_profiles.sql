@@ -1,5 +1,7 @@
--- Fix profiles table and handle_new_user trigger to support phone-only OTP authentication
--- When a user signs in/up with Phone OTP, new.email is NULL and new.phone is set.
+-- ==============================================================================
+-- Migration: 20260819000043_fix_phone_auth_profiles.sql
+-- Description: Support phone-only OTP authentication and nullable email in profiles
+-- ==============================================================================
 
 -- 1. Ensure email column in public.profiles is nullable for phone-only travelers
 DO $$

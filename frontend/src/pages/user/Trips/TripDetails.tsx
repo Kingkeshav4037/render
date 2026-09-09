@@ -1,11 +1,9 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
   ArrowLeft, 
   Map, 
-  CloudSun, 
   MapPin, 
-  Navigation, 
   Calendar, 
   Plus, 
   Sun, 
@@ -15,20 +13,17 @@ import {
   Activity as ActivityIcon, 
   Home, 
   FileText,
-  CheckCircle2,
-  AlertCircle,
   Share2,
   Printer,
   Download,
   Copy,
   AlertTriangle,
-  Clock,
   DollarSign
 } from 'lucide-react';
 import { OptimizedImage } from '../../../components/shared/OptimizedImage';
 import { SEO } from '../../../components/shared/SEO';
 import { toast } from 'sonner';
-import { tripService, TripDay, SmartTripWarning } from '../../../services/tripService';
+import { tripService } from '../../../services/tripService';
 import { tripExportService } from '../../../services/tripExportService';
 import { ShareTripModal } from '../../../components/trips/ShareTripModal';
 
@@ -142,7 +137,7 @@ export const TripDetails = () => {
   // Share Modal
   const [isShareOpen, setIsShareOpen] = useState(false);
 
-  const loadTrip = () => {
+  const loadTrip = useCallback(() => {
     if (!id) {
       setLoading(false);
       return;
@@ -174,7 +169,7 @@ export const TripDetails = () => {
       setTrip(null);
     }
     setLoading(false);
-  };
+  }, [id]);
 
   const handleDuplicateTrip = () => {
     if (!trip) return;
@@ -191,15 +186,17 @@ export const TripDetails = () => {
       localStorage.setItem('nsl_user_saved_trips', JSON.stringify([duplicated, ...saved]));
       toast.success('Trip duplicated successfully!');
       navigate(`/trips/${duplicated.id}`);
-    } catch (err) {
+    } catch {
       toast.error('Failed to duplicate trip.');
     }
   };
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    loadTrip();
-  }, [id]);
+    void (async () => {
+      loadTrip();
+    })();
+  }, [loadTrip]);
 
   const saveUpdatedTrip = (updatedTrip: any) => {
     setTrip(updatedTrip);
@@ -334,7 +331,7 @@ export const TripDetails = () => {
       }
       toast.success('Trip removed from your journal.');
       navigate('/trips');
-    } catch (err) {
+    } catch {
       toast.error('Failed to remove trip.');
     }
   };

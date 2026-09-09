@@ -108,27 +108,28 @@ export const SmartMap = () => {
   const [searchQuery, setSearchQuery] = useState(queryParam);
   const [selectedPoint, setSelectedPoint] = useState<MapEntity | null>(null);
   const [mapPoints, setMapPoints] = useState<MapEntity[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
+    let ignore = false;
     mapService.getUnifiedMapPoints()
       .then(data => {
-        // Filter out any duplicate coordinates or records with missing coordinates
-        const unique = data.filter((item, index, self) => 
-          item.latitude && 
-          item.longitude && 
-          index === self.findIndex((t) => t.id === item.id)
-        );
-        setMapPoints(unique);
-        setLoading(false);
+        if (!ignore) {
+          // Filter out any duplicate coordinates or records with missing coordinates
+          const unique = data.filter((item, index, self) => 
+            item.latitude && 
+            item.longitude && 
+            index === self.findIndex((t) => t.id === item.id)
+          );
+          setMapPoints(unique);
+        }
       })
       .catch(err => {
-        setError(err);
-        setLoading(false);
+        console.error('Failed to load map points:', err);
       });
+
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   const handleCategoryChange = (catId: string) => {
@@ -199,7 +200,7 @@ export const SmartMap = () => {
       const updated = [newEntry, ...existing.filter((t: any) => t.id !== newEntry.id)];
       localStorage.setItem('nsl_user_saved_trips', JSON.stringify(updated));
       toast.success(`"${point.name}" added to your Digital Travel Journal!`);
-    } catch (err) {
+    } catch {
       toast.error('Unable to save point to travel journal.');
     }
   };

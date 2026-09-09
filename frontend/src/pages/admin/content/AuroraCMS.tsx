@@ -24,7 +24,9 @@ export const AuroraCMS = () => {
   }, []);
 
   useEffect(() => {
-    fetchItems();
+    void (async () => {
+      await fetchItems();
+    })();
   }, [fetchItems]);
 
 

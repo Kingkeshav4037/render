@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CinematicBackground } from '../../design/backgrounds/CinematicBackground';
 import { Container } from '../../components/layout/Container';
-import { Map, Mountain, Clock, TrendingUp, AlertTriangle, ShieldCheck, ArrowLeft, Navigation, MapPin } from 'lucide-react';
+import { Mountain, Clock, TrendingUp, AlertTriangle, ShieldCheck, ArrowLeft, Navigation, MapPin } from 'lucide-react';
 import { trailService, Trail } from '../../services/trailService';
 import { SEO } from '../../components/shared/SEO';
 

@@ -30,7 +30,9 @@ export const Flora = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    loadFlora();
+    void (async () => {
+      await loadFlora();
+    })();
   }, [loadFlora]);
 
   const categories = [

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Users, Building2, Calendar, DollarSign, Activity, 
+  Users, Calendar, DollarSign, Activity, 
   RefreshCw, ArrowUpRight, ShieldCheck, Layers, 
-  Radio, MapPin, Trees, Snowflake, ChevronRight, 
+  MapPin, Trees, Snowflake, ChevronRight, 
   CheckCircle2, CreditCard,
   Sparkles, Compass, LucideIcon, ShoppingCart
 } from 'lucide-react';
@@ -240,15 +240,15 @@ export const AdminDashboard = () => {
   }, [timeRange]);
 
   useEffect(() => {
-    fetchDashboardData();
+    void (async () => {
+      await fetchDashboardData();
+    })();
   }, [fetchDashboardData]);
 
   const handleRefresh = () => {
     setRefreshing(true);
     fetchDashboardData();
   };
-
-  const totalCatalogItems = stats.totalDestinations + stats.totalFlora + stats.totalWildlife + stats.totalResorts;
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-8 max-w-7xl mx-auto animate-in fade-in duration-300">

@@ -1,5 +1,5 @@
 -- ==============================================================================
--- Migration: 20260819000040_booking_availability_and_holds.sql
+-- Migration: 20260819000041_booking_availability_and_holds.sql
 -- Description: Inventory Holds, Real-time Availability Validation, and Concurrent Booking Protection
 -- ==============================================================================
 

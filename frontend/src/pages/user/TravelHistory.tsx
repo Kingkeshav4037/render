@@ -1,5 +1,5 @@
 import React from 'react';
-import { History, Calendar, MapPin, ArrowRight } from 'lucide-react';
+import { History, Calendar, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { OptimizedImage } from '../../components/shared/OptimizedImage';
 

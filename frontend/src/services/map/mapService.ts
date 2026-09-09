@@ -63,7 +63,7 @@ export const getLocationsNearby = async (
   lng: number,
   lat: number,
   radiusMeters: number = 50000,
-  category: string | string[] | null = null
+  _category: string | string[] | null = null
 ): Promise<Location[]> => {
   try {
     const { data, error } = await supabase.rpc('get_nearby_locations' as any, {

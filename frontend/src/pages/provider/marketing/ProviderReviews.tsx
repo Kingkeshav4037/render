@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Star, MessageCircle, Reply, ThumbsUp, Filter, Search } from 'lucide-react';
+import { Star, MessageCircle, Reply, Filter, Search } from 'lucide-react';
 
 const MOCK_REVIEWS = [
   { id: 1, customer: 'Sarah Jenkins', listing: 'Lofoten Panoramic Cabin', rating: 5, date: 'Oct 18, 2026', text: 'Absolutely breathtaking. The cabin was spotless, and watching the northern lights from the bed was a once in a lifetime experience.', response: null },

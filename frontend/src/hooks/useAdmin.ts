@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '../store/useAuthStore';
 import { useProfile } from './useProfile';
-import { adminService, AdminPermissions } from '../services/admin/adminService';
+import { adminService } from '../services/admin/adminService';
 import { normalizeRole } from '../types/profile';
 
 // Determine if the base application role is considered staff/admin

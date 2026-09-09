@@ -1,5 +1,5 @@
 -- ==============================================================================
--- Migration: 20260819000041_smart_tourism_features.sql
+-- Migration: 20260819000042_smart_tourism_features.sql
 -- Description: Smart Tourism Features — Recently Viewed, Trip Sharing, Notes, and Archive
 -- ==============================================================================
 

@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useCart } from '../../store/useCartStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useCurrencyStore } from '../../store/useCurrencyStore';
-import { Check, CreditCard, User, Tag, Lock, ShieldCheck, Leaf, ArrowRight, Info, ShoppingBag, AlertCircle } from 'lucide-react';
+import { Check, CreditCard, User, Tag, Lock, ShieldCheck, Leaf, ArrowRight, Info, ShoppingBag } from 'lucide-react';
 import { checkoutService } from '../../services/checkoutService';
 import { toast } from 'sonner';
 
@@ -43,15 +43,17 @@ export const Checkout = () => {
   }, []);
 
   useEffect(() => {
-    if (profile?.fullName) {
-      const parts = profile.fullName.split(' ');
-      if (!firstName) setFirstName(parts[0] || '');
-      if (!lastName) setLastName(parts.slice(1).join(' ') || '');
-    }
-    if (user?.email && !email) {
-      setEmail(user.email);
-    }
-  }, [profile, user]);
+    void Promise.resolve().then(() => {
+      if (profile?.fullName) {
+        const parts = profile.fullName.split(' ');
+        setFirstName(prev => prev || parts[0] || '');
+        setLastName(prev => prev || parts.slice(1).join(' ') || '');
+      }
+      if (user?.email) {
+        setEmail(prev => prev || user.email || '');
+      }
+    });
+  }, [profile?.fullName, user?.email]);
 
   const handleStep1Next = () => {
     if (!firstName.trim()) {

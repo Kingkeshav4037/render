@@ -8,7 +8,7 @@ import {
   HomeEvent,
   HomeDeal
 } from '../../types/home';
-import { getFoodImage, getFoodPrice } from '../foodService';
+import { getFoodImage } from '../foodService';
 import { getWildlifeImage } from '../wildlifeService';
 
 // ─── ACTIVITY IMAGE MAP (category → local image) ────────────────────────────

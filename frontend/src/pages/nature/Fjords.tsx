@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Waves, Navigation, Compass, Sparkles, ArrowRight, ShieldCheck, Ship, Camera, Sun, Leaf, Snowflake, MapPin, Anchor, Info } from 'lucide-react';
+import { Waves, ArrowRight, ShieldCheck, Ship, Camera, Sun, Leaf, Snowflake, MapPin } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLocations } from '../../hooks/useLocations';
 import { Location } from '../../services/map/mapService';

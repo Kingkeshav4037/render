@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Clock, MapPin, Phone, Globe, Star, Users, Calendar as CalendarIcon, CheckCircle2, ChevronRight, Heart, Share2, Info, ShoppingCart, Plus, Minus, Check, ArrowRight, ShieldCheck, Sparkles, Utensils } from 'lucide-react';
+import { Clock, MapPin, Phone, Globe, Star, CheckCircle2, ChevronRight, ShoppingCart, Plus, Minus, Check, ArrowRight, ShieldCheck, Sparkles, Utensils } from 'lucide-react';
 import { foodService, Restaurant, Food, getFoodImage, getRestaurantImage, getFoodPrice } from '../services/foodService';
 import { OptimizedImage } from '../components/shared/OptimizedImage';
 import { useCartStore } from '../store/useCartStore';
@@ -105,7 +105,6 @@ export const FoodDetails = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     if (id) {
-      setLoading(true);
       foodService.getRestaurantById(id).then(async (restData) => {
         if (restData) {
           setRestaurant(restData);

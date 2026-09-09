@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../../lib/supabase';
 import { Deal } from '../../../services/dealService';
-import { Plus, Trash, Edit, Tag } from 'lucide-react';
+import { Plus, Trash, Edit } from 'lucide-react';
 
 export const AdminDeals = () => {
   const [deals, setDeals] = useState<Deal[]>([]);
@@ -14,7 +14,9 @@ export const AdminDeals = () => {
   };
 
   useEffect(() => {
-    fetchDeals();
+    void (async () => {
+      await fetchDeals();
+    })();
   }, []);
 
 

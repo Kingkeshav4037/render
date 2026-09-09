@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { CinematicBackground } from '../../design/backgrounds/CinematicBackground';
 import { Container } from '../../components/layout/Container';
 import { trailService, Trail } from '../../services/trailService';
-import { Map, Mountain, Clock, TrendingUp, Sun, CloudRain, AlertTriangle, Snowflake, Search, X } from 'lucide-react';
+import { Map, Mountain, Clock, TrendingUp, Sun, AlertTriangle, Search } from 'lucide-react';
 import { OptimizedImage } from '../../components/shared/OptimizedImage';
 import { SEO } from '../../components/shared/SEO';
 
@@ -18,24 +18,35 @@ export const HikingTrails = () => {
   const [trails, setTrails] = useState<Trail[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const fetchTrails = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const data = await trailService.getTrails();
-      setTrails(data || []);
-    } catch (err: any) {
-      console.error('Failed to load hiking trails:', err);
-      setError(err?.message || 'Unable to load trails at this moment.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [retryTrigger, setRetryTrigger] = useState(0);
 
   React.useEffect(() => {
-    fetchTrails();
-  }, []);
+    let ignore = false;
+    trailService.getTrails()
+      .then(data => {
+        if (!ignore) {
+          setTrails(data || []);
+          setError(null);
+        }
+      })
+      .catch((err: any) => {
+        console.error('Failed to load hiking trails:', err);
+        if (!ignore) setError(err?.message || 'Unable to load trails at this moment.');
+      })
+      .finally(() => {
+        if (!ignore) setIsLoading(false);
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [retryTrigger]);
+
+  const handleRetry = () => {
+    setIsLoading(true);
+    setError(null);
+    setRetryTrigger(c => c + 1);
+  };
 
   const [sortBy, setSortBy] = useState<'default' | 'distance' | 'elevation'>('default');
 
@@ -247,7 +258,7 @@ export const HikingTrails = () => {
                     <h3 className="text-white text-xl font-display font-bold mb-2">Unable to Load Trails</h3>
                     <p className="text-gray-300 text-sm mb-6 leading-relaxed">{error}</p>
                     <button
-                      onClick={fetchTrails}
+                      onClick={handleRetry}
                       className="px-6 py-2.5 bg-nordic-sage text-midnight font-bold rounded-xl text-xs uppercase tracking-wider hover:bg-white transition-all shadow-md cursor-pointer"
                     >
                       Try Again

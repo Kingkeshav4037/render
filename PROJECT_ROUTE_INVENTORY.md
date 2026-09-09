@@ -87,24 +87,58 @@ These routes are protected by `ProtectedRoute` and primarily use `MainLayout`.
 
 Protected by `ProviderGuard` and uses `ProviderLayout`.
 
+- `/provider` - Base Provider Route Guard
 - `/provider/dashboard` - `ProviderDashboard`
-- `/provider/listings`, `listings/new`, `listings/:id/edit`, `listings/:id/preview`
-- `/provider/calendar`
-- `/provider/bookings`, `bookings/:id`
-- `/provider/customers`
-- `/provider/messages`
-- `/provider/reviews`
-- `/provider/finance`
-- `/provider/analytics`
-- `/provider/marketing`
-- `/provider/settings`
+- `/provider/listings`, `/provider/listings/new`, `/provider/listings/:id/edit`, `/provider/listings/:id/preview`
+- `/provider/calendar` - `ProviderCalendar`
+- `/provider/bookings`, `/provider/bookings/:id` - `ProviderBookings`, `ProviderBookingDetails`
+- `/provider/customers` - `ProviderCustomers`
+- `/provider/messages` - `ProviderMessages`
+- `/provider/reviews` - `ProviderReviews`
+- `/provider/finance` - `ProviderFinance`
+- `/provider/analytics` - `ProviderAnalytics`
+- `/provider/marketing` - `ProviderMarketing`
+- `/provider/settings` - `ProviderSettings`
 
 ### Admin Routes
 
-Protected by `RoleGuard` (ADMIN/SUPER_ADMIN).
+Protected by `RoleGuard` (ADMIN/SUPER_ADMIN) and uses `AdminLayout`.
 
 - `/admin/login` - `AdminLogin`
-- `/admin/*` - Admin features including CMS, Operations, IoT, Data Quality, Users, etc.
+- `/admin` - `AdminDashboard`
+- `/admin/analytics` - `AdminAnalytics`
+- `/admin/pages` - `AdminPageRegistry`
+- `/admin/data-quality` - `AdminDataQuality`
+- `/admin/users`, `/admin/users/:id` - `AdminUsers`, `AdminUserDetails`
+- `/admin/providers`, `/admin/providers/verification` - `AdminProviders`, `AdminProviderVerification`
+- `/admin/moderation` - `AdminModeration`
+- `/admin/bookings` - `AdminBookings`
+- `/admin/orders` - `AdminOrders`
+- `/admin/products` - `AdminProducts`
+- `/admin/payments` - `AdminPayments`
+- `/admin/destinations` - `AdminDestinations`
+- `/admin/operations` - `AdminLiveOperations`
+- `/admin/operations/import` - `ImportManager`
+- `/admin/iot` - `AdminIoT`
+- `/admin/settings` - `AdminSettings`
+- `/admin/infrastructure` - `AdminIoT`
+- `/admin/health` - `AdminPageHealth`
+- `/admin/content` - Content CMS Hub
+- `/admin/content/wildlife` - `AdminWildlifeCMS`
+- `/admin/content/flora` - `AdminFloraCMS`
+- `/admin/content/places` - `PlacesCMS`
+- `/admin/content/stays` - `StaysCMS`
+- `/admin/content/activities` - `ActivitiesCMS`
+- `/admin/content/trails` - `TrailsCMS`
+- `/admin/content/skiresorts` - `SkiResortsCMS`
+- `/admin/content/roadtrips` - `RoadTripsCMS`
+- `/admin/content/aurora` - `AuroraCMS`
+- `/admin/content/relationships` - `RelationshipsCMS`
+- `/admin/content/translations` - `TranslationsCMS`
+- `/admin/content/food` - `FoodCMS`
+- `/admin/content/events` - `AdminEvents`
+- `/admin/content/deals` - `AdminDeals`
+- `/admin/media` - `AdminMedia`
 
 ## Redirected Canonical Routes
 

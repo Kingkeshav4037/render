@@ -8,7 +8,6 @@ interface Props {
 }
 
 const STAY_TYPES = ['Hotel', 'Cabin', 'Hostel', 'Resort', 'Apartment', 'Camping', 'Glamping'];
-const LOCATIONS = ['City Center', 'Nature/Remote', 'Fjord View', 'Mountain', 'Coastal'];
 
 export const StayPreferencesForm: React.FC<Props> = ({ userId, setDirty }) => {
   const [types, setTypes] = useState<string[]>([]);

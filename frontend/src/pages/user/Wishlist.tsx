@@ -1,16 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Bookmark, Heart, MapPin, ArrowRight, Trash2, Plus, Search, 
-  ExternalLink, Filter, Zap, Compass, Bed, Mountain, Utensils, 
-  ShoppingBag, BookOpen, Star, RefreshCw, Loader2 
+  Zap, Compass, Bed, Mountain, Utensils, ShoppingBag, BookOpen 
 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { OptimizedImage } from '../../components/shared/OptimizedImage';
-import { EmptyState } from '../../components/ui/EmptyState';
 import { toast } from 'sonner';
 import { useAuthStore } from '../../store/useAuthStore';
-import { favoriteService, HydratedFavorite, FavoriteCategory, normalizeItemType } from '../../services/favoriteService';
-import { motion, AnimatePresence } from 'framer-motion';
+import { favoriteService, HydratedFavorite, normalizeItemType } from '../../services/favoriteService';
+import { motion } from 'framer-motion';
 import { SEO } from '../../components/shared/SEO';
 
 export interface SavedFavorite {
@@ -85,25 +83,27 @@ export const Wishlist: React.FC = () => {
   const [isRemoteLoading, setIsRemoteLoading] = useState<boolean>(false);
 
   // 1. Fetch remote Supabase hydrated favorites when user is authenticated
-  const loadSupabaseFavorites = async () => {
-    if (!user?.id) {
-      setSupabaseFavorites(null);
+  useEffect(() => {
+    let ignore = false;
+    const userId = user?.id;
+    if (!userId) {
       return;
     }
 
-    try {
-      setIsRemoteLoading(true);
-      const data = await favoriteService.getHydratedFavorites(user.id);
-      setSupabaseFavorites(data || []);
-    } catch (err) {
-      console.warn('Failed to load Supabase favorites:', err);
-    } finally {
-      setIsRemoteLoading(false);
-    }
-  };
+    favoriteService.getHydratedFavorites(userId)
+      .then(data => {
+        if (!ignore) setSupabaseFavorites(data || []);
+      })
+      .catch(err => {
+        console.warn('Failed to load Supabase favorites:', err);
+      })
+      .finally(() => {
+        if (!ignore) setIsRemoteLoading(false);
+      });
 
-  useEffect(() => {
-    loadSupabaseFavorites();
+    return () => {
+      ignore = true;
+    };
   }, [user?.id]);
 
   // Combine and deduplicate items

@@ -1,7 +1,6 @@
-import React, { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import React from 'react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
-import { Mountain, Tent, Fish, Map as MapIcon, Waves } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 
 // Fix for default marker icons in React Leaflet

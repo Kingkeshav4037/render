@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Clock, Navigation, AlertTriangle, ArrowRight, Train, Ship, Car, Leaf, MapPin, MapIcon, Calendar, Info, Users, CreditCard, Ticket, CheckCircle2 } from 'lucide-react';
+import { Clock, Navigation, AlertTriangle, ArrowRight, Train, Ship, Car, Leaf, MapIcon, Ticket, CheckCircle2 } from 'lucide-react';
 import { transportService, RouteWithLocations } from '../services/transportService';
 import { AsyncStateWrapper } from '../components/shared/AsyncStateWrapper';
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Container } from '../../components/layout/Container';
-import { Zap, MapPin, Battery, TrendingUp, Search, ShieldCheck, ArrowRight, Activity, Filter, Server } from 'lucide-react';
+import { Zap, Battery, Search, ArrowRight, Activity } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { SEO } from '../../components/shared/SEO';
 

@@ -1,22 +1,17 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ShoppingBag, 
   Search, 
-  Filter, 
-  Calendar, 
-  ArrowUpRight, 
   CheckCircle2, 
   Clock, 
   XCircle, 
   RefreshCw, 
   FileText, 
-  ExternalLink,
-  ChevronDown,
-  Eye,
-  Utensils,
-  Package,
-  Home,
-  Compass
+  Eye, 
+  Utensils, 
+  Package, 
+  Home, 
+  Compass 
 } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 import { useCurrencyStore } from '../../../store/useCurrencyStore';
@@ -99,10 +94,9 @@ export const AdminOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState<OrderRow | null>(null);
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
 
-  const loadOrders = useCallback(async () => {
+  const loadOrders = async () => {
     setLoading(true);
     try {
-      // 1. Fetch Orders from Database
       const { data: dbOrders, error: orderErr } = await supabase
         .from('orders')
         .select('*')
@@ -113,7 +107,6 @@ export const AdminOrders = () => {
         return;
       }
 
-      // 2. Fetch associated items and transactions
       const enrichedOrders: OrderRow[] = await Promise.all(
         dbOrders.map(async (ord: any) => {
           const { data: items } = await supabase
@@ -142,11 +135,56 @@ export const AdminOrders = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
   useEffect(() => {
-    loadOrders();
-  }, [loadOrders]);
+    let ignore = false;
+    (async () => {
+      try {
+        const { data: dbOrders, error: orderErr } = await supabase
+          .from('orders')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (orderErr || !dbOrders || dbOrders.length === 0) {
+          if (!ignore) setOrders(FALLBACK_ADMIN_ORDERS);
+          return;
+        }
+
+        const enrichedOrders: OrderRow[] = await Promise.all(
+          dbOrders.map(async (ord: any) => {
+            const { data: items } = await supabase
+              .from('order_items')
+              .select('*')
+              .eq('order_id', ord.id);
+
+            const { data: tx } = await supabase
+              .from('payment_transactions')
+              .select('gateway, gateway_order_id, status')
+              .eq('order_id', ord.id)
+              .maybeSingle();
+
+            return {
+              ...ord,
+              order_items: items || [],
+              payment_transaction: tx || null
+            };
+          })
+        );
+
+        if (!ignore) setOrders(enrichedOrders);
+      } catch (err) {
+        console.warn('Error loading admin orders:', err);
+        if (!ignore) setOrders(FALLBACK_ADMIN_ORDERS);
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    })();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const handleUpdateOrderStatus = async (orderId: string, newStatus: string) => {
     const currentOrder = orders.find(o => o.id === orderId);

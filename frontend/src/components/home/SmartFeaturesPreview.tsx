@@ -2,7 +2,6 @@ import { motion } from 'framer-motion';
 import { Map, Zap, Bot, Navigation } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { Container } from '../layout/Container';
 
 export const SmartFeaturesPreview = () => {
   const navigate = useNavigate();

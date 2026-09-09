@@ -1,5 +1,5 @@
 -- ==============================================================================
--- Migration: 20260819000039_favorites_system.sql
+-- Migration: 20260819000040_favorites_system.sql
 -- Description: Production-ready Favorites system schema, indexes, and RLS policies
 -- ==============================================================================
 

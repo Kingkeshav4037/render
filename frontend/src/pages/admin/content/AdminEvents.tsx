@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../../lib/supabase';
 import { Event, getEventFallbackDescription } from '../../../services/eventService';
-import { Plus, Trash, Edit, Calendar, X, Check, Search, FileText } from 'lucide-react';
+import { Plus, Trash, Edit, Calendar, X, Search } from 'lucide-react';
 import { toast } from 'sonner';
 
 export const AdminEvents = () => {
@@ -18,7 +18,9 @@ export const AdminEvents = () => {
   };
 
   useEffect(() => {
-    fetchEvents();
+    void (async () => {
+      await fetchEvents();
+    })();
   }, []);
 
   const deleteEvent = async (id: string) => {

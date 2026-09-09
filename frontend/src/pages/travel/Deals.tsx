@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Tag, Clock, Users, ArrowRight, Star, Flame, Ticket, Percent } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Tag, Clock, Star, Flame, Ticket, Percent } from 'lucide-react';
 import { toast } from 'sonner';
 import { dealService, Deal } from '../../services/dealService';
 import { useCart } from '../../store/useCartStore';
@@ -13,27 +13,38 @@ export const Deals = () => {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retryTrigger, setRetryTrigger] = useState(0);
   const { addItem } = useCart();
   const { requireAuth } = useRequireAuth();
   const [activeCategory, setActiveCategory] = useState('All');
 
-  const fetchDeals = async () => {
+  useEffect(() => {
+    let ignore = false;
+    dealService.getPublishedDeals()
+      .then(data => {
+        if (!ignore) {
+          setDeals(data || []);
+          setError(null);
+        }
+      })
+      .catch((err: any) => {
+        console.error('Failed to load deals:', err);
+        if (!ignore) setError(err?.message || 'Unable to retrieve travel packages at this time.');
+      })
+      .finally(() => {
+        if (!ignore) setLoading(false);
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [retryTrigger]);
+
+  const handleRetry = () => {
     setLoading(true);
     setError(null);
-    try {
-      const data = await dealService.getPublishedDeals();
-      setDeals(data || []);
-    } catch (err: any) {
-      console.error('Failed to load deals:', err);
-      setError(err?.message || 'Unable to retrieve travel packages at this time.');
-    } finally {
-      setLoading(false);
-    }
+    setRetryTrigger(c => c + 1);
   };
-
-  useEffect(() => {
-    fetchDeals();
-  }, []);
 
 
   const categories = ['All', 'Flash Sales', 'Packages', 'Seasonal', 'Early Bird'];
@@ -119,7 +130,7 @@ export const Deals = () => {
             <h3 className="text-xl font-bold text-[#78350F] mb-2">Failed to Load Deals</h3>
             <p className="text-sm text-[#92400E] mb-6 leading-relaxed">{error}</p>
             <button
-              onClick={fetchDeals}
+              onClick={handleRetry}
               className="px-6 py-2.5 bg-[#D97706] text-white font-bold rounded-lg text-xs uppercase tracking-wider hover:bg-[#B45309] transition-all shadow-md cursor-pointer"
             >
               Try Again

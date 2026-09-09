@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Search, Compass, Map, Tent, Fish, CloudRain, ShieldAlert } from 'lucide-react';
+import { Search, Compass, Tent, CloudRain, ShieldAlert } from 'lucide-react';
 import { CinematicBackground } from '../../design/backgrounds/CinematicBackground';
 import { Container } from '../../components/layout/Container';
 import { AdventureMap } from './components/AdventureMap';
@@ -15,7 +15,7 @@ export interface AdventureCategory {
   count: number;
 }
 
-export const ADVENTURE_CATEGORIES: AdventureCategory[] = [
+const ADVENTURE_CATEGORIES: AdventureCategory[] = [
   { id: 'hiking',   name: 'Hiking',    description: 'Norwegian mountain trails.',          image: '/images/trolltunga_1786936111320.jpg',      count: 245 },
   { id: 'skiing',   name: 'Skiing',    description: 'Alpine and cross-country experiences.',image: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=skiing+norway+winter&w=800', count: 120 },
   { id: 'kayaking', name: 'Kayaking',  description: 'Fjords and coastal exploration.',       image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=kayak+fjord+norway&w=800', count: 85  },

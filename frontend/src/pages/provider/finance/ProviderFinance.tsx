@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { DollarSign, ArrowUpRight, ArrowDownRight, Download, CreditCard, CheckCircle2, Clock } from 'lucide-react';
+import React from 'react';
+import { ArrowUpRight, Download, CreditCard, CheckCircle2, Clock } from 'lucide-react';
 
 const MOCK_TRANSACTIONS = [
   { id: 'TXN-001', date: 'Oct 15, 2026', desc: 'Booking NSL-8201', amount: 4500, type: 'CREDIT', status: 'COMPLETED' },

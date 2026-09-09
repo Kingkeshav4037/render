@@ -5,14 +5,12 @@ import { supabase } from '../../lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
-export const generateSlug = (text: string): string => {
+const generateSlug = (text: string): string => {
   return text
     .toLowerCase()
     .trim()
-    .replace(/æ/g, 'ae')
-    .replace(/ø/g, 'o')
-    .replace(/å/g, 'a')
-    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
     .replace(/^-+|-+$/g, '');
 };
 
@@ -65,7 +63,22 @@ export const AdminDestinations = () => {
   };
 
   useEffect(() => {
-    fetchDestinations();
+    let ignore = false;
+    mapService.fetchLocationsInBounds(57, 4, 71, 31)
+      .then(data => {
+        if (!ignore) setDestinations(data || []);
+      })
+      .catch((err: any) => {
+        console.error("Failed to load destinations", err);
+        if (!ignore) setError(err?.message || 'Unable to retrieve destination records.');
+      })
+      .finally(() => {
+        if (!ignore) setLoading(false);
+      });
+
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   const handleOpenModal = (dest?: Location) => {
@@ -192,7 +205,7 @@ export const AdminDestinations = () => {
 
       setDestinations(prev => prev.map(d => d.id === dest.id ? { ...d, status: nextStatus } : d));
       toast.success(`Destination "${dest.name}" marked as ${nextStatus}`);
-    } catch (err: any) {
+    } catch {
       toast.error('Failed to update destination status');
     }
   };

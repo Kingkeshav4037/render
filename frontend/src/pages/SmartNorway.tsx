@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Container } from '../components/layout/Container';
-import { Activity, Radio, Database, Shield, Zap, Server, Bus, CloudLightning, ArrowUpRight } from 'lucide-react';
+import { Activity, Radio, Database, Shield, Zap, Bus, ArrowUpRight } from 'lucide-react';
 import { useRealtimeStore } from '../store/useRealtimeStore';
 
 export const SmartNorway = () => {
   const { connectionStatus, alerts, evChargers, ferries } = useRealtimeStore();
   const [pulse, setPulse] = useState(false);
 
-  const logTimestamps = useMemo(() => {
+  const [logTimestamps] = useState(() => {
     const base = Date.now();
     return {
       current: new Date(base).toISOString().split('T')[1].substring(0, 8),
@@ -17,7 +17,7 @@ export const SmartNorway = () => {
       offset3600: new Date(base - 3600).toISOString().split('T')[1].substring(0, 8),
       offset4800: new Date(base - 4800).toISOString().split('T')[1].substring(0, 8),
     };
-  }, []);
+  });
 
 
   // Simulate data heartbeat

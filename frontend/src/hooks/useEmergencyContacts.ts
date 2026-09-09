@@ -31,7 +31,7 @@ export const useUpdateEmergencyContact = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ userId, contactId, updates }: { userId: string; contactId: string; updates: Partial<Omit<EmergencyContact, 'id' | 'isPrimary'>> }) => {
+    mutationFn: async ({ userId: _userId, contactId, updates }: { userId: string; contactId: string; updates: Partial<Omit<EmergencyContact, 'id' | 'isPrimary'>> }) => {
       await emergencyContactsService.update(contactId, updates);
     },
     onSuccess: (_, variables) => {
@@ -44,7 +44,7 @@ export const useDeleteEmergencyContact = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ userId, contactId }: { userId: string; contactId: string }) => {
+    mutationFn: async ({ userId: _userId, contactId }: { userId: string; contactId: string }) => {
       await emergencyContactsService.delete(contactId);
     },
     onSuccess: (_, variables) => {

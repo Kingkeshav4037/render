@@ -21,7 +21,7 @@ export const useCancelBooking = () => {
     mutationFn: async (bookingId: string) => {
       return bookingService.cancelBooking(bookingId);
     },
-    onSuccess: (data, variables) => {
+    onSuccess: () => {
       // The user ID is ideally available from auth store to invalidate the correct key,
       // but since we only ever view the logged-in user's bookings, we can invalidate
       // all 'bookings' query keys or just let it refetch everything.
