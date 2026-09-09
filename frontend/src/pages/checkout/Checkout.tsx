@@ -627,7 +627,7 @@ export const Checkout = () => {
                     <div className="w-16 h-16 bg-arctic-gold/10 rounded-2xl border border-arctic-gold/30 flex items-center justify-center mx-auto mb-4 text-arctic-gold">
                       <Sparkles size={32} />
                     </div>
-                    <h3 className="text-2xl font-display font-bold text-snow mb-2">Complete Your Booking</h3>
+                    <h3 className="text-2xl font-display font-bold text-snow mb-2">Ready to complete your booking?</h3>
                     <p className="text-snow/60 text-sm">
                       Total due: <strong className="text-arctic-gold text-lg">{formatPrice(total)}</strong>. You can confirm instantly via procedure test mode or use the Razorpay test gateway.
                     </p>
@@ -683,7 +683,7 @@ export const Checkout = () => {
                         disabled={processing}
                         className="w-full md:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold uppercase tracking-wider text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                       >
-                        <CreditCard size={16} /> Open Razorpay Popup
+                        <CreditCard size={16} /> Pay securely (Razorpay)
                       </button>
                     </div>
 
