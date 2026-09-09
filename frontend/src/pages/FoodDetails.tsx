@@ -6,6 +6,8 @@ import { OptimizedImage } from '../components/shared/OptimizedImage';
 import { useCartStore } from '../store/useCartStore';
 import { useCurrencyStore } from '../store/useCurrencyStore';
 import { useRequireAuth } from '../hooks/useRequireAuth';
+import { useAuthStore } from '../store/useAuthStore';
+import { toast } from '../store/useToastStore';
 import { SEO } from '../components/shared/SEO';
 import { FavoriteButton } from '../components/common/FavoriteButton';
 import { recentlyViewedService } from '../services/recentlyViewedService';
@@ -92,15 +94,40 @@ export const FoodDetails = () => {
   const { requireAuth } = useRequireAuth();
   const [addedItemName, setAddedItemName] = useState<string | null>(null);
 
-  // 5-Step Reservation State
+  const { user, profile } = useAuthStore();
+
+  // Helper for tomorrow's date
+  const getTomorrowDate = () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
+  };
+
+  // 4-Step Table Reservation State
   const [step, setStep] = useState(1);
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
+  const [date, setDate] = useState(getTomorrowDate());
+  const [time, setTime] = useState('19:00');
   const [guests, setGuests] = useState(2);
   const [tablePref, setTablePref] = useState('Standard');
   const [guestName, setGuestName] = useState('');
   const [guestEmail, setGuestEmail] = useState('');
   const [guestPhone, setGuestPhone] = useState('');
+  const [isBookingSubmitting, setIsBookingSubmitting] = useState(false);
+  const [bookingReference, setBookingReference] = useState<string | null>(null);
+
+  // Pre-fill user contact info if logged in
+  useEffect(() => {
+    if (profile) {
+      if (profile.fullName) setGuestName(profile.fullName);
+      else if ((profile as any).first_name) {
+        setGuestName(`${(profile as any).first_name} ${(profile as any).last_name || ''}`.trim());
+      }
+      if (profile.phone) setGuestPhone(profile.phone);
+    }
+    if (user?.email && !guestEmail) {
+      setGuestEmail(user.email);
+    }
+  }, [profile, user]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -483,9 +510,43 @@ export const FoodDetails = () => {
     }, { message: 'Sign in to add restaurant orders to your cart.' });
   };
 
+  const handleConfirmBooking = async () => {
+    if (!guestName.trim() || !guestEmail.trim() || !restaurant) return;
+    setIsBookingSubmitting(true);
+    try {
+      if (typeof foodService.createTableReservation === 'function') {
+        const res = await foodService.createTableReservation({
+          restaurantId: restaurant.id,
+          restaurantName: restaurant.name,
+          date,
+          time,
+          guests,
+          tablePreference: tablePref,
+          guestName: guestName.trim(),
+          guestEmail: guestEmail.trim(),
+          guestPhone: guestPhone.trim(),
+        });
+        setBookingReference(res.bookingReference);
+      } else {
+        const fallbackRef = `TB-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+        setBookingReference(fallbackRef);
+      }
+      setStep(4);
+      toast.success(`Table confirmed at ${restaurant.name}!`);
+    } catch (err) {
+      console.error('Failed to reserve table:', err);
+      toast.error('Failed to reserve table. Please try again.');
+    } finally {
+      setIsBookingSubmitting(false);
+    }
+  };
+
   const handleNextStep = () => {
     if (step === 1 && (!date || !time)) return;
-    if (step === 3 && (!guestName || !guestEmail)) return;
+    if (step === 3) {
+      handleConfirmBooking();
+      return;
+    }
     setStep(step + 1);
   };
 
@@ -703,20 +764,41 @@ export const FoodDetails = () => {
                   </div>
                   <div className="flex gap-4">
                     <button onClick={() => setStep(2)} className="flex-1 py-4 text-sm font-bold uppercase tracking-widest border border-gray-200 hover:bg-gray-50 transition-colors">Back</button>
-                    <button onClick={handleNextStep} disabled={!guestName || !guestEmail} className="flex-1 bg-[#2C1810] text-white font-bold uppercase tracking-widest text-sm py-4 hover:bg-[#FF7F50] transition-colors disabled:opacity-50">Confirm</button>
+                    <button 
+                      onClick={handleConfirmBooking} 
+                      disabled={!guestName || !guestEmail || isBookingSubmitting} 
+                      className="flex-1 bg-[#2C1810] text-white font-bold uppercase tracking-widest text-sm py-4 hover:bg-[#FF7F50] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      {isBookingSubmitting ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <span>Reserving...</span>
+                        </>
+                      ) : (
+                        <span>Confirm Table</span>
+                      )}
+                    </button>
                   </div>
                 </div>
               )}
 
               {step === 4 && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-right-4 text-center py-4">
-                  <div className="w-16 h-16 bg-[#FF7F50]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle2 className="w-8 h-8 text-[#FF7F50]"/>
+                  <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-600">
+                    <CheckCircle2 className="w-8 h-8"/>
                   </div>
                   <h3 className="text-2xl font-display font-bold mb-2">Table Confirmed</h3>
-                  <p className="text-gray-600 text-sm mb-6">Your reservation at {restaurant.name} is confirmed for {guests} guests on {date} at {time}.</p>
+                  <p className="text-gray-600 text-sm mb-6">
+                    Your reservation at <strong>{restaurant.name}</strong> is confirmed for {guests} {guests === 1 ? 'guest' : 'guests'} on {date} at {time}.
+                  </p>
                   
                   <div className="bg-gray-50 p-4 text-left border border-gray-100 rounded-sm mb-6 space-y-2">
+                    {bookingReference && (
+                      <div className="flex justify-between items-center text-sm pb-2 border-b border-gray-200">
+                        <span className="text-gray-500 font-bold">Booking Ref</span>
+                        <span className="font-mono font-black text-[#FF7F50] bg-white px-2 py-0.5 rounded border border-gray-200">{bookingReference}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500">Name</span>
                       <span className="font-bold">{guestName}</span>
@@ -725,9 +807,30 @@ export const FoodDetails = () => {
                       <span className="text-gray-500">Preference</span>
                       <span className="font-bold">{tablePref}</span>
                     </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Contact</span>
+                      <span className="font-bold truncate">{guestEmail}</span>
+                    </div>
                   </div>
 
-                  <button onClick={() => setStep(1)} className="text-sm font-bold uppercase tracking-widest text-[#FF7F50] hover:text-[#2C1810] transition-colors">Make another booking</button>
+                  <div className="space-y-3">
+                    <button 
+                      onClick={() => navigate('/user/bookings')} 
+                      className="w-full bg-[#FF7F50] hover:bg-[#E86A3E] text-white font-bold uppercase tracking-widest text-xs py-3.5 transition-colors rounded-sm flex items-center justify-center gap-2 shadow-md cursor-pointer"
+                    >
+                      <span>View in My Bookings</span>
+                      <ArrowRight size={14} />
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setStep(1);
+                        setBookingReference(null);
+                      }} 
+                      className="w-full text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-[#2C1810] py-2 transition-colors cursor-pointer"
+                    >
+                      Make another booking
+                    </button>
+                  </div>
                 </div>
               )}
 

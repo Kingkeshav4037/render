@@ -32,8 +32,38 @@ export const MyBookings = () => {
           .eq('user_id', user.id)
           .order('start_time', { ascending: true });
 
-        if (error) throw error;
-        setBookings(data || []);
+        if (error) {
+          console.warn('Could not fetch remote bookings:', error);
+        }
+
+        let list: any[] = data ? [...data] : [];
+
+        // Check if there are local restaurant reservations to merge
+        try {
+          const cached = JSON.parse(localStorage.getItem('norway_restaurant_reservations') || '{}');
+          const localBookings = Object.values(cached).map((r: any) => ({
+            id: r.bookingId,
+            item_type: 'RESTAURANT',
+            status: 'CONFIRMED',
+            start_time: `${r.date}T${r.time}:00`,
+            end_time: new Date(new Date(`${r.date}T${r.time}:00`).getTime() + 2 * 3600000).toISOString(),
+            pax: r.guests || 2,
+            total_amount: 0,
+            currency: 'NOK',
+            restaurant_name: r.restaurantName,
+            created_at: r.created_at || new Date().toISOString(),
+          }));
+
+          for (const localB of localBookings) {
+            if (!list.some(b => b.id === localB.id)) {
+              list.push(localB);
+            }
+          }
+        } catch {
+          // ignore
+        }
+
+        setBookings(list);
       } catch (err) {
         console.error(err);
       } finally {
@@ -168,7 +198,11 @@ export const MyBookings = () => {
                       </div>
                       
                       <h3 className="text-xl font-display font-bold text-navy-900 mb-2 group-hover:text-aurora-green transition-colors">
-                        Booking #{booking.id.split('-')[0]}
+                        {(booking as any).restaurant_name 
+                          ? `Table at ${(booking as any).restaurant_name}` 
+                          : booking.item_type === 'RESTAURANT' 
+                            ? 'Restaurant Table Reservation' 
+                            : `Booking #${booking.id?.split('-')[0] || booking.id}`}
                       </h3>
                       
                       <div className="flex flex-wrap gap-x-6 gap-y-2 mt-4 text-sm font-medium text-gray-600">

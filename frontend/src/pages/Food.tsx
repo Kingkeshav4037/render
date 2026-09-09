@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Utensils, MapPin, Calendar, Clock, Users, Search, Filter, ArrowRight, Award, Fish, Carrot, Flame, ChevronLeft, ChevronRight, ShoppingCart, Plus, Minus, Sparkles, Info, Check, RotateCcw, AlertCircle, ShoppingBag, X } from 'lucide-react';
-import { foodService, getFoodImage, getRestaurantImage, getFoodPrice, Food as FoodType } from '../services/foodService';
+import { foodService, getFoodImage, getRestaurantImage, getFoodPrice, Food as FoodType, Restaurant as RestaurantType } from '../services/foodService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AsyncStateWrapper } from '../components/shared/AsyncStateWrapper';
 import { useQuery } from '@tanstack/react-query';
@@ -12,6 +12,7 @@ import { useCurrencyStore } from '../store/useCurrencyStore';
 import { useRequireAuth } from '../hooks/useRequireAuth';
 import { PageHeader } from '../components/ui/PageHeader';
 import { FoodItemModal } from '../components/food/FoodItemModal';
+import { RestaurantReservationModal } from '../components/food/RestaurantReservationModal';
 import { FavoriteButton } from '../components/common/FavoriteButton';
 
 const CUISINES = [
@@ -57,6 +58,7 @@ export const Food = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [selectedFood, setSelectedFood] = useState<FoodType | null>(null);
+  const [reservationRestaurant, setReservationRestaurant] = useState<RestaurantType | null>(null);
   const { addItem, getItemCount, getCartTotal, setIsOpen } = useCartStore();
   const { formatPrice } = useCurrencyStore();
   const { requireAuth } = useRequireAuth();
@@ -533,7 +535,7 @@ export const Food = () => {
                           )}
                         </div>
 
-                        <div className="p-6 flex flex-col flex-grow relative z-20 justify-between">
+                        <div className="p-6 flex flex-col flex-grow relative z-20 justify-between pointer-events-none">
                           <div>
                             <h3 className="text-xl font-display font-semibold mb-1 text-snow group-hover:text-[#FF7F50] transition-colors">{restaurant.name}</h3>
                             <div className="flex items-center gap-2 text-xs font-sans text-snow/60 mb-2">
@@ -547,11 +549,24 @@ export const Food = () => {
                             )}
                           </div>
 
-                          <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-                            <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">Open for Reservations</span>
-                            <div className="flex items-center gap-1.5 font-sans text-[10px] font-bold uppercase tracking-widest text-[#FF7F50] group-hover:translate-x-1 transition-transform">
-                              Reserve <ArrowRight className="w-3.5 h-3.5" />
-                            </div>
+                          <div className="pt-4 border-t border-white/10 flex items-center justify-between pointer-events-auto">
+                            <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                              Open for Reservations
+                            </span>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setReservationRestaurant(restaurant as RestaurantType);
+                              }}
+                              className="relative z-30 px-3.5 py-1.5 bg-[#FF7F50] hover:bg-[#E86A3E] text-white text-[11px] font-bold uppercase tracking-wider rounded-xl flex items-center gap-1.5 transition-all shadow-md hover:scale-105 cursor-pointer"
+                              aria-label={`Reserve table at ${restaurant.name}`}
+                            >
+                              <span>Reserve</span>
+                              <ArrowRight className="w-3.5 h-3.5" />
+                            </button>
                           </div>
                         </div>
                       </motion.div>
@@ -569,6 +584,12 @@ export const Food = () => {
       <FoodItemModal 
         food={selectedFood} 
         onClose={() => setSelectedFood(null)} 
+      />
+
+      {/* Table Reservation Modal */}
+      <RestaurantReservationModal
+        restaurant={reservationRestaurant}
+        onClose={() => setReservationRestaurant(null)}
       />
     </div>
   );
