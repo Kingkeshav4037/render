@@ -35,12 +35,12 @@ INSERT INTO public.products (id, name, category, price, co2, img, rating) VALUES
 
 -- Phase 12 Seed Data
 DELETE FROM content_media WHERE entity_type = 'wildlife_species';
-DELETE FROM foods WHERE true;
-DELETE FROM wildlife_species WHERE true;
-DELETE FROM restaurants WHERE true;
-DELETE FROM accommodations WHERE true;
-DELETE FROM activities WHERE true;
-DELETE FROM trails WHERE true;
+DELETE FROM foods WHERE 1=1;
+DELETE FROM wildlife_species WHERE 1=1;
+DELETE FROM restaurants WHERE 1=1;
+DELETE FROM accommodations WHERE 1=1;
+DELETE FROM activities WHERE 1=1;
+DELETE FROM trails WHERE 1=1;
 
 
 -- Foods
