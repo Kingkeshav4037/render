@@ -121,6 +121,15 @@ export const availabilityService = {
         return { available: true };
       }
 
+      // If RPC returned false without error and no userId is passed to verify self-conflict, it's definitely unavailable
+      if (data === false && !error && !userId) {
+        return {
+          available: false,
+          message: 'Selected dates are unavailable. Please choose different dates.',
+          errorCode: 'ERR_DATES_UNAVAILABLE',
+        };
+      }
+
       // If RPC returned false or errored, verify whether the conflict is a genuine confirmed/paid
       // booking, or merely an uncompleted PENDING_PAYMENT booking by the same user or expired session.
       let realBookingConflicts: any[] = [];

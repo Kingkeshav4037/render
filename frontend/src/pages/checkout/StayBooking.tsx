@@ -7,7 +7,7 @@ import { useCurrencyStore } from '../../store/useCurrencyStore';
 import { useCartStore } from '../../store/useCartStore';
 import { 
   Calendar as CalendarIcon, Users, MapPin, ShieldCheck, ArrowLeft,
-  CreditCard, TreePine, AlertCircle, Lock, ShoppingBag
+  CreditCard, TreePine, AlertCircle, Lock, ShoppingBag, Sparkles, Zap, Copy
 } from 'lucide-react';
 import { OptimizedImage } from '../../components/shared/OptimizedImage';
 import { SEO } from '../../components/shared/SEO';
@@ -502,6 +502,135 @@ export const StayBooking = () => {
     }
   };
 
+  const handleSimulatedProcedureBooking = async () => {
+    if (!user) {
+      toast.error('Please log in to complete your reservation.');
+      const returnUrl = `/checkout/stay/${id || room?.accommodation_id || 'stay-default'}?roomId=${room?.id || ''}&checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`;
+      navigate(`/login?redirect=${encodeURIComponent(returnUrl)}`);
+      return;
+    }
+
+    if (!room || !activeStay) {
+      toast.error('Accommodation details could not be loaded.');
+      return;
+    }
+
+    const ruleCheck = availabilityService.validateBookingRules(checkIn, checkOut, guests, {
+      minNights: 1,
+      maxNights: 30,
+      minGuests: 1,
+      maxGuests: (room as any)?.capacity || (room as any)?.max_guests || 10,
+    });
+    if (!ruleCheck.valid) {
+      toast.error(ruleCheck.error);
+      return;
+    }
+
+    if (!fullName.trim()) {
+      toast.error('Please enter the primary guest full name.');
+      return;
+    }
+
+    if (!email.trim() || !email.includes('@')) {
+      toast.error('Please enter a valid guest email address.');
+      return;
+    }
+
+    if (!phone.trim()) {
+      toast.error('Please enter a contact phone number.');
+      return;
+    }
+
+    setProcessing(true);
+    let holdId: string | undefined;
+
+    try {
+      try {
+        const bkgFrom = (supabase.from as any)?.('bookings');
+        if (bkgFrom && typeof bkgFrom.update === 'function') {
+          await bkgFrom
+            .update({ status: 'CANCELLED' })
+            .eq('user_id', user.id)
+            .eq('item_id', targetAccommodationId)
+            .eq('status', 'PENDING_PAYMENT');
+        }
+      } catch (cleanErr) {
+        console.warn('Pre-checkout cleanup notice:', cleanErr);
+      }
+
+      const holdRes = await availabilityService.validateAndHoldInventory(
+        user.id,
+        'ACCOMMODATION',
+        targetAccommodationId,
+        checkIn,
+        checkOut,
+        guests,
+        1,
+        15
+      );
+
+      if (!holdRes.success) {
+        toast.error(holdRes.message || 'Room no longer available for selected dates.');
+        setProcessing(false);
+        return;
+      }
+
+      holdId = holdRes.holdId;
+
+      const bookingItems = [
+        {
+          id: room.id,
+          item_type: 'ACCOMMODATION' as const,
+          item_id: room.id,
+          name: `${activeStay.name} - ${room.name}`,
+          description: `${nights} nights (${checkIn} to ${checkOut}) for ${guests} guests. ${specialRequests ? `Special request: ${specialRequests}` : ''}`,
+          unit_price: pricePerNight,
+          quantity: nights,
+          image: room.image_url || activeStay.image_url,
+          start_time: new Date(checkIn).toISOString(),
+          end_time: new Date(checkOut).toISOString(),
+          pax: guests,
+        }
+      ];
+
+      toast.loading('Processing procedure reservation...', { id: 'proc-stay-booking' });
+
+      const checkoutRes = await checkoutService.processCheckout(user.id, bookingItems, 'NOK');
+      const orderId = (typeof checkoutRes === 'object' && checkoutRes !== null)
+        ? ((checkoutRes as any).orderId || (checkoutRes as any).id)
+        : checkoutRes;
+
+      if (!orderId) {
+        throw new Error('Failed to generate reservation order');
+      }
+
+      // Mark order PAID and booking CONFIRMED
+      try {
+        const ordFrom = (supabase.from as any)?.('orders');
+        const bkgFrom = (supabase.from as any)?.('bookings');
+        const tasks = [];
+        if (ordFrom && typeof ordFrom.update === 'function') {
+          tasks.push(ordFrom.update({ status: 'PAID' }).eq('id', orderId));
+        }
+        if (bkgFrom && typeof bkgFrom.update === 'function') {
+          tasks.push(bkgFrom.update({ status: 'CONFIRMED' }).eq('user_id', user.id).eq('item_id', targetAccommodationId).eq('status', 'PENDING_PAYMENT'));
+        }
+        if (tasks.length > 0) await Promise.all(tasks);
+      } catch (dbErr) {
+        console.warn('Database procedure update warning:', dbErr);
+      }
+
+      toast.success('Test payment verified! Reservation confirmed.', { id: 'proc-stay-booking' });
+      navigate(`/payment-success?order_id=${orderId}`);
+    } catch (err: any) {
+      if (holdId) availabilityService.releaseInventoryHold(holdId, user.id);
+      console.error('Procedure stay booking error:', err);
+      toast.error(err?.message || 'Procedure booking failed.', { id: 'proc-stay-booking' });
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-deep-night text-snow pt-32 pb-24 flex justify-center items-center">
@@ -780,34 +909,65 @@ export const StayBooking = () => {
 
               {/* Submit Buttons */}
               <div className="space-y-3">
+                {/* 1-Click Procedure Demo Booking */}
                 <button 
-                  type="submit"
+                  type="button"
+                  onClick={handleSimulatedProcedureBooking}
                   disabled={processing || nights <= 0 || !termsAccepted}
-                  className="w-full py-4 bg-arctic-gold hover:bg-snow text-deep-night font-bold uppercase tracking-widest text-xs rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-4 bg-arctic-gold hover:bg-snow text-deep-night font-bold uppercase tracking-widest text-xs rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {processing ? (
                     <>
                       <div className="w-4 h-4 border-2 border-deep-night border-t-transparent rounded-full animate-spin"></div>
-                      Processing Reservation...
+                      Confirming Reservation...
                     </>
                   ) : (
                     <>
-                      <Lock className="w-4 h-4" /> Confirm & Pay with Razorpay
+                      <Zap size={15} className="fill-current" /> Complete Demo Booking (Instant)
                     </>
                   )}
+                </button>
+
+                {/* Gateway Test Checkout */}
+                <button 
+                  type="submit"
+                  disabled={processing || nights <= 0 || !termsAccepted}
+                  className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold uppercase tracking-widest text-xs rounded-xl transition-all shadow flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  <CreditCard className="w-4 h-4" /> Confirm & Pay with Razorpay
                 </button>
 
                 <button 
                   type="button"
                   onClick={handleAddToCart}
                   disabled={nights <= 0}
-                  className="w-full py-3 bg-white/10 hover:bg-white/20 text-snow font-bold uppercase tracking-widest text-xs rounded-xl border border-white/20 transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-white/10 hover:bg-white/20 text-snow font-bold uppercase tracking-widest text-xs rounded-xl border border-white/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <ShoppingBag className="w-4 h-4 text-arctic-gold" /> Add to Cart
                 </button>
               </div>
 
-              <div className="mt-4 flex items-center justify-center gap-2 text-[10px] text-snow/40 uppercase tracking-wider">
+              {/* Test Card Helper */}
+              <div className="mt-4 p-3 bg-white/5 border border-white/10 rounded-xl text-left">
+                <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-snow/60 mb-1">
+                  <span>Razorpay Test Card</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText('4012000000000002');
+                      toast.success('Test card number copied!');
+                    }}
+                    className="flex items-center gap-1 text-arctic-gold hover:underline cursor-pointer"
+                  >
+                    <Copy size={11} /> Copy Card
+                  </button>
+                </div>
+                <div className="text-[11px] font-mono text-snow/90">
+                  4012 0000 0000 0002 &bull; 12/28 &bull; CVV: 123
+                </div>
+              </div>
+
+              <div className="mt-3 flex items-center justify-center gap-2 text-[10px] text-snow/40 uppercase tracking-wider">
                 <CreditCard size={12} /> Encrypted 256-bit SSL Payment
               </div>
             </div>

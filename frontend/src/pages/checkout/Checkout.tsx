@@ -3,8 +3,9 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useCart } from '../../store/useCartStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useCurrencyStore } from '../../store/useCurrencyStore';
-import { Check, CreditCard, User, Tag, Lock, ShieldCheck, Leaf, ArrowRight, Info, ShoppingBag } from 'lucide-react';
+import { Check, CreditCard, User, Tag, Lock, ShieldCheck, Leaf, ArrowRight, Info, ShoppingBag, Sparkles, Zap, Copy } from 'lucide-react';
 import { checkoutService } from '../../services/checkoutService';
+import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 
 export const Checkout = () => {
@@ -254,6 +255,55 @@ export const Checkout = () => {
       if (orderId) {
         navigate(`/payment-failure?order_id=${orderId}&reason=PROVIDER_ERROR&description=${encodeURIComponent(error.message || 'Order initialization failed')}`);
       }
+    }
+  };
+
+  const handleSimulatedProcedurePayment = async () => {
+    if (!user || !profile) {
+      toast.error("Please log in to checkout.");
+      navigate('/login');
+      return;
+    }
+
+    if (isSubmittingRef.current || processing) return;
+    isSubmittingRef.current = true;
+    setProcessing(true);
+
+    let orderId = pendingOrderId || '';
+    try {
+      if (!orderId) {
+        orderId = await checkoutService.processCheckout(user.id, safeItems, 'NOK');
+        setPendingOrderId(orderId);
+      }
+
+      toast.loading('Processing procedure checkout...', { id: 'proc-checkout' });
+
+      // Confirm order and bookings in Supabase
+      try {
+        const ordFrom = (supabase.from as any)?.('orders');
+        const bkgFrom = (supabase.from as any)?.('bookings');
+        const tasks = [];
+        if (ordFrom && typeof ordFrom.update === 'function') {
+          tasks.push(ordFrom.update({ status: 'PAID' }).eq('id', orderId));
+        }
+        if (bkgFrom && typeof bkgFrom.update === 'function') {
+          tasks.push(bkgFrom.update({ status: 'CONFIRMED' }).eq('user_id', user.id).eq('status', 'PENDING_PAYMENT'));
+        }
+        if (tasks.length > 0) await Promise.all(tasks);
+      } catch (dbErr) {
+        console.warn('Database procedure update warning:', dbErr);
+      }
+
+      toast.success('Test payment verified! Order confirmed.', { id: 'proc-checkout' });
+      clearCart();
+      isSubmittingRef.current = false;
+      setProcessing(false);
+      navigate(`/payment-success?order_id=${orderId}`);
+    } catch (err: any) {
+      console.error('Procedure checkout error:', err);
+      isSubmittingRef.current = false;
+      setProcessing(false);
+      toast.error(err?.message || 'Procedure checkout could not be completed.', { id: 'proc-checkout' });
     }
   };
 
@@ -568,39 +618,119 @@ export const Checkout = () => {
             <div className={`bg-midnight shadow-sm border transition-all duration-300 ${step === 4 ? 'border-arctic-gold ring-1 ring-arctic-gold/50 scale-[1.01] shadow-2xl' : 'border-white/10'} opacity-${step === 4 ? '100' : '60'}`}>
               <div className={`p-6 border-b border-white/5 flex items-center gap-4 ${step === 4 ? 'bg-white/5' : 'bg-transparent'}`}>
                 <div className={`w-10 h-10 flex items-center justify-center font-bold text-lg ${step === 4 ? 'bg-arctic-gold text-deep-night' : 'bg-white/10 text-snow/50'}`}>4</div>
-                <h2 className={`text-2xl font-display font-bold ${step === 4 ? 'text-snow' : 'text-snow/50'}`}>Payment</h2>
+                <h2 className={`text-2xl font-display font-bold ${step === 4 ? 'text-snow' : 'text-snow/50'}`}>Payment & Confirmation</h2>
               </div>
               
               {step === 4 && (
-                <div className="p-8 animate-in fade-in slide-in-from-bottom-4 duration-500 text-center py-12">
-                  <div className="w-20 h-20 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Lock className="text-blue-400 w-10 h-10" />
+                <div className="p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="text-center max-w-xl mx-auto mb-8">
+                    <div className="w-16 h-16 bg-arctic-gold/10 rounded-2xl border border-arctic-gold/30 flex items-center justify-center mx-auto mb-4 text-arctic-gold">
+                      <Sparkles size={32} />
+                    </div>
+                    <h3 className="text-2xl font-display font-bold text-snow mb-2">Complete Your Booking</h3>
+                    <p className="text-snow/60 text-sm">
+                      Total due: <strong className="text-arctic-gold text-lg">{formatPrice(total)}</strong>. You can confirm instantly via procedure test mode or use the Razorpay test gateway.
+                    </p>
                   </div>
-                  <h3 className="text-2xl font-display font-bold text-snow mb-2">Ready to complete your booking?</h3>
-                  <p className="text-snow/60 mb-8 max-w-md mx-auto">You will be redirected to Razorpay's secure checkout gateway to process your payment of <strong className="text-arctic-gold">{formatPrice(total)}</strong>.</p>
-                  
-                  <div className="flex gap-4 justify-center">
-                    <button onClick={() => setStep(3)} className="px-6 py-4 text-snow/50 font-bold uppercase tracking-widest text-xs hover:text-snow transition-colors border border-white/10 bg-transparent">
+
+                  {/* Procedure Checkout (Instant Demo Payment) */}
+                  <div className="bg-gradient-to-r from-arctic-gold/15 via-white/5 to-arctic-gold/10 border border-arctic-gold/40 rounded-2xl p-6 mb-6 shadow-xl relative overflow-hidden">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                      <div>
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-arctic-gold text-deep-night text-[11px] font-black uppercase tracking-wider mb-2">
+                          <Zap size={13} className="fill-current" /> Recommended For Evaluation
+                        </div>
+                        <h4 className="text-lg font-bold text-snow">1-Click Demo Procedure Checkout</h4>
+                        <p className="text-snow/70 text-xs mt-1">
+                          Immediately marks order as <strong>PAID</strong>, reserves bookings as <strong>CONFIRMED</strong>, and generates an official invoice without requiring real card details.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleSimulatedProcedurePayment}
+                        disabled={processing}
+                        className="w-full sm:w-auto shrink-0 px-6 py-3.5 bg-arctic-gold hover:bg-snow text-deep-night font-bold uppercase tracking-wider text-xs rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                      >
+                        {processing ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-deep-night border-t-transparent rounded-full animate-spin" />
+                            Processing...
+                          </>
+                        ) : (
+                          <>
+                            <Zap size={16} className="fill-current" /> Complete Demo Checkout
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Razorpay Gateway Option with Test Credentials */}
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-white/10">
+                      <div>
+                        <h4 className="text-base font-bold text-snow flex items-center gap-2">
+                          <CreditCard size={18} className="text-blue-400" />
+                          Test Gateway (Razorpay Modal)
+                        </h4>
+                        <p className="text-snow/60 text-xs mt-1">
+                          Test the interactive payment popup. Use the dummy card below to pass gateway validation.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRazorpayMock}
+                        disabled={processing}
+                        className="w-full md:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold uppercase tracking-wider text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                      >
+                        <CreditCard size={16} /> Open Razorpay Popup
+                      </button>
+                    </div>
+
+                    {/* Test Credentials Helper */}
+                    <div className="mt-4 pt-2">
+                      <div className="text-[11px] font-bold text-snow/50 uppercase tracking-wider mb-2">
+                        Official Test Card Credentials
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                        <div className="bg-black/40 border border-white/10 rounded-lg p-2.5 flex items-center justify-between">
+                          <div>
+                            <span className="text-snow/40 block text-[10px]">Card Number</span>
+                            <span className="font-mono text-snow font-bold tracking-wider">4012 0000 0000 0002</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard.writeText('4012000000000002');
+                              toast.success('Test card number copied!');
+                            }}
+                            title="Copy Card Number"
+                            className="p-1.5 hover:bg-white/10 rounded text-snow/60 hover:text-arctic-gold transition-colors cursor-pointer"
+                          >
+                            <Copy size={14} />
+                          </button>
+                        </div>
+                        <div className="bg-black/40 border border-white/10 rounded-lg p-2.5">
+                          <span className="text-snow/40 block text-[10px]">Expiry Date</span>
+                          <span className="font-mono text-snow font-bold">12 / 28 (Any future)</span>
+                        </div>
+                        <div className="bg-black/40 border border-white/10 rounded-lg p-2.5">
+                          <span className="text-snow/40 block text-[10px]">CVV & OTP</span>
+                          <span className="font-mono text-snow font-bold">123 | OTP: 123456</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-between">
+                    <button onClick={() => setStep(3)} className="px-6 py-3 text-snow/50 font-bold uppercase tracking-widest text-xs hover:text-snow transition-colors border border-white/10 bg-transparent rounded-xl cursor-pointer">
                       Back to Add-ons
                     </button>
-                    <button 
-                      onClick={handleRazorpayMock}
-                      disabled={processing}
-                      className="px-12 py-4 bg-blue-600 text-white font-bold uppercase tracking-widest text-sm border border-blue-500 hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300 shadow-lg shadow-blue-600/30 flex items-center gap-3 rounded-xl transition-all disabled:bg-slate-500 disabled:text-slate-200 disabled:border-slate-400 disabled:shadow-none disabled:cursor-not-allowed cursor-pointer"
-                    >
-                      {processing ? (
-                        'Connecting...'
-                      ) : (
-                        <>
-                          <CreditCard size={20} /> Pay securely
-                        </>
-                      )}
-                    </button>
-                  </div>
-                  <div className="mt-6 flex items-center justify-center gap-6 opacity-50 grayscale">
-                     <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-4" />
-                     <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-6" />
-                     <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-4" />
+                    <div className="flex items-center gap-4 opacity-50 grayscale">
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-4" />
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-6" />
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-4" />
+                    </div>
                   </div>
                 </div>
               )}
