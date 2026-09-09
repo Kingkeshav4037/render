@@ -6,6 +6,8 @@ import { useCurrencyStore } from '../../store/useCurrencyStore';
 import { invoiceService } from '../../services/invoice/invoiceService';
 import { useAuthStore } from '../../store/useAuthStore';
 
+import { bookingService } from '../../services/bookingService';
+
 export const BookingDetails = () => {
   const { id = '' } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -25,8 +27,35 @@ export const BookingDetails = () => {
           .eq('id', id)
           .single();
 
-        if (error) throw error;
-        setBooking(data);
+        let rawBooking: any = data;
+        if (error || !rawBooking) {
+          // Check local restaurant reservations
+          try {
+            const cached = JSON.parse(localStorage.getItem('norway_restaurant_reservations') || '{}');
+            const foundLocal = Object.values(cached).find((r: any) => r.bookingId === id) as any;
+            if (foundLocal) {
+              rawBooking = {
+                id: foundLocal.bookingId,
+                item_type: 'RESTAURANT',
+                status: 'CONFIRMED',
+                start_time: `${foundLocal.date}T${foundLocal.time}:00`,
+                end_time: new Date(new Date(`${foundLocal.date}T${foundLocal.time}:00`).getTime() + 2 * 3600000).toISOString(),
+                pax: foundLocal.guests || 2,
+                total_amount: 0,
+                currency: 'NOK',
+                restaurant_name: foundLocal.restaurantName,
+                created_at: foundLocal.created_at || new Date().toISOString(),
+              };
+            }
+          } catch {
+            // ignore
+          }
+        }
+
+        if (rawBooking) {
+          const enriched = await bookingService.enrichBooking(rawBooking);
+          setBooking(enriched);
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -92,7 +121,15 @@ export const BookingDetails = () => {
               }`}>
                 {booking.status}
               </span>
-              <h1 className="text-4xl md:text-5xl font-display font-black mb-2">Booking #{booking.id.split('-')[0]}</h1>
+              <h1 className="text-4xl md:text-5xl font-display font-black mb-2">
+                {booking.restaurant_name 
+                  ? `Table at ${booking.restaurant_name}` 
+                  : booking.stay_name 
+                    ? `Stay at ${booking.stay_name}` 
+                    : booking.activity_name 
+                      ? booking.activity_name 
+                      : `Booking #${booking.id?.split('-')[0] || booking.id}`}
+              </h1>
               <p className="text-white/60 font-medium">Placed on {new Date(booking.created_at).toLocaleDateString()}</p>
             </div>
             
@@ -119,7 +156,15 @@ export const BookingDetails = () => {
               <div className="p-8">
                 <div className="flex justify-between items-start border-b border-gray-100 pb-6 mb-6">
                   <div>
-                    <h3 className="text-2xl font-display font-bold text-navy-900 mb-1">{booking.item_type}</h3>
+                    <h3 className="text-2xl font-display font-bold text-navy-900 mb-1">
+                      {booking.restaurant_name 
+                        ? `Table at ${booking.restaurant_name}` 
+                        : booking.stay_name 
+                          ? `Stay at ${booking.stay_name}` 
+                          : booking.activity_name 
+                            ? booking.activity_name 
+                            : booking.item_type}
+                    </h3>
                     <p className="text-gray-500 font-medium">Digital Ticket ID: {booking.id}</p>
                   </div>
                   <Ticket size={40} className="text-gray-200" />
@@ -140,10 +185,17 @@ export const BookingDetails = () => {
                     <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Guests / Pax</span>
                     <span className="font-bold text-lg">{booking.pax}</span>
                   </div>
-                  <div>
-                    <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Status</span>
-                    <span className="font-bold text-lg">{booking.status}</span>
-                  </div>
+                  {booking.item_type === 'ACCOMMODATION' && booking.nights ? (
+                    <div>
+                      <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Duration</span>
+                      <span className="font-bold text-lg">{booking.nights} {booking.nights === 1 ? 'Night' : 'Nights'}</span>
+                    </div>
+                  ) : (
+                    <div>
+                      <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Status</span>
+                      <span className="font-bold text-lg">{booking.status}</span>
+                    </div>
+                  )}
                 </div>
               </div>
               
@@ -151,7 +203,7 @@ export const BookingDetails = () => {
                 <div className="bg-gray-50 p-6 border-t border-gray-200 border-dashed text-center">
                   <p className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4">Show this code at entry</p>
                   <div className="bg-white border border-gray-300 p-4 inline-block font-mono text-2xl font-black tracking-[0.25em]">
-                    {booking.id.split('-')[1].toUpperCase()}
+                    {(booking.id.split('-')[1] || booking.id.slice(0, 6)).toUpperCase()}
                   </div>
                 </div>
               )}
@@ -192,25 +244,57 @@ export const BookingDetails = () => {
             <div className="bg-white border border-gray-200 shadow-sm p-6 sticky top-28">
               <h3 className="font-bold uppercase tracking-widest text-xs text-gray-400 mb-6">Payment Summary</h3>
               
-              <div className="space-y-4 mb-6 pb-6 border-b border-gray-100">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-600">Base Price</span>
-                  <span className="font-medium">{formatPrice(booking.total_amount * 0.75)}</span>
+              {booking.item_type === 'RESTAURANT' && (!booking.total_amount || Number(booking.total_amount) === 0) ? (
+                <div className="space-y-4">
+                  <div className="space-y-4 pb-6 border-b border-gray-100">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-600">Table Reservation Fee</span>
+                      <span className="font-semibold text-emerald-700">Free / Complimentary</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-600">Upfront Deposit</span>
+                      <span className="font-medium">kr 0</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-600">Dining Billing</span>
+                      <span className="text-xs text-gray-500 font-medium">Pay at venue</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-between items-end mb-4 pt-2">
+                    <span className="font-bold text-navy-900">Total Deposit</span>
+                    <span className="font-display font-black text-2xl text-emerald-700">kr 0</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                    <CheckCircle2 size={14} className="text-aurora-green" /> Guaranteed table hold confirmed
+                  </div>
                 </div>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-600">Taxes & Fees</span>
-                  <span className="font-medium">{formatPrice(booking.total_amount * 0.25)}</span>
+              ) : (
+                <div>
+                  <div className="space-y-4 mb-6 pb-6 border-b border-gray-100">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-600">
+                        Base Price {booking.nights ? `(${booking.nights} ${booking.nights === 1 ? 'night' : 'nights'})` : ''}
+                      </span>
+                      <span className="font-medium">{formatPrice((booking.total_amount || 0) * 0.75)}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-600">Taxes & MVA (25%)</span>
+                      <span className="font-medium">{formatPrice((booking.total_amount || 0) * 0.25)}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-between items-end mb-4">
+                    <span className="font-bold text-navy-900">Total Paid</span>
+                    <span className="font-display font-black text-2xl text-navy-900">{formatPrice(booking.total_amount || 0)}</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                    <CheckCircle2 size={14} className="text-aurora-green" /> Payment completed & verified
+                  </div>
                 </div>
-              </div>
-              
-              <div className="flex justify-between items-end mb-4">
-                <span className="font-bold text-navy-900">Total Paid</span>
-                <span className="font-display font-black text-2xl text-navy-900">{formatPrice(booking.total_amount)}</span>
-              </div>
-              
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <CheckCircle2 size={14} className="text-aurora-green" /> Payment successful via Razorpay
-              </div>
+              )}
             </div>
           </div>
           

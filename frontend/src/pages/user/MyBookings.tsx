@@ -6,6 +6,7 @@ import { useCurrencyStore } from '../../store/useCurrencyStore';
 import { CinematicBackground } from '../../design/backgrounds/CinematicBackground';
 import { invoiceService } from '../../services/invoice/invoiceService';
 import { useAuthStore } from '../../store/useAuthStore';
+import { bookingService } from '../../services/bookingService';
 
 export const MyBookings = () => {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -63,7 +64,9 @@ export const MyBookings = () => {
           // ignore
         }
 
-        setBookings(list);
+        // Automatically resolve prices, nights, and stay names for any bookings
+        const enrichedList = await bookingService.enrichBookings(list);
+        setBookings(enrichedList);
       } catch (err) {
         console.error(err);
       } finally {
@@ -202,7 +205,11 @@ export const MyBookings = () => {
                           ? `Table at ${(booking as any).restaurant_name}` 
                           : booking.item_type === 'RESTAURANT' 
                             ? 'Restaurant Table Reservation' 
-                            : `Booking #${booking.id?.split('-')[0] || booking.id}`}
+                            : (booking as any).stay_name
+                              ? `Stay at ${(booking as any).stay_name}`
+                              : (booking as any).activity_name
+                                ? (booking as any).activity_name
+                                : `Booking #${booking.id?.split('-')[0] || booking.id}`}
                       </h3>
                       
                       <div className="flex flex-wrap gap-x-6 gap-y-2 mt-4 text-sm font-medium text-gray-600">
@@ -210,14 +217,35 @@ export const MyBookings = () => {
                         {endDate && (
                           <div className="flex items-center gap-2"><Calendar size={16} className="text-gray-400"/> Until {endDate.toLocaleDateString()}</div>
                         )}
+                        {booking.item_type === 'ACCOMMODATION' && (booking as any).nights && (
+                          <div className="flex items-center gap-2 text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                            {(booking as any).nights} {((booking as any).nights === 1) ? 'Night' : 'Nights'}
+                          </div>
+                        )}
                       </div>
                     </div>
 
                     {/* Price & Action (Right) */}
                     <div className="w-full md:w-56 bg-white border-t md:border-t-0 md:border-l border-gray-100 p-6 flex md:flex-col justify-between items-center md:items-end md:justify-center gap-3">
                       <div className="text-left md:text-right">
-                        <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Total</div>
-                        <div className="text-xl font-display font-black text-navy-900">{formatPrice(booking.total_amount)}</div>
+                        <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">
+                          {booking.item_type === 'RESTAURANT' && (!booking.total_amount || Number(booking.total_amount) === 0)
+                            ? 'Reservation Fee'
+                            : 'Total'}
+                        </div>
+                        <div className="text-xl font-display font-black text-navy-900">
+                          {booking.item_type === 'RESTAURANT' && (!booking.total_amount || Number(booking.total_amount) === 0) ? (
+                            <span className="text-emerald-700 text-base font-bold">Free Reservation</span>
+                          ) : (
+                            formatPrice(booking.total_amount)
+                          )}
+                        </div>
+                        {booking.item_type === 'RESTAURANT' && (!booking.total_amount || Number(booking.total_amount) === 0) && (
+                          <div className="text-[11px] text-gray-500 font-medium mt-0.5">0 kr deposit • Pay at venue</div>
+                        )}
+                        {booking.item_type === 'ACCOMMODATION' && (booking as any).nights && (
+                          <div className="text-[11px] text-gray-400 font-medium mt-0.5">{(booking as any).nights} {((booking as any).nights === 1) ? 'night' : 'nights'} included</div>
+                        )}
                       </div>
                       
                       <div className="flex items-center gap-2 mt-0 md:mt-2">

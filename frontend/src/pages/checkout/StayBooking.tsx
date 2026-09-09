@@ -409,7 +409,11 @@ export const StayBooking = () => {
                   tasks.push(ordFrom.update({ status: 'PAID' }).eq('id', orderId));
                 }
                 if (bkgFrom && typeof bkgFrom.update === 'function') {
-                  tasks.push(bkgFrom.update({ status: 'CONFIRMED' }).eq('user_id', user.id).eq('item_id', targetAccommodationId).eq('status', 'PENDING_PAYMENT'));
+                  tasks.push(bkgFrom.update({ 
+                    status: 'CONFIRMED',
+                    total_amount: totalAmount,
+                    currency: 'NOK'
+                  }).eq('user_id', user.id).eq('item_id', targetAccommodationId));
                 }
                 if (tasks.length > 0) await Promise.all(tasks);
               } catch (dbErr) {
@@ -476,7 +480,11 @@ export const StayBooking = () => {
             tasks.push(ordFrom.update({ status: 'PAID' }).eq('id', orderId));
           }
           if (bkgFrom && typeof bkgFrom.update === 'function') {
-            tasks.push(bkgFrom.update({ status: 'CONFIRMED' }).eq('user_id', user.id).eq('item_id', targetAccommodationId).eq('status', 'PENDING_PAYMENT'));
+            tasks.push(bkgFrom.update({ 
+              status: 'CONFIRMED',
+              total_amount: totalAmount,
+              currency: 'NOK'
+            }).eq('user_id', user.id).eq('item_id', targetAccommodationId));
           }
           if (tasks.length > 0) await Promise.all(tasks);
         } catch (e) {}
