@@ -58,8 +58,15 @@ export const ReviewSection: React.FC<Props> = ({ productType, productId }) => {
     ));
   };
 
+  const handleAddPhoto = () => {
+    const url = window.prompt("Enter an image URL for your review:");
+    if (url && url.trim()) {
+      setPhotos((prev) => [...prev, url.trim()]);
+    }
+  };
+
   return (
-    <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm mt-12">
+    <div className="bg-white text-navy-900 rounded-3xl p-8 border border-gray-100 shadow-sm mt-12">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h2 className="text-2xl font-bold text-navy-900 flex items-center gap-2">
@@ -92,7 +99,7 @@ export const ReviewSection: React.FC<Props> = ({ productType, productId }) => {
                         onClick={() => setRating(i + 1)}
                         onMouseEnter={() => setHoverRating(i + 1)}
                         onMouseLeave={() => setHoverRating(rating)}
-                        className={`transition-colors ${i < hoverRating ? 'text-yellow-400' : 'text-gray-300'}`}
+                        className={`transition-colors cursor-pointer ${i < hoverRating ? 'text-yellow-400' : 'text-gray-300'}`}
                       >
                         <Star size={28} fill={i < hoverRating ? "currentColor" : "none"} />
                       </button>
@@ -106,7 +113,7 @@ export const ReviewSection: React.FC<Props> = ({ productType, productId }) => {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     required
-                    className="w-full p-3 rounded-xl border border-gray-200 focus:border-navy-900 focus:ring-0 outline-none"
+                    className="w-full p-3 rounded-xl border border-gray-200 bg-white text-navy-900 placeholder:text-gray-400 focus:border-navy-900 focus:ring-2 focus:ring-navy-900/10 outline-none text-sm font-medium transition-colors"
                   />
                 </div>
                 <div>
@@ -116,17 +123,38 @@ export const ReviewSection: React.FC<Props> = ({ productType, productId }) => {
                     onChange={(e) => setDescription(e.target.value)}
                     required
                     rows={4}
-                    className="w-full p-3 rounded-xl border border-gray-200 focus:border-navy-900 focus:ring-0 outline-none resize-none"
+                    className="w-full p-3 rounded-xl border border-gray-200 bg-white text-navy-900 placeholder:text-gray-400 focus:border-navy-900 focus:ring-2 focus:ring-navy-900/10 outline-none resize-none text-sm font-medium transition-colors"
                   ></textarea>
                 </div>
+                {photos.length > 0 && (
+                  <div className="flex gap-2 flex-wrap pt-1">
+                    {photos.map((photo, idx) => (
+                      <div key={idx} className="relative group">
+                        <img src={photo} alt="Preview" className="w-14 h-14 object-cover rounded-lg border border-gray-200" />
+                        <button
+                          type="button"
+                          onClick={() => setPhotos(photos.filter((_, i) => i !== idx))}
+                          className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow hover:bg-red-600 transition-colors cursor-pointer"
+                          title="Remove photo"
+                        >
+                          &times;
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <div className="flex items-center gap-4">
-                  <button type="button" className="p-3 bg-white border border-gray-200 rounded-xl text-gray-500 hover:text-navy-900 hover:border-gray-300 transition-colors flex items-center gap-2 text-sm font-bold">
+                  <button 
+                    type="button" 
+                    onClick={handleAddPhoto}
+                    className="p-3 bg-white border border-gray-200 rounded-xl text-gray-600 hover:text-navy-900 hover:border-gray-300 transition-colors flex items-center gap-2 text-sm font-bold cursor-pointer"
+                  >
                     <ImageIcon size={18} /> Add Photos
                   </button>
                   <button 
                     type="submit" 
                     disabled={isSubmitting}
-                    className="flex-1 py-3 bg-navy-900 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-navy-800 transition-colors disabled:opacity-70"
+                    className="flex-1 py-3 bg-navy-900 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-navy-800 transition-colors disabled:opacity-70 cursor-pointer"
                   >
                     {isSubmitting ? 'Posting...' : <><Send size={18} /> Post Review</>}
                   </button>
