@@ -69,7 +69,7 @@ const DEFAULT_TRAILS: Trail[] = [
     id: 'tr-007', name: 'Romsdalseggen Ridge', location: 'Åndalsnes, Møre og Romsdal',
     difficulty: 'Hard', distance_km: 10, duration_hrs: '5–7', elevation_gain_m: 1000,
     rating: 4.7, best_season: 'Jun–Sep', weather_status: 'Clear',
-    image: 'https://images.unsplash.com/photo-1519451241324-20b4ea2c4220?auto=format&fit=crop&q=80&w=1200',
+    image: '/images/svalbard_trek.jpg',
     description: 'Voted one of the world\'s most beautiful hikes — a dramatic ridge walk above Åndalsnes with the Romsdalshorn and Trollveggen as a backdrop.',
     highlights: ['World top-10 hike', '360° panoramas', 'Mountain railway return', 'Eagle views']
   },
@@ -77,11 +77,19 @@ const DEFAULT_TRAILS: Trail[] = [
     id: 'tr-008', name: 'Glittertind via Spiterstulen', location: 'Jotunheimen, Innlandet',
     difficulty: 'Hard', distance_km: 16, duration_hrs: '6–8', elevation_gain_m: 1100,
     rating: 4.6, best_season: 'Jul–Sep', weather_status: 'Variable',
-    image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=1200',
+    image: '/images/svalbard_hikers.jpg',
     description: 'Norway\'s second-highest peak at 2,465m, with a glacial ice cap that occasionally makes it taller than Galdhøpiggen. A less-crowded alternative.',
     highlights: ['Second highest peak', 'Glacial cap', 'Jotunheimen NP', 'Quieter crowds']
   },
 ];
+
+const resolveTrailImage = (name: string, heroImage?: string, firstImage?: string): string => {
+  if (heroImage && !heroImage.includes('placeholder')) return heroImage;
+  if (firstImage && !firstImage.includes('placeholder')) return firstImage;
+  const match = DEFAULT_TRAILS.find(d => name.toLowerCase().includes(d.name.toLowerCase()) || d.name.toLowerCase().includes(name.toLowerCase()));
+  if (match) return match.image;
+  return '/images/trolltunga_1786936111320.jpg';
+};
 
 export const trailService = {
   getTrails: async (filters?: { difficulty?: string }): Promise<Trail[]> => {
@@ -105,7 +113,7 @@ export const trailService = {
       }
 
       return (data || []).map((t: any) => {
-        const heroImage = t.content_media?.find((m: any) => m.media_type === 'HERO')?.media_url;
+        const heroImage = t.content_media?.find?.((m: any) => m.media_type === 'HERO')?.media_url;
         const firstImage = t.content_media?.[0]?.media_url;
         return {
           id: t.id,
@@ -118,7 +126,7 @@ export const trailService = {
           rating: 4.8,
           best_season: 'Jun–Sep',
           weather_status: 'Clear',
-          image: (heroImage && !heroImage.includes('placeholder')) ? heroImage : firstImage || '/images/besseggen_1786936349992.jpg'
+          image: resolveTrailImage(t.name, heroImage, firstImage)
         };
       });
     } catch {
@@ -160,7 +168,7 @@ export const trailService = {
         rating: 4.8,
         best_season: 'Jun–Sep',
         weather_status: 'Clear',
-        image: (heroImage && !heroImage.includes('placeholder')) ? heroImage : firstImage || '/images/besseggen_1786936349992.jpg'
+        image: resolveTrailImage(trailData.name, heroImage, firstImage)
       };
     } catch {
       return DEFAULT_TRAILS.find(t => t.id === id) || null;

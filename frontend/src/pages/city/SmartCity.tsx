@@ -15,7 +15,7 @@ export const SmartCity = () => {
       />
       
       <CinematicBackground 
-        imageUrl="/images/infra_windfarm.jpg"
+        imageUrl="/images/smart_home_energy_system.jpg"
         gradient="aurora"
         overlayOpacity={0.7}
         className="h-[60vh] flex items-center pt-24 mb-16"

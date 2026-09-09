@@ -26,7 +26,7 @@ export const RoadTrips = () => {
   return (
     <div className="min-h-screen bg-pine-forest text-white">
       <CinematicBackground
-        imageUrl="/images/kjeragbolten_1786936275605.jpg"
+        imageUrl="/images/aurlandsfjord_viewpoint.jpg"
         overlayOpacity={0.65}
         theme="pineForest"
       />

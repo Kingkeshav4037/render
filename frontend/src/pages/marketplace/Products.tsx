@@ -86,7 +86,7 @@ export const Products = () => {
     <div className="bg-deep-night min-h-screen text-snow font-sans">
       {/* Premium Header */}
       <CinematicBackground 
-        imageUrl="https://images.unsplash.com/photo-1522204523234-8729aa6e3d5f?w=1600"
+        imageUrl="/images/norwegian_shop_exterior.jpg"
         gradient="aurora"
         overlayOpacity={0.7}
         className="h-[60vh] flex items-end pb-12 mb-12"

@@ -208,7 +208,7 @@ export const StayDetails = () => {
         </div>
         <div className="hidden md:block col-span-1 h-full relative group overflow-hidden">
           <OptimizedImage 
-            src="https://images.unsplash.com/photo-1590490360182-c33d57733427?q=luxury+nordic+hotel+interior+room&w=800" 
+            src="/images/hotel_restaurant.jpg" 
             alt="Room & Interior" 
             category="stay"
             fallbackSrc={getStayImage(stay.name, stay.type)}
@@ -219,7 +219,7 @@ export const StayDetails = () => {
         <div className="hidden md:flex col-span-1 h-full flex-col gap-2">
           <div className="h-1/2 relative group overflow-hidden">
             <OptimizedImage 
-              src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=scandinavian+resort+room+view&w=800" 
+              src="/images/aurlandsfjord_viewpoint.jpg" 
               alt="Panoramic View" 
               category="stay"
               fallbackSrc={getStayImage(stay.name, stay.type)}
@@ -229,7 +229,7 @@ export const StayDetails = () => {
           </div>
           <div className="h-1/2 relative group overflow-hidden">
             <OptimizedImage 
-              src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=nordic+sauna+wellness+resort&w=800" 
+              src="/images/fjord_sauna.jpg" 
               alt="Sauna & Spa" 
               category="stay"
               fallbackSrc={getStayImage(stay.name, stay.type)}

@@ -19,21 +19,21 @@ export type ImageCategory =
   | 'default';
 
 const CATEGORY_FALLBACKS: Record<ImageCategory, string> = {
-  landscape: '/images/fjords.jpg',
+  landscape: '/images/fjords_1786935800026.jpg',
   wildlife: '/images/wildlife_reindeer_1787013667019.jpg',
-  flora: 'https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?q=cloudberries+flora+norway&w=1200',
-  food: '/images/food_salmon_1787013684123.jpg',
+  flora: '/images/cloudberry.jpg',
+  food: '/images/food_market_hall.jpg',
   stay: '/images/hotel_juvet_1787013813000.jpg',
   trail: '/images/besseggen_1786936349992.jpg',
-  winter: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=ski+slopes+norway+winter&w=1200',
+  winter: '/images/skiing_norway.jpg',
   aurora: '/images/northern_lights_1786935879330.jpg',
   product: '/images/product_thermostat.jpg',
   infra: '/images/infra_windfarm_1786938637138.jpg',
   activity: '/images/preikestolen_1786936002797.jpg',
-  culture: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=bryggen+bergen+norway&w=1200',
-  history: 'https://images.unsplash.com/photo-1548625361-195feee1361c?q=stave+church+norway&w=1200',
-  transport: 'https://images.unsplash.com/photo-1448375240586-882707db888b?q=flamsbana+train+norway&w=1200',
-  default: '/images/fjords.jpg'
+  culture: '/images/bergen.jpg',
+  history: '/images/avaldsnes_viking.jpg',
+  transport: '/images/flamsbana.jpg',
+  default: '/images/fjords_1786935800026.jpg'
 };
 
 interface OptimizedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src'> {

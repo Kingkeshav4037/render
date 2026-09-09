@@ -181,7 +181,7 @@ export const Food = () => {
       <SEO 
         title="Culinary & Dining"
         description="Reserve a table at world-class New Nordic restaurants, coastal seafood huts, and traditional dining rooms across Norway."
-        ogImage="/images/food_salmon_1787013684123.jpg"
+        ogImage="/images/fine_dining_interior.jpg"
       />
       
       {/* Header */}
@@ -193,7 +193,7 @@ export const Food = () => {
             <Utensils className="w-4 h-4" /> Culinary Scene
           </>
         }
-        backgroundImage="/images/food_salmon_1787013684123.jpg"
+        backgroundImage="/images/fine_dining_interior.jpg"
       >
         {/* Live Search & Filter Bar */}
         <div className="bg-white/5 backdrop-blur-2xl border border-white/10 p-2 flex flex-col md:flex-row gap-2 max-w-5xl shadow-2xl rounded-2xl">
@@ -357,7 +357,7 @@ export const Food = () => {
                               src={foodImage} 
                               alt={food.name}
                               category="food"
-                              fallbackSrc="/images/food_salmon_1787013684123.jpg"
+                              fallbackSrc="/images/food_market_hall.jpg"
                               className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-90 group-hover:opacity-100"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-midnight via-transparent to-transparent pointer-events-none" />
@@ -515,7 +515,7 @@ export const Food = () => {
                             src={restaurant.image_url || getRestaurantImage(restaurant.name)} 
                             alt={restaurant.name}
                             category="food"
-                            fallbackSrc="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800"
+                            fallbackSrc="/images/fine_dining_interior.jpg"
                             className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-90 group-hover:opacity-100"
                           />
                           <div className="absolute top-4 left-4 flex gap-2 flex-col z-20">

@@ -45,27 +45,27 @@ const TIMELINE_ERAS = [
 const getHistoricalImage = (name: string, currentUrl?: string | null) => {
   const n = (name || '').toLowerCase();
   if (n.includes('viking') || n.includes('oseberg') || n.includes('gokstad') || n.includes('ship museum')) {
-    return 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=viking+longship+norway&w=1200';
+    return '/images/viking_maritime.jpg';
   }
   if (n.includes('munch')) {
-    return 'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?q=edvard+munch+art+gallery&w=1200';
+    return '/images/munch_museum.jpg';
   }
   if (n.includes('fram') || n.includes('polar') || n.includes('amundsen') || n.includes('nansen')) {
-    return 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=polar+exploration+ship+arctic&w=1200';
+    return '/images/fram_museum.jpg';
   }
   if (n.includes('stave') || n.includes('heddal') || n.includes('borgund') || n.includes('kirke')) {
-    return 'https://images.unsplash.com/photo-1548625361-195feee1361c?q=stave+church+norway+heddal&w=1200';
+    return '/images/nidaros_cathedral.jpg';
   }
   if (n.includes('bryggen') || n.includes('hanseatic') || n.includes('bergen')) {
-    return 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=bryggen+bergen+norway&w=1200';
+    return '/images/bryggen.jpg';
   }
   if (n.includes('nidaros') || n.includes('cathedral') || n.includes('trondheim')) {
-    return 'https://images.unsplash.com/photo-1548625361-195feee1361c?q=nidaros+cathedral+trondheim+gothic&w=1200';
+    return '/images/nidaros_cathedral.jpg';
   }
   if (currentUrl && !currentUrl.includes('placeholder') && !currentUrl.includes('fjords_')) {
     return currentUrl;
   }
-  return 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=bryggen+bergen+norway&w=1200';
+  return '/images/bryggen.jpg';
 };
 
 const getHistoricalDescription = (name: string, description?: string | null) => {
@@ -113,7 +113,7 @@ export const History = () => {
         title="Norwegian History & Heritage"
         description="Step back in time to the era of Vikings, explore medieval stave churches, and uncover the rich cultural tapestry of Norway."
         breadcrumb="History"
-        backgroundImage="https://images.unsplash.com/photo-1548625361-195feee1361c?q=stave+church+norway+heddal&w=1600"
+        backgroundImage="/images/viking_maritime.jpg"
       >
         <div className="flex flex-wrap items-center gap-6 mt-8">
           <div className="flex items-center gap-2 text-snow/70">
@@ -219,7 +219,7 @@ export const History = () => {
                     src={getHistoricalImage(dest.name, dest.hero_image_url)}
                     alt={dest.name}
                     category="culture"
-                    fallbackSrc="https://images.unsplash.com/photo-1516483638261-f4dbaf036963?q=80&w=800"
+                    fallbackSrc="/images/bryggen.jpg"
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-85 group-hover:opacity-100"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-midnight via-transparent to-transparent opacity-80" />

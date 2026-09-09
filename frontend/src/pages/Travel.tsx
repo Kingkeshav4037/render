@@ -85,7 +85,7 @@ export const Travel = () => {
             <Leaf className="w-4 h-4" /> Smart Mobility
           </>
         }
-        backgroundImage="/images/infra_windfarm_1786938637138.jpg"
+        backgroundImage="/images/flamsbana.jpg"
       >
         {/* Smart Routing Bar */}
         <form onSubmit={handleSearch} className="bg-white/5 backdrop-blur-2xl border border-white/10 p-2 flex flex-col md:flex-row gap-2 max-w-5xl shadow-2xl rounded-sm">

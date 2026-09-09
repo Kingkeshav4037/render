@@ -42,7 +42,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'loc-tromso': {
     title: 'Tromsø & The Arctic Gateway',
     region: 'Northern Norway',
-    image: '/images/destinations/tromso.jpg',
+    image: '/images/tromso_winter.jpg',
     url: '/explore/tromso',
     description: 'The capital of the Arctic, renowned for ethereal Northern Lights, midnight sun, and vibrant culture.',
     rating: 4.9,
@@ -51,7 +51,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'tromso': {
     title: 'Tromsø',
     region: 'Northern Norway',
-    image: '/images/destinations/tromso.jpg',
+    image: '/images/tromso_winter.jpg',
     url: '/explore/tromso',
     description: 'Arctic adventure hub with world-class auroral research stations and whale watching fjords.',
     rating: 4.9,
@@ -60,7 +60,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'loc-geiranger': {
     title: 'Geirangerfjord',
     region: 'Western Norway',
-    image: '/images/destinations/geirangerfjord.jpg',
+    image: '/images/geirangerfjord.jpg',
     url: '/explore/geirangerfjord',
     description: 'UNESCO World Heritage fjord with soaring Seven Sisters waterfalls and majestic snow-capped peaks.',
     rating: 5.0,
@@ -69,7 +69,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'geirangerfjord': {
     title: 'Geirangerfjord',
     region: 'Western Norway',
-    image: '/images/destinations/geirangerfjord.jpg',
+    image: '/images/geirangerfjord.jpg',
     url: '/explore/geirangerfjord',
     description: 'UNESCO World Heritage fjord featuring dramatic emerald waters and towering granite walls.',
     rating: 5.0,
@@ -78,7 +78,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'fav-geiranger': {
     title: 'Geirangerfjord',
     region: 'Western Norway',
-    image: '/images/destinations/geirangerfjord.jpg',
+    image: '/images/geirangerfjord.jpg',
     url: '/explore/geirangerfjord',
     description: 'UNESCO World Heritage fjord with soaring waterfalls and majestic snow-capped peaks.',
     rating: 5.0,
@@ -87,7 +87,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'loc-lofoten': {
     title: 'Lofoten Islands',
     region: 'Nordland',
-    image: '/images/destinations/lofoten.jpg',
+    image: '/images/lofoten_1787013505867.jpg',
     url: '/explore/lofoten',
     description: 'Dramatic peaks rising straight from turquoise arctic waters, dotted with crimson rorbuer.',
     rating: 4.9,
@@ -96,7 +96,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'lofoten': {
     title: 'Lofoten Archipelago',
     region: 'Nordland',
-    image: '/images/destinations/lofoten.jpg',
+    image: '/images/lofoten_1787013505867.jpg',
     url: '/explore/lofoten',
     description: 'Unspoiled arctic islands famous for cod fishing traditions and towering sea cliffs.',
     rating: 4.9,
@@ -105,7 +105,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'loc-bergen': {
     title: 'Bergen & Hanseatic Wharf',
     region: 'Western Norway',
-    image: '/images/destinations/bergen.jpg',
+    image: '/images/bergen.jpg',
     url: '/explore/bergen',
     description: 'Gateway to the fjords, home to the iconic UNESCO Bryggen wooden wharf and seven mountains.',
     rating: 4.8,
@@ -114,7 +114,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'bergen': {
     title: 'Bergen',
     region: 'Western Norway',
-    image: '/images/destinations/bergen.jpg',
+    image: '/images/bergen.jpg',
     url: '/explore/bergen',
     description: 'Charming coastal city nestled between mountains, famous for fresh seafood and funiculars.',
     rating: 4.8,
@@ -123,7 +123,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'loc-oslo': {
     title: 'Oslo Capital Region',
     region: 'Eastern Norway',
-    image: '/images/destinations/oslo.jpg',
+    image: '/images/oslo_hotel_hub.jpg',
     url: '/explore/oslo',
     description: 'Nordic innovation hub blending cutting-edge sustainable architecture with fjord swimming.',
     rating: 4.7,
@@ -132,7 +132,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'oslo': {
     title: 'Oslo',
     region: 'Eastern Norway',
-    image: '/images/destinations/oslo.jpg',
+    image: '/images/oslo_hotel_hub.jpg',
     url: '/explore/oslo',
     description: 'Modern waterfront, Munch Museum, Opera House, and green forest micro-adventures.',
     rating: 4.7,
@@ -141,7 +141,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'loc-stavanger': {
     title: 'Stavanger & Lysefjord',
     region: 'Rogaland',
-    image: '/images/destinations/stavanger.jpg',
+    image: '/images/stavanger.jpg',
     url: '/explore/stavanger',
     description: 'Historic white wooden houses and the springboard to the world-famous Preikestolen rock.',
     rating: 4.8,
@@ -150,7 +150,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'loc-flam': {
     title: 'Flåm & Aurlandsfjord',
     region: 'Sogn og Fjordane',
-    image: '/images/destinations/flam.jpg',
+    image: '/images/flam.jpg',
     url: '/explore/flam',
     description: 'World-renowned scenic railway journey down steep mountain valleys to serene fjord shores.',
     rating: 4.9,
@@ -159,7 +159,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'loc-alesund': {
     title: 'Ålesund Art Nouveau Town',
     region: 'Møre og Romsdal',
-    image: '/images/destinations/alesund.jpg',
+    image: '/images/alesund.jpg',
     url: '/explore/alesund',
     description: 'Fairy-tale Art Nouveau architecture spread across islands where the Atlantic meets the Sunnmøre Alps.',
     rating: 4.8,
@@ -170,7 +170,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'stay-grand-hotel': {
     title: 'Grand Hotel Oslo',
     region: 'Oslo City Center',
-    image: '/images/stays/grand_hotel_1787013661159.jpg',
+    image: '/images/hotel_historic.jpg',
     url: '/stay/stay-grand-hotel',
     description: 'Historic 1874 luxury hotel hosting Nobel Peace Prize laureates on Karl Johans gate.',
     price: 3200,
@@ -180,7 +180,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'stay-the-thief': {
     title: 'The Thief',
     region: 'Tjuvholmen, Oslo',
-    image: '/images/stays/the_thief_1787013645398.jpg',
+    image: '/images/clarion_hotel_the_hub.jpg',
     url: '/stay/stay-the-thief',
     description: 'Avant-garde design waterfront hotel with bespoke contemporary art collections and luxury spa.',
     price: 3800,
@@ -190,7 +190,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'stay-sommerro': {
     title: 'Sommerro House',
     region: 'Frogner, Oslo',
-    image: '/images/stays/sommerro_1787013653139.jpg',
+    image: '/images/hotel_bar.jpg',
     url: '/stay/stay-sommerro',
     description: 'Iconic 1930s Art Deco transformation with rooftop pool, public baths, and multiple restaurants.',
     price: 2950,
@@ -200,7 +200,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'stay-opus-xvi': {
     title: 'Opus XVI',
     region: 'Bergen',
-    image: '/images/stays/opus_xvi_1787013667623.jpg',
+    image: '/images/hotel_restaurant.jpg',
     url: '/stay/stay-opus-xvi',
     description: 'Boutique heritage property owned by the descendants of legendary composer Edvard Grieg.',
     price: 2600,
@@ -210,7 +210,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'stay-britannia': {
     title: 'Britannia Hotel',
     region: 'Trondheim',
-    image: '/images/stays/britannia_1787013681423.jpg',
+    image: '/images/hotel_union.jpg',
     url: '/stay/stay-britannia',
     description: 'Five-star grandeur featuring Michelin-starred dining in the Palm Court and historic salons.',
     price: 3400,
@@ -220,7 +220,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'stay-solstrand': {
     title: 'Solstrand Hotel & Bad',
     region: 'Os, Bjørnafjorden',
-    image: '/images/stays/solstrand_1787013674681.jpg',
+    image: '/images/hotel_union_oye.jpg',
     url: '/stay/stay-solstrand',
     description: '1896 Swiss-style fjord retreat with outdoor heated fjord pools and gardens.',
     price: 3100,
@@ -230,7 +230,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'fav-juvet': {
     title: 'Juvet Landscape Hotel',
     region: 'Valldal',
-    image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&q=80',
+    image: '/images/hotel_juvet_1787013813000.jpg',
     url: '/stay/juvet-landscape-hotel',
     description: 'Architectural forest cabins with floor-to-ceiling glass walls immersed in Norwegian nature.',
     price: 4200,
@@ -242,7 +242,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'fav-reinebringen': {
     title: 'Reinebringen Ridge Trail',
     region: 'Lofoten Islands',
-    image: 'https://images.unsplash.com/photo-1513519107127-1ea506ce3c53?auto=format&fit=crop&q=80',
+    image: '/images/reinebringen_twilight.jpg',
     url: '/trails/reinebringen',
     description: '1,560 stone Sherpa steps leading to the iconic panoramic view of Reine and surrounding fjords.',
     rating: 4.9,
@@ -261,7 +261,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'act-trolltunga': {
     title: 'Guided Trolltunga Extreme Day Trek',
     region: 'Hardanger',
-    image: '/images/mountains.jpg',
+    image: '/images/trolltunga_1786936111320.jpg',
     url: '/activities/act-trolltunga',
     description: '28km expedition across mountain plateaus to the suspended cliff hanging 700m above Lake Ringedalsvatnet.',
     price: 1850,
@@ -271,7 +271,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'fav-ionity-oslo': {
     title: 'IONITY Oslo Central Hub',
     region: 'Eastern Norway',
-    image: 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&q=80',
+    image: '/images/ev_charger.jpg',
     url: '/mobility/ev/ionity-oslo',
     description: 'Ultra-fast 350kW high-power charging with 100% renewable hydroelectric power.',
     itemType: 'PLACE'
@@ -281,7 +281,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'food-reinsdyrgryte': {
     title: 'Reinsdyrgryte (Arctic Reindeer Stew)',
     region: 'Troms & Finnmark',
-    image: '/images/food_salmon_1787013684123.jpg',
+    image: '/images/sami_reindeer.jpg',
     url: '/food/food-reinsdyrgryte',
     description: 'Tender arctic reindeer simmered with wild chanterelles, juniper berries, goat cheese, and mountain cranberries.',
     price: 345,
@@ -291,7 +291,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'food-1': {
     title: 'Arctic Reinsdyrgryte',
     region: 'Troms & Finnmark',
-    image: '/images/food_salmon_1787013684123.jpg',
+    image: '/images/food_market_hall.jpg',
     url: '/food/food-1',
     description: 'Slow-simmered reindeer stew with lingonberries and creamy mashed potatoes.',
     price: 320,
@@ -313,7 +313,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'prod-wool-sweater-001': {
     title: 'Dale of Norway Cortina Wool Sweater',
     region: 'Artisanal Gear',
-    image: '/images/shop/cortina_sweater.jpg',
+    image: '/images/merino_wool_top.jpg',
     url: '/shop/prod-wool-sweater-001',
     description: '100% Norwegian virgin wool crafted in the Dale valley with traditional winter star patterns.',
     price: 2890,
@@ -323,7 +323,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'prod-knife-002': {
     title: 'Helle Viking Hand-Forged Carbon Knife',
     region: 'Holmedal Workshop',
-    image: '/images/shop/helle_knife.jpg',
+    image: '/images/chrome_travel_backpack.jpg',
     url: '/shop/prod-knife-002',
     description: 'Triple laminated carbon steel blade with curly birch handle and genuine leather sheath.',
     price: 1650,
@@ -343,7 +343,7 @@ const DOMAIN_REGISTRY: Record<string, Partial<HydratedFavorite>> = {
   'guide-ferry': {
     title: 'Norway Ferry & Scenic Fjord Transport Survival Guide',
     region: 'Travel Guides',
-    image: '/images/fjords.jpg',
+    image: '/images/geiranger_cruise.jpg',
     url: '/guides',
     description: 'Navigating AutoPASS, express electric catamarans, and coastal routes effortlessly.',
     itemType: 'GUIDE'
@@ -559,14 +559,14 @@ function formatFallbackTitle(rawId: string): string {
 
 function getFallbackImage(type: FavoriteCategory): string {
   switch (type) {
-    case 'DESTINATION': return '/images/destinations/tromso.jpg';
-    case 'PLACE': return '/images/fjords.jpg';
-    case 'STAY': return '/images/stays/the_thief_1787013645398.jpg';
-    case 'ACTIVITY': return '/images/mountains.jpg';
-    case 'FOOD': return '/images/food_salmon_1787013684123.jpg';
-    case 'PRODUCT': return '/images/shop/cortina_sweater.jpg';
-    case 'GUIDE': return '/images/northern_lights_1786935879330.jpg';
-    default: return '/images/destinations/geirangerfjord.jpg';
+    case 'DESTINATION': return '/images/tromso_winter.jpg';
+    case 'PLACE': return '/images/fjords_1786935800026.jpg';
+    case 'STAY': return '/images/hotel_historic.jpg';
+    case 'ACTIVITY': return '/images/trolltunga_1786936111320.jpg';
+    case 'FOOD': return '/images/food_market_hall.jpg';
+    case 'PRODUCT': return '/images/merino_wool_top.jpg';
+    case 'GUIDE': return '/images/flamsbana.jpg';
+    default: return '/images/geirangerfjord.jpg';
   }
 }
 

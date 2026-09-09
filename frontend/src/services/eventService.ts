@@ -57,7 +57,7 @@ export const sanitizeEvent = (raw: any): Event => {
     end_date: raw?.end_date || new Date(Date.now() + 86400000).toISOString(),
     ticket_price: typeof raw?.ticket_price === 'number' ? raw.ticket_price : (Number(raw?.price) || 0),
     currency: raw?.currency || 'NOK',
-    image_url: raw?.image_url || 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=1200',
+    image_url: raw?.image_url || '/images/festspillene_bergen.jpg',
     featured: Boolean(raw?.featured),
     lat: Number(raw?.lat) || 60.3929,
     lng: Number(raw?.lng) || 5.322,
@@ -77,7 +77,7 @@ export const FALLBACK_EVENTS: Event[] = [
     end_date: '2026-06-21T02:00:00Z',
     ticket_price: 850,
     currency: 'NOK',
-    image_url: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?q=80&w=1200',
+    image_url: '/images/midnight_sun_marathon.jpg',
     featured: true,
     lat: 69.6492,
     lng: 18.9553
@@ -93,7 +93,7 @@ export const FALLBACK_EVENTS: Event[] = [
     end_date: '2026-06-10T22:00:00Z',
     ticket_price: 650,
     currency: 'NOK',
-    image_url: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=1200',
+    image_url: '/images/festspillene_bergen.jpg',
     featured: true,
     lat: 60.3913,
     lng: 5.3221
@@ -109,7 +109,7 @@ export const FALLBACK_EVENTS: Event[] = [
     end_date: '2027-01-24T23:00:00Z',
     ticket_price: 350,
     currency: 'NOK',
-    image_url: 'https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?q=tromso+winter+arctic&w=1200',
+    image_url: '/images/tromso_winter.jpg',
     featured: true,
     lat: 69.6492,
     lng: 18.9553
@@ -125,7 +125,7 @@ export const FALLBACK_EVENTS: Event[] = [
     end_date: '2027-03-08T18:00:00Z',
     ticket_price: 490,
     currency: 'NOK',
-    image_url: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=holmenkollen+ski+jumping+oslo&w=1200',
+    image_url: '/images/holmenkollen_ski_festival.jpg',
     featured: true,
     lat: 59.9639,
     lng: 10.6672
@@ -141,7 +141,7 @@ export const FALLBACK_EVENTS: Event[] = [
     end_date: '2026-08-15T23:00:00Z',
     ticket_price: 3400,
     currency: 'NOK',
-    image_url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1200',
+    image_url: '/images/oyafestivalen_toyenparken.jpg',
     featured: true,
     lat: 59.9139,
     lng: 10.7522
@@ -157,7 +157,7 @@ export const FALLBACK_EVENTS: Event[] = [
     end_date: '2026-08-01T22:00:00Z',
     ticket_price: 150,
     currency: 'NOK',
-    image_url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1200',
+    image_url: '/images/food_market_hall.jpg',
     featured: true,
     lat: 63.4305,
     lng: 10.3951
@@ -173,7 +173,7 @@ export const FALLBACK_EVENTS: Event[] = [
     end_date: '2026-06-27T23:00:00Z',
     ticket_price: 0,
     currency: 'NOK',
-    image_url: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200',
+    image_url: '/images/gladmat_stavanger.jpg',
     featured: true,
     lat: 58.9699,
     lng: 5.7331
@@ -189,7 +189,7 @@ export const FALLBACK_EVENTS: Event[] = [
     end_date: '2026-08-09T22:00:00Z',
     ticket_price: 750,
     currency: 'NOK',
-    image_url: 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?q=80&w=1200',
+    image_url: '/images/viking_reenactment.jpg',
     featured: true,
     lat: 61.5032,
     lng: 9.7951
@@ -205,7 +205,7 @@ export const FALLBACK_EVENTS: Event[] = [
     end_date: '2026-06-14T18:00:00Z',
     ticket_price: 220,
     currency: 'NOK',
-    image_url: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1200',
+    image_url: '/images/viking_festival_avaldsnes.jpg',
     featured: false,
     lat: 59.3564,
     lng: 5.2891
@@ -221,7 +221,7 @@ export const FALLBACK_EVENTS: Event[] = [
     end_date: '2026-06-28T23:59:00Z',
     ticket_price: 1950,
     currency: 'NOK',
-    image_url: 'https://images.unsplash.com/photo-1522163182402-834f871fd851?q=80&w=1200',
+    image_url: '/images/ekstremsportveko_voss.jpg',
     featured: true,
     lat: 60.6277,
     lng: 6.4258
@@ -237,7 +237,7 @@ export const FALLBACK_EVENTS: Event[] = [
     end_date: '2027-03-19T18:00:00Z',
     ticket_price: 0,
     currency: 'NOK',
-    image_url: 'https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?q=sled+dog+norway&w=1200',
+    image_url: '/images/finnmarkslopet_alta.jpg',
     featured: true,
     lat: 69.9689,
     lng: 23.2716
@@ -253,7 +253,7 @@ export const FALLBACK_EVENTS: Event[] = [
     end_date: '2027-02-20T19:00:00Z',
     ticket_price: 0,
     currency: 'NOK',
-    image_url: 'https://images.unsplash.com/photo-1517824806704-9040b037703b?q=80&w=1200',
+    image_url: '/images/roros_winter_fair.jpg',
     featured: true,
     lat: 62.575,
     lng: 11.3833
@@ -269,7 +269,7 @@ export const FALLBACK_EVENTS: Event[] = [
     end_date: '2027-02-07T20:00:00Z',
     ticket_price: 180,
     currency: 'NOK',
-    image_url: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=1200',
+    image_url: '/images/reindeer_racing_tromso.jpg',
     featured: true,
     lat: 69.6492,
     lng: 18.9553
@@ -285,7 +285,7 @@ export const FALLBACK_EVENTS: Event[] = [
     end_date: '2027-02-07T23:00:00Z',
     ticket_price: 520,
     currency: 'NOK',
-    image_url: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1200',
+    image_url: '/images/ice_music_festival.jpg',
     featured: true,
     lat: 60.5332,
     lng: 8.2091
@@ -301,7 +301,7 @@ export const FALLBACK_EVENTS: Event[] = [
     end_date: '2026-08-14T20:00:00Z',
     ticket_price: 250,
     currency: 'NOK',
-    image_url: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=vintage+steamship+maritime+festival&w=1200',
+    image_url: '/images/viking_maritime.jpg',
     featured: false,
     lat: 60.8631,
     lng: 7.1132
@@ -317,7 +317,7 @@ export const FALLBACK_EVENTS: Event[] = [
     end_date: '2026-08-15T23:30:00Z',
     ticket_price: 1200,
     currency: 'NOK',
-    image_url: 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?q=80&w=1200',
+    image_url: '/images/norwegian_jazz_festival.jpg',
     featured: false,
     lat: 59.9139,
     lng: 10.7522

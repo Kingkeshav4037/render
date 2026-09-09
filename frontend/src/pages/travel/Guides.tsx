@@ -37,7 +37,7 @@ export const Guides = () => {
       category: 'Food & Culture',
       author: 'Henrik V.',
       readTime: '5 min read',
-      image: '/images/food_salmon_1787013684123.jpg',
+      image: '/images/food_market_hall.jpg',
       route: '/food',
       excerpt: 'Discover the rich seafood traditions and modern Nordic cuisine hidden within the historic streets of Bergen.'
     },
@@ -67,7 +67,7 @@ export const Guides = () => {
       category: 'Food & Culture',
       author: 'Astrid N.',
       readTime: '6 min read',
-      image: '/images/besseggen_1786936349992.jpg',
+      image: '/images/arctic_expedition_group.jpg',
       route: '/wildlife',
       excerpt: 'How to practice ethical wildlife observation and tread lightly across sensitive high-latitude tundra.'
     }
@@ -92,7 +92,7 @@ export const Guides = () => {
       />
       {/* Hero Section */}
       <div className="bg-navy-900 text-white pt-32 pb-24 px-4 md:px-12 relative overflow-hidden mb-12 rounded-b-3xl shadow-xl">
-        <div className="absolute inset-0 bg-[url('/images/kjeragbolten_1786936275605.jpg')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
+        <div className="absolute inset-0 bg-[url('/images/trolltunga.jpg')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-navy-900 via-navy-900/60 to-transparent"></div>
         
         <div className="relative max-w-7xl mx-auto z-10 text-center">

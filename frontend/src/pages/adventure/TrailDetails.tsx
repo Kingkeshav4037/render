@@ -203,7 +203,10 @@ export const TrailDetails = () => {
           <div className="flex flex-col gap-8">
             {/* Interactive Map Link */}
             <div className="glass-panel rounded-3xl overflow-hidden h-[400px] flex flex-col relative group">
-               <div className="absolute inset-0 bg-[url('/images/besseggen_1786936349992.jpg')] bg-cover bg-center opacity-40 mix-blend-luminosity group-hover:scale-105 transition-transform duration-700" />
+               <div 
+                 className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-luminosity group-hover:scale-105 transition-transform duration-700" 
+                 style={{ backgroundImage: `url(${trail.image || '/images/trolltunga.jpg'})` }}
+               />
                <div className="absolute inset-0 bg-nordic-sage/20 mix-blend-overlay" />
                <Link to="/map" className="absolute inset-0 flex items-center justify-center z-20">
                  <div className="bg-black/70 backdrop-blur-md px-6 py-3 rounded-full border border-white/20 text-white font-bold flex items-center gap-2 group-hover:bg-nordic-sage group-hover:text-pine-forest transition-colors shadow-2xl">

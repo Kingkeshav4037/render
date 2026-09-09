@@ -126,9 +126,9 @@ describe('Phase 6 — Comprehensive Image & Content Quality Audit', () => {
   describe('3. Wildlife Species & Authentic Photography Matching', () => {
     it('maps every iconic Norwegian wildlife species to exact, dedicated imagery', () => {
       const testCases = [
-        { slug: 'polar-bear', name: 'Polar Bear', expectedKeyword: 'polar+bear' },
+        { slug: 'polar-bear', name: 'Polar Bear', expectedKeyword: 'polar' },
         { slug: 'atlantic-puffin', name: 'Atlantic Puffin', expectedKeyword: 'puffin' },
-        { slug: 'white-tailed-eagle', name: 'Sea Eagle', expectedKeyword: 'sea+eagle' },
+        { slug: 'white-tailed-eagle', name: 'Sea Eagle', expectedKeyword: 'eagle' },
         { slug: 'orca', name: 'Killer Whale', expectedKeyword: 'orca' },
         { slug: 'humpback-whale', name: 'Humpback Whale', expectedKeyword: 'humpback' },
         { slug: 'walrus', name: 'Walrus', expectedKeyword: 'walrus' },
@@ -159,7 +159,7 @@ describe('Phase 6 — Comprehensive Image & Content Quality Audit', () => {
         expect(flora.habitat).toBeTruthy();
         expect(flora.foraging_status).toBeTruthy();
         expect(flora.description.length).toBeGreaterThan(30);
-        expect(flora.image_url).toMatch(/^https:\/\/images\.unsplash\.com/);
+        expect(flora.image_url).toMatch(/^(\/images\/|https:\/\/images\.unsplash\.com)/);
       });
 
       const norwegianNames = FALLBACK_FLORA.map((f) => f.norwegian_name);

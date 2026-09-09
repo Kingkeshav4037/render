@@ -39,7 +39,7 @@ export const FALLBACK_FLORA: FloraSpecies[] = [
     ecological_role: 'Provides critical habitat for Western Capercaillie, Pine Martens, and Red Squirrels.',
     traditional_uses: 'Needles used for vitamin C-rich tea by Sami and Norse settlers.',
     foraging_tips: 'Harvest tender young green needles in spring for herbal tea.',
-    image_url: 'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?q=scots+pine+norway&w=1080'
+    image_url: '/images/birch_forest.jpg'
   },
   {
     id: 'f2',
@@ -57,7 +57,7 @@ export const FALLBACK_FLORA: FloraSpecies[] = [
     ecological_role: 'Forms dense canopy cover sheltering forest fauna during severe Nordic blizzards.',
     traditional_uses: 'Spruce shoot syrup (granskuddsirup) is a beloved Norwegian culinary delicacy.',
     foraging_tips: 'Pick tender neon-green spring shoots in May/June for syrups and infusions.',
-    image_url: 'https://images.unsplash.com/photo-1448375240586-882707db888b?q=norway+spruce+forest&w=1080'
+    image_url: '/images/flora_norway_spruce.jpg'
   },
   {
     id: 'f3',
@@ -75,7 +75,7 @@ export const FALLBACK_FLORA: FloraSpecies[] = [
     ecological_role: 'Provides high-energy nutrition to Arctic migratory birds and voles.',
     traditional_uses: 'Served as the centerpiece Norwegian Christmas dessert "Multekrem" (whipped cream with fresh cloudberries).',
     foraging_tips: 'Look for translucent golden-apricot berries that slip easily off their calyx.',
-    image_url: 'https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?q=cloudberries+norway&w=1080'
+    image_url: '/images/cloudberry.jpg'
   },
   {
     id: 'f4',
@@ -93,7 +93,7 @@ export const FALLBACK_FLORA: FloraSpecies[] = [
     ecological_role: 'Primary late-autumn foraging food for Brown Bears, Moose, and forest birds.',
     traditional_uses: 'Stirred raw with sugar into "Rørte tyttebær", the companion to Norwegian meatballs.',
     foraging_tips: 'Easy to pick in late August with a traditional berry-picker comb under Allemannsretten.',
-    image_url: 'https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?q=lingonberries+forest&w=1080'
+    image_url: '/images/lingonberry.jpg'
   },
   {
     id: 'f5',
@@ -111,7 +111,7 @@ export const FALLBACK_FLORA: FloraSpecies[] = [
     ecological_role: 'Keystone understory plant supporting bumblebees in spring.',
     traditional_uses: 'Eaten fresh with cold whole milk, baked into summer tarts, or preserved as blueberry jam.',
     foraging_tips: 'Pick throughout late July and August in acidic forest clearings.',
-    image_url: 'https://images.unsplash.com/photo-1498557850523-fd3d118b962e?q=wild+blueberries+norway&w=1080'
+    image_url: '/images/wild_bilberry.jpg'
   },
   {
     id: 'f6',
@@ -129,7 +129,7 @@ export const FALLBACK_FLORA: FloraSpecies[] = [
     ecological_role: 'Produces antifreeze proteins allowing its cells to survive freezing nightly summer blizzards.',
     traditional_uses: 'Symbol of alpine resilience and high-mountain Norwegian mountaineering heritage.',
     foraging_tips: 'Strictly observe Leave No Trace principles; alpine tundra plants take decades to recover.',
-    image_url: 'https://images.unsplash.com/photo-1533038590840-1cde6e668a91?q=ranunculus+glacialis+alpine+buttercup+flower&w=1080'
+    image_url: '/images/flora_purple_saxifrage.jpg'
   },
   {
     id: 'f7',
@@ -147,7 +147,7 @@ export const FALLBACK_FLORA: FloraSpecies[] = [
     ecological_role: 'Fixes atmospheric nitrogen in barren limestone soils, creating fertile footholds.',
     traditional_uses: 'Official county flower of historic Oppland; famous paleoclimatological marker.',
     foraging_tips: 'Look for circular blooming mats on sun-exposed rocky limestone outcrops.',
-    image_url: 'https://images.unsplash.com/photo-1508873696983-2df5293cb325?q=mountain+avens+flower&w=1080'
+    image_url: '/images/flora_mountain_avens.jpg'
   },
   {
     id: 'f8',
@@ -165,7 +165,7 @@ export const FALLBACK_FLORA: FloraSpecies[] = [
     ecological_role: 'Highly specialized mycorrhizal symbiosis with soil fungi required for germination.',
     traditional_uses: 'Crown jewel of Norwegian botanical photography. Completely protected by law.',
     foraging_tips: 'Strictly protected under Norwegian law. Photograph from designated boardwalks only.',
-    image_url: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?q=yellow+wild+orchid&w=1080'
+    image_url: '/images/orchid.jpg'
   }
 ];
 

@@ -16,12 +16,12 @@ import { getWildlifeImage } from '../wildlifeService';
 export const ACTIVITY_CATEGORY_IMAGES: Record<string, string> = {
   HIKING:    '/images/preikestolen_1786936002797.jpg',
   AURORA:    '/images/northern_lights_1786935879330.jpg',
-  KAYAK:     'https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=kayak+fjord+norway&w=1200',
+  KAYAK:     '/images/geirangerfjord_kayak.jpg',
   WILDLIFE:  '/images/wildlife_reindeer_1787013667019.jpg',
-  CRUISE:    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=fjord+electric+cruise+norway&w=1200',
+  CRUISE:    '/images/fjord_naeroyfjord.jpg',
   CLIMBING:  '/images/kjeragbolten_1786936275605.jpg',
   MOUNTAIN:  '/images/galdhopiggen_1786936412055.jpg',
-  SKIING:    'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=skiing+norway+slopes&w=1200',
+  SKIING:    '/images/skiing_norway.jpg',
   DEFAULT:   '/images/fjords_1786935800026.jpg',
 };
 
@@ -35,12 +35,12 @@ export function getActivityImage(category: string, dbImageUrl?: string | null): 
 // ─── FALLBACK DATA ────────────────────────────────────────────────────────────
 
 const FALLBACK_DESTINATIONS: HomePlace[] = [
-  { id: 'l-01', name: 'Geirangerfjord', slug: 'geirangerfjord', category: 'Fjord', region: 'Møre og Romsdal', short_description: 'UNESCO-listed fjord flanked by cascading waterfalls and dramatic cliffs.', image: 'https://images.unsplash.com/photo-1601824592766-a7cee45a7f87?q=80&w=1200', latitude: 62.1, longitude: 7.2, rating: 4.9, featured: true },
+  { id: 'l-01', name: 'Geirangerfjord', slug: 'geirangerfjord', category: 'Fjord', region: 'Møre og Romsdal', short_description: 'UNESCO-listed fjord flanked by cascading waterfalls and dramatic cliffs.', image: '/images/fjords_1786935800026.jpg', latitude: 62.1, longitude: 7.2, rating: 4.9, featured: true },
   { id: 'l-02', name: 'Lofoten Islands', slug: 'lofoten', category: 'Island', region: 'Nordland', short_description: 'Dramatic archipelago with red fishing cabins, midnight sun, and the Aurora.', image: '/images/lofoten_1787013505867.jpg', latitude: 68.2, longitude: 14.5, rating: 4.9, featured: true },
   { id: 'l-03', name: 'Preikestolen', slug: 'preikestolen', category: 'Mountain', region: 'Rogaland', short_description: 'Iconic 604m cliff rising sheer above the Lysefjord — a bucket-list viewpoint.', image: '/images/preikestolen_1786936002797.jpg', latitude: 58.99, longitude: 6.19, rating: 4.8, featured: true },
   { id: 'l-04', name: 'Trolltunga', slug: 'trolltunga', category: 'Mountain', region: 'Vestland', short_description: 'Norway\'s most spectacular cliff ledge hovering 700 metres above Lake Ringedalsvatnet.', image: '/images/trolltunga_1786936111320.jpg', latitude: 60.12, longitude: 6.74, rating: 4.8, featured: true },
-  { id: 'l-05', name: 'Tromsø', slug: 'tromso', category: 'City', region: 'Troms', short_description: 'The gateway to the Arctic and Norway\'s prime Northern Lights destination.', image: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?q=80&w=1200', latitude: 69.65, longitude: 18.95, rating: 4.7, featured: true },
-  { id: 'l-06', name: 'Bergen', slug: 'bergen', category: 'City', region: 'Vestland', short_description: 'Gateway to the fjords with a colourful Hanseatic wharf and lush surrounding mountains.', image: 'https://images.unsplash.com/photo-1568430758878-24a0b8c5a75b?q=80&w=1200', latitude: 60.39, longitude: 5.32, rating: 4.8, featured: true },
+  { id: 'l-05', name: 'Tromsø', slug: 'tromso', category: 'City', region: 'Troms', short_description: 'The gateway to the Arctic and Norway\'s prime Northern Lights destination.', image: '/images/tromso_winter.jpg', latitude: 69.65, longitude: 18.95, rating: 4.7, featured: true },
+  { id: 'l-06', name: 'Bergen', slug: 'bergen', category: 'City', region: 'Vestland', short_description: 'Gateway to the fjords with a colourful Hanseatic wharf and lush surrounding mountains.', image: '/images/bryggen.jpg', latitude: 60.39, longitude: 5.32, rating: 4.8, featured: true },
 ];
 
 const FALLBACK_ACTIVITIES: HomeActivity[] = [
@@ -51,35 +51,35 @@ const FALLBACK_ACTIVITIES: HomeActivity[] = [
 ];
 
 const FALLBACK_FOODS: HomeFood[] = [
-  { id: 'fo-01', name: 'Fårikål', category: 'Traditional', origin_region: 'Nationwide', short_description: "Norway's national dish: lamb slow-cooked with cabbage and black pepper.", image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?q=lamb+cabbage+stew+pot&w=800' },
-  { id: 'fo-02', name: 'Gravlaks', category: 'Seafood', origin_region: 'Coastal Norway', short_description: 'Cold-cured salmon with dill, mustard, and aquavit — an iconic Nordic starter.', image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=gravlax+salmon+dill&w=800' },
-  { id: 'fo-03', name: 'Brunost', category: 'Traditional', origin_region: 'Gudbrandsdalen', short_description: 'Caramelised brown whey cheese — utterly unique and deeply Norwegian.', image: 'https://images.unsplash.com/photo-1452195100486-9cc805987862?q=brown+cheese+norway&w=800' },
-  { id: 'fo-04', name: 'Pinnekjøtt', category: 'Land Food', origin_region: 'Western Norway', short_description: 'Salted dried lamb ribs steamed over birch twigs — the Christmas centrepiece.', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?q=lamb+ribs+steamed&w=800' },
+  { id: 'fo-01', name: 'Fårikål', category: 'Traditional', origin_region: 'Nationwide', short_description: "Norway's national dish: lamb slow-cooked with cabbage and black pepper.", image: '/images/reindeer_sausage_kiosk.jpg' },
+  { id: 'fo-02', name: 'Gravlaks', category: 'Seafood', origin_region: 'Coastal Norway', short_description: 'Cold-cured salmon with dill, mustard, and aquavit — an iconic Nordic starter.', image: '/images/salmon.jpg' },
+  { id: 'fo-03', name: 'Brunost', category: 'Traditional', origin_region: 'Gudbrandsdalen', short_description: 'Caramelised brown whey cheese — utterly unique and deeply Norwegian.', image: '/images/cloudberry_cream.jpg' },
+  { id: 'fo-04', name: 'Pinnekjøtt', category: 'Land Food', origin_region: 'Western Norway', short_description: 'Salted dried lamb ribs steamed over birch twigs — the Christmas centrepiece.', image: '/images/reindeer_sausage_kiosk.jpg' },
 ];
 
 const FALLBACK_WILDLIFE: HomeAnimal[] = [
-  { id: 'w-01', name: 'Arctic Fox', scientific_name: 'Vulpes lagopus', category: 'Land', habitat: 'Arctic tundra', short_description: 'One of Norway\'s most endangered mammals, perfectly adapted to extreme cold.', image: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=arctic+fox+white+snow+winter&w=800', best_season: 'Winter' },
-  { id: 'w-02', name: 'Moose', scientific_name: 'Alces alces', category: 'Land', habitat: 'Boreal forest', short_description: 'The largest of the deer family, a majestic sight in Norway\'s forests.', image: 'https://images.unsplash.com/photo-1543946602-a0fce8117697?q=moose+norway+forest&w=800', best_season: 'Summer' },
-  { id: 'w-03', name: 'Atlantic Puffin', scientific_name: 'Fratercula arctica', category: 'Bird', habitat: 'Sea cliffs', short_description: 'Colourful seabird nesting in millions along Norway\'s western coast.', image: 'https://images.unsplash.com/photo-1550950158-d0d960dff51b?q=atlantic+puffin+norway&w=800', best_season: 'Summer' },
-  { id: 'w-04', name: 'Orca', scientific_name: 'Orcinus orca', category: 'Marine', habitat: 'Fjords', short_description: 'Pods of orcas follow herring into Norwegian fjords each winter.', image: 'https://images.unsplash.com/photo-1568430462989-44163eb1752f?q=orca+whale+norway+fjord&w=800', best_season: 'Winter' },
+  { id: 'w-01', name: 'Arctic Fox', scientific_name: 'Vulpes lagopus', category: 'Land', habitat: 'Arctic tundra', short_description: 'One of Norway\'s most endangered mammals, perfectly adapted to extreme cold.', image: '/images/arctic_fox.jpg', best_season: 'Winter' },
+  { id: 'w-02', name: 'Moose', scientific_name: 'Alces alces', category: 'Land', habitat: 'Boreal forest', short_description: 'The largest of the deer family, a majestic sight in Norway\'s forests.', image: '/images/moose.jpg', best_season: 'Summer' },
+  { id: 'w-03', name: 'Atlantic Puffin', scientific_name: 'Fratercula arctica', category: 'Bird', habitat: 'Sea cliffs', short_description: 'Colourful seabird nesting in millions along Norway\'s western coast.', image: '/images/atlantic_puffin.jpg', best_season: 'Summer' },
+  { id: 'w-04', name: 'Orca', scientific_name: 'Orcinus orca', category: 'Marine', habitat: 'Fjords', short_description: 'Pods of orcas follow herring into Norwegian fjords each winter.', image: '/images/orca.jpg', best_season: 'Winter' },
 ];
 
 const FALLBACK_HOTELS: HomeHotel[] = [
   { id: 'h-01', name: 'Juvet Landscape Hotel', category: 'Cabin', city: 'Valldal', region: 'Møre og Romsdal', rating: 4.9, price_indicator: 'NOK 4 200/night', image: '/images/hotel_juvet_1787013813000.jpg', latitude: 62.22, longitude: 7.68 },
-  { id: 'h-02', name: 'The Thief Oslo', category: 'Boutique', city: 'Oslo', region: 'Eastern Norway', rating: 4.8, price_indicator: 'NOK 2 800/night', image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=800', latitude: 59.91, longitude: 10.72 },
-  { id: 'h-03', name: 'Svinøya Rorbuer', category: 'Cabin', city: 'Svolvær', region: 'Lofoten', rating: 4.7, price_indicator: 'NOK 1 900/night', image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=800', latitude: 68.23, longitude: 14.57 },
+  { id: 'h-02', name: 'The Thief Oslo', category: 'Boutique', city: 'Oslo', region: 'Eastern Norway', rating: 4.8, price_indicator: 'NOK 2 800/night', image: '/images/clarion_hotel_the_hub.jpg', latitude: 59.91, longitude: 10.72 },
+  { id: 'h-03', name: 'Svinøya Rorbuer', category: 'Cabin', city: 'Svolvær', region: 'Lofoten', rating: 4.7, price_indicator: 'NOK 1 900/night', image: '/images/lofoten_cabins.jpg', latitude: 68.23, longitude: 14.57 },
 ];
 
 const FALLBACK_RESTAURANTS = [
-  { id: 'r-01', name: 'Maaemo', type: 'FINE_DINING', image_url: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=800', rating: 5.0, price_range: '$$$$', locations: { name: 'Oslo' } },
-  { id: 'r-02', name: 'Cornelius Seafood', type: 'SEAFOOD', image_url: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=800', rating: 4.8, price_range: '$$$', locations: { name: 'Bergen' } },
-  { id: 'r-03', name: 'Sabi Omakase', type: 'FINE_DINING', image_url: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=800', rating: 4.9, price_range: '$$$$', locations: { name: 'Stavanger' } },
+  { id: 'r-01', name: 'Maaemo', type: 'FINE_DINING', image_url: '/images/restaurant_maaemo.jpg', rating: 5.0, price_range: '$$$$', locations: { name: 'Oslo' } },
+  { id: 'r-02', name: 'Cornelius Seafood', type: 'SEAFOOD', image_url: '/images/food_salmon_1787013684123.jpg', rating: 4.8, price_range: '$$$', locations: { name: 'Bergen' } },
+  { id: 'r-03', name: 'Sabi Omakase', type: 'FINE_DINING', image_url: '/images/fine_dining_interior.jpg', rating: 4.9, price_range: '$$$$', locations: { name: 'Stavanger' } },
 ];
 
 const FALLBACK_EVENTS: HomeEvent[] = [
-  { id: 'ev-01', name: 'Bergen International Festival', date: 'May 21 – Jun 1', location: 'Bergen', category: 'Culture', image: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=800' },
-  { id: 'ev-02', name: 'Tromsø International Film Festival', date: 'Jan 17–22', location: 'Tromsø', category: 'Film', image: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?q=outdoor+cinema+arctic+film+festival&w=800' },
-  { id: 'ev-03', name: 'Midnight Sun Marathon', date: 'Jun 21', location: 'Tromsø', category: 'Sport', image: 'https://images.unsplash.com/photo-1530549387789-4c1017266635?q=marathon+running+athletes&w=800' },
+  { id: 'ev-01', name: 'Bergen International Festival', date: 'May 21 – Jun 1', location: 'Bergen', category: 'Culture', image: '/images/festspillene_bergen.jpg' },
+  { id: 'ev-02', name: 'Tromsø International Film Festival', date: 'Jan 17–22', location: 'Tromsø', category: 'Film', image: '/images/tromso_winter.jpg' },
+  { id: 'ev-03', name: 'Midnight Sun Marathon', date: 'Jun 21', location: 'Tromsø', category: 'Sport', image: '/images/midnight_sun_marathon.jpg' },
 ];
 
 // ─── SERVICE ──────────────────────────────────────────────────────────────────

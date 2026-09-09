@@ -7,21 +7,21 @@ import { Snowflake, Wind } from 'lucide-react';
 import { OptimizedImage } from '../../components/shared/OptimizedImage';
 
 const WINTER_CATEGORIES = [
-  { id: 'ski-resorts', title: 'Ski Resorts', desc: 'World-class alpine facilities and snowparks', img: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?auto=format&fit=crop&q=80&w=800' },
-  { id: 'alpine', title: 'Alpine Skiing', desc: 'Steep drops and groomed Olympic slopes', img: 'https://images.unsplash.com/photo-1565992441121-4367c2967103?auto=format&fit=crop&q=80&w=800' },
-  { id: 'cross-country', title: 'Cross-Country', desc: 'Endless miles of prepared pine forest tracks', img: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&q=80&w=800' },
-  { id: 'snowboarding', title: 'Snowboarding', desc: 'Terrain parks and backcountry powder', img: 'https://images.unsplash.com/photo-1528722828814-77b9b83aafb2?auto=format&fit=crop&q=80&w=800' },
-  { id: 'snowshoeing', title: 'Snowshoeing', desc: 'Quiet walks through winter taiga forests', img: 'https://images.unsplash.com/photo-1516715094483-75da7dee9758?auto=format&fit=crop&q=80&w=800' },
+  { id: 'ski-resorts', title: 'Ski Resorts', desc: 'World-class alpine facilities and snowparks', img: '/images/skiing_norway.jpg' },
+  { id: 'alpine', title: 'Alpine Skiing', desc: 'Steep drops and groomed Olympic slopes', img: '/images/nordic_ski_championship.jpg' },
+  { id: 'cross-country', title: 'Cross-Country', desc: 'Endless miles of prepared pine forest tracks', img: '/images/cross_country_skiing.jpg' },
+  { id: 'snowboarding', title: 'Snowboarding', desc: 'Terrain parks and backcountry powder', img: '/images/nordic_skiing.jpg' },
+  { id: 'snowshoeing', title: 'Snowshoeing', desc: 'Quiet walks through winter taiga forests', img: '/images/winter_cross_country.jpg' },
   { id: 'dog-sledding', title: 'Dog Sledding', desc: 'Husky teams racing across the Arctic tundra', img: 'https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?q=husky+sledding+arctic+norway&w=800' },
-  { id: 'snowmobiling', title: 'Snowmobiling', desc: 'High-speed Arctic wilderness exploration', img: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=snowmobile+arctic+norway&w=800' },
-  { id: 'ice-fishing', title: 'Ice Fishing', desc: 'Patience and tranquility on frozen mountain lakes', img: 'https://images.unsplash.com/photo-1548777123-e216912df7d8?q=ice+fishing+winter+lake&w=800' },
+  { id: 'snowmobiling', title: 'Snowmobiling', desc: 'High-speed Arctic wilderness exploration', img: '/images/snowmobile_safari.jpg' },
+  { id: 'ice-fishing', title: 'Ice Fishing', desc: 'Patience and tranquility on frozen mountain lakes', img: '/images/ice_cave.jpg' },
 ];
 
 export const WinterSports = () => {
   return (
     <div className="min-h-screen bg-midnight text-white">
       <CinematicBackground 
-        imageUrl="/images/northern_lights_1786935879330.jpg"
+        imageUrl="/images/skiing_norway.jpg"
         overlayOpacity={0.6}
         theme="glacierBlue"
       />

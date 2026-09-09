@@ -238,7 +238,7 @@ export const FoodDetails = () => {
             src={foodImage}
             alt={foodItem.name}
             category="food"
-            fallbackSrc="/images/food_salmon_1787013684123.jpg"
+            fallbackSrc="/images/food_market_hall.jpg"
             className="w-full h-full object-cover opacity-85"
             containerClassName="w-full h-full"
           />

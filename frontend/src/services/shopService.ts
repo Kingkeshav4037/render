@@ -62,10 +62,11 @@ export const FALLBACK_PRODUCTS: Product[] = [
     rating: 4.8,
     stock: 12,
     co2: -24.8,
-    img: '/images/product_charger.jpg',
+    img: '/images/ev_charging_cable.jpg',
     gallery: [
-      '/images/product_charger.jpg',
-      '/images/product_charger_1786938528191.jpg'
+      '/images/ev_charging_cable.jpg',
+      '/images/type2_charging_cable.jpg',
+      '/images/ev_charger.jpg'
     ],
     description: 'Heavy-duty 3-Phase Type 2 EV charging cable custom formulated with arctic-flex elastomer that stays completely supple down to -40°C. Includes integrated LED status illumination and smart cable lock.',
     specs: {
@@ -92,10 +93,11 @@ export const FALLBACK_PRODUCTS: Product[] = [
     rating: 5.0,
     stock: 18,
     co2: -8.2,
-    img: 'https://images.unsplash.com/photo-1578932750294-f5075e85f44a?w=800&auto=format&fit=crop',
+    img: '/images/merino_wool_top.jpg',
     gallery: [
-      'https://images.unsplash.com/photo-1578932750294-f5075e85f44a?w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=800&auto=format&fit=crop'
+      '/images/merino_wool_top.jpg',
+      '/images/merino_base_layer.jpg',
+      '/images/wool_thermal_top.jpg'
     ],
     description: '100% Norwegian free-grazing sheep wool base layer. Delivers superior thermo-regulation, natural antimicrobial odor resistance, and breathability during intense fjord treks and arctic ski touring.',
     specs: {
@@ -122,10 +124,11 @@ export const FALLBACK_PRODUCTS: Product[] = [
     rating: 4.7,
     stock: 8,
     co2: -19.5,
-    img: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&auto=format&fit=crop',
+    img: '/images/chrome_travel_backpack.jpg',
     gallery: [
-      'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&auto=format&fit=crop',
-      '/images/besseggen.jpg'
+      '/images/chrome_travel_backpack.jpg',
+      '/images/travel_backpack.jpg',
+      '/images/besseggen_1786936349992.jpg'
     ],
     description: 'Rugged expedition backpack featuring integrated SunPower 24W ETFE flexible solar panel cells with dual USB-C Power Delivery outputs. Keeps navigation devices and cameras charged on multi-day backcountry trails.',
     specs: {
@@ -152,9 +155,10 @@ export const FALLBACK_PRODUCTS: Product[] = [
     rating: 4.9,
     stock: 35,
     co2: -3.5,
-    img: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&auto=format&fit=crop',
+    img: '/images/norwegian_gift.jpg',
     gallery: [
-      'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&auto=format&fit=crop'
+      '/images/norwegian_gift.jpg',
+      '/images/product_gift_set.jpg'
     ],
     description: 'Traditional Sami-style carved wooden cup carved from sustainably harvested Arctic birch burls. Finished with organic beeswax and pure linseed oil for enjoying morning campfire coffee overlooking the fjords.',
     specs: {
@@ -181,9 +185,10 @@ export const FALLBACK_PRODUCTS: Product[] = [
     rating: 4.8,
     stock: 40,
     co2: -6.0,
-    img: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=800&auto=format&fit=crop',
+    img: '/images/voss_water_bottles.jpg',
     gallery: [
-      'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=800&auto=format&fit=crop'
+      '/images/voss_water_bottles.jpg',
+      '/images/voss_glass_bottles.jpg'
     ],
     description: 'Double-wall vacuum insulated flask made from 18/8 food-grade Swedish stainless steel with a natural FSC-certified oak cap. Keeps coffee piping hot for 24 hours or mountain spring water glacier-cold for 36 hours.',
     specs: {
@@ -210,10 +215,10 @@ export const FALLBACK_PRODUCTS: Product[] = [
     rating: 4.9,
     stock: 15,
     co2: -11.0,
-    img: 'https://images.unsplash.com/photo-1507499739999-097706ad8914?w=800&auto=format&fit=crop',
+    img: '/images/northern_lights_1786935879330.jpg',
     gallery: [
-      'https://images.unsplash.com/photo-1507499739999-097706ad8914?w=800&auto=format&fit=crop',
-      '/images/northern_lights.jpg'
+      '/images/northern_lights_1786935879330.jpg',
+      '/images/aurora_borealis_1787013684123.jpg'
     ],
     description: 'Smart ambient mood lamp that synchronizes in real time with live Tromsø space weather sensors. Emulates the mesmerizing undulating ribbons of the Northern Lights (Aurora Borealis) in your living space.',
     specs: {
@@ -240,10 +245,11 @@ export const FALLBACK_PRODUCTS: Product[] = [
     rating: 4.6,
     stock: 7,
     co2: -31.2,
-    img: 'https://images.unsplash.com/photo-1558441719-ef0489820582?w=800&auto=format&fit=crop',
+    img: '/images/ev_charger.jpg',
     gallery: [
-      'https://images.unsplash.com/photo-1558441719-ef0489820582?w=800&auto=format&fit=crop',
-      '/images/infra_windfarm.jpg'
+      '/images/ev_charger.jpg',
+      '/images/wall_ev_charger.jpg',
+      '/images/smart_home_energy_system.jpg'
     ],
     description: 'Smart aerogel thermal insulation cover designed to preserve EV battery range during sub-zero overnight parking. Reduces cold-soak winter range loss by up to 28% without requiring grid pre-heating.',
     specs: {
@@ -295,8 +301,8 @@ export const shopService = {
             rating: Number(row.rating || 4.8),
             stock: Number(row.stock ?? 15),
             co2: Number(row.co2 || -10),
-            img: row.img || matchedFallback?.img || '/images/product_charger_1786938528191.jpg',
-            gallery: matchedFallback?.gallery || [row.img || '/images/product_charger_1786938528191.jpg'],
+            img: row.img || matchedFallback?.img || '/images/smart_energy_monitor.jpg',
+            gallery: matchedFallback?.gallery || [row.img || '/images/smart_energy_monitor.jpg'],
             description: matchedFallback?.description || `High-quality sustainable ${row.category} engineered in Norway.`,
             specs: matchedFallback?.specs || { 'Standard': 'Nordic Swan Certified', 'Origin': 'Norway' },
             features: matchedFallback?.features || ['Engineered for extreme Nordic climate', 'Sustainable materials'],
@@ -382,8 +388,8 @@ export const shopService = {
           rating: Number(data.rating || 4.8),
           stock: Number(data.stock ?? 15),
           co2: Number(data.co2 || -10),
-          img: data.img || matchedFallback?.img || '/images/product_charger_1786938528191.jpg',
-          gallery: matchedFallback?.gallery || [data.img || '/images/product_charger_1786938528191.jpg'],
+          img: data.img || matchedFallback?.img || '/images/smart_energy_monitor.jpg',
+          gallery: matchedFallback?.gallery || [data.img || '/images/smart_energy_monitor.jpg'],
           description: matchedFallback?.description || `High-quality sustainable ${data.category} engineered in Norway.`,
           specs: matchedFallback?.specs || { 'Standard': 'Nordic Swan Certified', 'Origin': 'Norway' },
           features: matchedFallback?.features || ['Engineered for extreme Nordic climate', 'Sustainable materials'],

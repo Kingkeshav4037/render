@@ -19,12 +19,12 @@ const getPlaceholderImage = (name: string) => {
   
   const map: Record<string, string> = {
     'Geirangerfjord': '/images/fjords_1786935800026.jpg',
-    'Tromsø': '/images/northern_lights_1786935879330.jpg',
-    'Oslo': '/images/login_background_1786937688053.jpg',
-    'Bergen': 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=bryggen+bergen&w=1200',
+    'Tromsø': '/images/tromso_winter.jpg',
+    'Oslo': '/images/oslo_hotel_hub.jpg',
+    'Bergen': '/images/bergen.jpg',
     'Lofoten': '/images/lofoten_1787013505867.jpg',
-    'Svalbard': 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=svalbard+glacier+arctic&w=1200',
-    'Trøndelag': 'https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?q=trondheim+norway&w=1200',
+    'Svalbard': '/images/svalbard_trek.jpg',
+    'Trøndelag': '/images/trondheim.jpg',
     'Southern Norway': '/images/preikestolen_1786936002797.jpg',
     'Fjord Norway': '/images/fjords_1786935800026.jpg',
     'Northern Norway': '/images/northern_lights_1786935879330.jpg',

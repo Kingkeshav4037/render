@@ -63,7 +63,7 @@ export const ProductDetails: React.FC = () => {
         setProduct(null);
       } else {
         setProduct(data);
-        setSelectedImage(data.img || data.gallery?.[0] || '/images/product_charger_1786938528191.jpg');
+        setSelectedImage(data.img || data.gallery?.[0] || '/images/smart_energy_monitor.jpg');
         // Fetch real related products
         const related = await shopService.getRelatedProducts(data.id, data.category, 3);
         setRelatedProducts(related);

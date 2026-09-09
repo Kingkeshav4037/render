@@ -140,7 +140,7 @@ export const NatureHub = () => {
         title="Norway's Wild Nature"
         description="From towering glacial peaks and arctic tundra to ancient pine taiga and cascading fjords, explore the untamed beauty of the North."
         breadcrumb="Nature"
-        backgroundImage="/images/besseggen_1786936349992.jpg"
+        backgroundImage="/images/galdhopiggen_1786936412055.jpg"
       >
         <div className="flex flex-wrap items-center gap-6 mt-8">
           <div className="flex items-center gap-2 text-snow/80">
@@ -355,7 +355,7 @@ export const NatureHub = () => {
 
                   <div className="h-64 relative overflow-hidden bg-black/40 pointer-events-none">
                     <OptimizedImage
-                      src={park.hero_image_url || park.image_url || '/images/besseggen_1786936349992.jpg'}
+                      src={park.hero_image_url || park.image_url || '/images/galdhopiggen_1786936412055.jpg'}
                       alt={park.name}
                       category="landscape"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"

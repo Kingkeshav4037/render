@@ -66,7 +66,7 @@ export const Flora = () => {
       <div className="relative h-[65vh] min-h-[460px] flex items-center justify-center overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1448375240586-882707db888b?q=norway+forest+spruce&w=1920')" }}
+          style={{ backgroundImage: "url('/images/norway_spruce.jpg')" }}
         >
           <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-900/60 to-navy-900/40"></div>
         </div>

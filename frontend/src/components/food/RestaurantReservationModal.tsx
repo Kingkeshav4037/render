@@ -153,7 +153,7 @@ export const RestaurantReservationModal: React.FC<RestaurantReservationModalProp
             src={restaurantImage}
             alt={restaurant.name}
             category="food"
-            fallbackSrc="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800"
+            fallbackSrc="/images/fine_dining_interior.jpg"
             className="w-full h-full object-cover opacity-60"
             containerClassName="w-full h-full"
           />
