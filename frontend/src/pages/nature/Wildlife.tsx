@@ -24,18 +24,11 @@ export const Wildlife = () => {
     category: selectedCategory !== 'All' ? selectedCategory : undefined,
     region: selectedRegion !== 'All' ? selectedRegion : undefined,
     season: selectedSeason !== 'All' ? selectedSeason : undefined,
+    searchTerm: searchTerm.trim() || undefined,
   }, page, limit);
 
-  const rawSpecies = data?.data || [];
-  const species = searchTerm.trim() 
-    ? rawSpecies.filter(s => 
-        s.common_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        s.scientific_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (s.norwegian_name && s.norwegian_name.toLowerCase().includes(searchTerm.toLowerCase()))
-      )
-    : rawSpecies;
-
-  const totalPages = data ? Math.ceil(data.count / limit) : 1;
+  const species = data?.data || [];
+  const totalPages = data ? Math.max(1, Math.ceil(data.count / limit)) : 1;
 
   const categories = [
     { id: 'All', label: 'All Fauna', icon: Sparkles },
@@ -48,7 +41,7 @@ export const Wildlife = () => {
   const seasons = ['All', 'Summer', 'Winter', 'Spring', 'Autumn', 'Year-round'];
 
   return (
-    <div className="min-h-screen bg-nordic-sage/10 text-nordic-charcoal font-sans pb-24">
+    <div className="min-h-screen bg-[#070D18] text-white font-sans pb-24">
       <SEO 
         title="Norwegian Wildlife & Arctic Fauna Field Guide | Norway SmartLife"
         description="Comprehensive field guide to Norway's wildlife: Polar bears, Atlantic puffins, muskoxen, reindeer, and orcas with ethical sighting locations and seasons."
@@ -86,7 +79,10 @@ export const Wildlife = () => {
                   type="text"
                   placeholder="Search species (e.g. Polar Bear, Puffin)..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setPage(1);
+                  }}
                   aria-label="Search wildlife species"
                   className="w-full pl-12 pr-4 py-3 sm:py-3.5 rounded-2xl bg-white/95 backdrop-blur-md text-nordic-charcoal placeholder-gray-400 font-medium text-xs sm:text-sm border-0 focus:ring-4 focus:ring-nordic-sage/50 outline-none transition-all"
                 />
@@ -197,23 +193,53 @@ export const Wildlife = () => {
       </div>
 
       <Container className="py-16">
-        <div className="mb-12 flex justify-between items-end">
+        <div className="mb-10 flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 border-b border-white/10 pb-8">
           <div>
-            <h2 className="text-3xl font-display font-bold text-nordic-charcoal mb-2">Species Field Guide</h2>
-            <p className="text-nordic-charcoal/60">Showing {data?.count || 0} fascinating species</p>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-[11px] font-bold uppercase tracking-widest mb-3">
+              <Compass className="w-3.5 h-3.5" /> Arctic Biodiversity & Field Guide
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-black text-white tracking-tight mb-2">
+              Species Field Guide
+            </h2>
+            <p className="text-gray-300 text-sm sm:text-base font-medium flex items-center gap-2">
+              <span>
+                Showing <strong className="text-emerald-400 font-bold">{data?.count ?? species.length}</strong>{' '}
+                {selectedCategory !== 'All' ? selectedCategory.toLowerCase() : 'fascinating'} species
+              </span>
+              {(selectedCategory !== 'All' || selectedRegion !== 'All' || selectedSeason !== 'All' || searchTerm.trim()) && (
+                <span className="text-xs bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-semibold">
+                  Filtered
+                </span>
+              )}
+            </p>
           </div>
+
+          {(selectedCategory !== 'All' || selectedRegion !== 'All' || selectedSeason !== 'All' || searchTerm) && (
+            <button
+              onClick={() => {
+                setSelectedCategory('All');
+                setSelectedRegion('All');
+                setSelectedSeason('All');
+                setSearchTerm('');
+                setPage(1);
+              }}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-wider transition-colors border border-white/15 cursor-pointer shrink-0"
+            >
+              <X className="w-3.5 h-3.5 text-red-400" /> Reset Filters
+            </button>
+          )}
         </div>
 
         <AsyncStateWrapper
           isLoading={isLoading}
           error={error as Error | null}
           data={species}
-          emptyMessage="No species match your current filters. Try broadening your search."
+          emptyMessage="No species match your current filters. Try selecting 'All Fauna' or resetting filters."
           errorMessage="Failed to load wildlife data."
           skeleton={
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {[1,2,3,4].map(i => (
-                <div key={i} className="aspect-[3/4] bg-nordic-sage/10 animate-pulse" />
+                <div key={i} className="aspect-[3/4] bg-white/5 rounded-2xl animate-pulse" />
               ))}
             </div>
           }
@@ -227,40 +253,41 @@ export const Wildlife = () => {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: idx * 0.1 }}
+                    transition={{ delay: idx * 0.05 }}
                     className="group"
                   >
-                    <Link to={`/wildlife/${animal.slug}`} className="block relative aspect-[3/4] overflow-hidden bg-nordic-sage/10">
+                    <Link to={`/wildlife/${animal.slug}`} className="block relative aspect-[3/4] overflow-hidden rounded-2xl bg-white/5 border border-white/10 shadow-xl group-hover:shadow-2xl transition-all">
                       <OptimizedImage
                         src={getWildlifeImage(animal.slug, animal.common_name)}
                         alt={animal.common_name}
                         fallbackSrc="/images/wildlife_reindeer_1787013667019.jpg"
                         className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 transition-opacity group-hover:opacity-100" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-80 transition-opacity group-hover:opacity-100" />
                       
                       {/* Meta Tags */}
                       <div className="absolute top-4 right-4 flex flex-col gap-2">
-                        {animal.conservation_status === 'Endangered' || animal.conservation_status === 'Vulnerable' ? (
-                          <div className="bg-red-500/90 text-white text-[10px] uppercase font-bold tracking-widest px-2 py-1 flex items-center gap-1 backdrop-blur-sm">
+                        {animal.conservation_status === 'Endangered' || animal.conservation_status === 'Vulnerable' || (animal.conservation_status && animal.conservation_status.includes('Endangered')) || (animal.conservation_status && animal.conservation_status.includes('Vulnerable')) ? (
+                          <div className="bg-red-500/90 text-white text-[10px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-full flex items-center gap-1 backdrop-blur-sm shadow-md">
                             <Shield className="w-3 h-3" /> {animal.conservation_status}
                           </div>
                         ) : null}
                       </div>
 
                       {/* Content */}
-                      <div className="absolute bottom-0 left-0 right-0 p-6 text-white transform translate-y-4 group-hover:translate-y-0 transition-transform">
-                        <div className="text-[10px] uppercase tracking-widest text-nordic-sage mb-2 font-bold">
-                          {animal.category || 'Wildlife'}
+                      <div className="absolute bottom-0 left-0 right-0 p-6 text-white transform translate-y-3 group-hover:translate-y-0 transition-transform">
+                        <div className="text-[10px] uppercase tracking-widest text-emerald-400 mb-2 font-extrabold flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                          {animal.category || 'Mammals'}
                         </div>
-                        <h3 className="text-2xl font-display font-bold mb-1">
+                        <h3 className="text-2xl font-display font-bold mb-1 group-hover:text-emerald-300 transition-colors">
                           {animal.common_name}
                         </h3>
-                        <p className="text-sm text-white/60 font-serif italic mb-4">
+                        <p className="text-xs sm:text-sm text-gray-300 font-serif italic mb-4 line-clamp-1">
                           {animal.scientific_name}
                         </p>
-                        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-nordic-sage opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Eye className="w-4 h-4" /> View Guide
+                        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Eye className="w-4 h-4" /> View Field Guide
                         </div>
                       </div>
                     </Link>
@@ -273,7 +300,8 @@ export const Wildlife = () => {
                   <button
                     onClick={() => setPage(p => Math.max(1, p - 1))}
                     disabled={page === 1}
-                    className="p-2 border border-nordic-sage/20 text-nordic-charcoal disabled:opacity-30 transition-opacity hover:bg-nordic-sage/10"
+                    aria-label="Previous page"
+                    className="p-2.5 border border-white/20 rounded-xl text-white disabled:opacity-30 transition-all hover:bg-white/10 cursor-pointer disabled:cursor-not-allowed"
                   >
                     <ChevronLeft className="w-5 h-5" />
                   </button>
@@ -282,10 +310,10 @@ export const Wildlife = () => {
                     <button
                       key={p}
                       onClick={() => setPage(p)}
-                      className={`w-10 h-10 border transition-colors ${
+                      className={`w-10 h-10 border rounded-xl transition-all font-bold text-sm cursor-pointer ${
                         page === p 
-                          ? 'border-nordic-sage bg-nordic-sage text-white' 
-                          : 'border-nordic-sage/20 text-nordic-charcoal hover:bg-nordic-sage/10'
+                          ? 'border-emerald-500 bg-emerald-600 text-white shadow-lg shadow-emerald-900/40 scale-105' 
+                          : 'border-white/20 text-gray-300 hover:bg-white/10 hover:text-white'
                       }`}
                     >
                       {p}
@@ -295,7 +323,8 @@ export const Wildlife = () => {
                   <button
                     onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                     disabled={page === totalPages}
-                    className="p-2 border border-nordic-sage/20 text-nordic-charcoal disabled:opacity-30 transition-opacity hover:bg-nordic-sage/10"
+                    aria-label="Next page"
+                    className="p-2.5 border border-white/20 rounded-xl text-white disabled:opacity-30 transition-all hover:bg-white/10 cursor-pointer disabled:cursor-not-allowed"
                   >
                     <ChevronRight className="w-5 h-5" />
                   </button>
@@ -306,46 +335,46 @@ export const Wildlife = () => {
         </AsyncStateWrapper>
 
         {/* Responsible Wildlife Observation Code */}
-        <div className="mt-20 pt-16 border-t border-nordic-sage/20">
+        <div className="mt-20 pt-16 border-t border-white/10">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-nordic-sage/20 text-nordic-sage font-bold text-xs uppercase tracking-widest mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold text-xs uppercase tracking-widest mb-4">
               <Shield className="w-4 h-4" /> Ethical Observation Code
             </div>
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-nordic-charcoal mb-4">
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-4">
               Responsible Wildlife Watching
             </h2>
-            <p className="text-nordic-charcoal/70 text-sm leading-relaxed">
+            <p className="text-gray-300 text-sm leading-relaxed">
               Norway's fauna thrives in fragile Arctic and alpine ecosystems. Adhere to these principles to preserve their natural behaviors.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-3xl border border-nordic-sage/20 shadow-sm">
-              <div className="w-12 h-12 rounded-2xl bg-nordic-sage/10 text-nordic-sage flex items-center justify-center mb-6">
+            <div className="bg-white/5 backdrop-blur-md p-8 rounded-3xl border border-white/10 shadow-lg hover:border-emerald-500/30 transition-colors">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-6">
                 <Binoculars className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold text-nordic-charcoal mb-3">Maintain Safe Distances</h3>
-              <p className="text-sm text-nordic-charcoal/70 leading-relaxed">
+              <h3 className="text-xl font-bold text-white mb-3">Maintain Safe Distances</h3>
+              <p className="text-sm text-gray-300 leading-relaxed">
                 Always use binoculars or telephoto lenses. For Muskox, maintain a strict 200m safety perimeter; never approach Polar Bears or seal haul-outs.
               </p>
             </div>
 
-            <div className="bg-white p-8 rounded-3xl border border-nordic-sage/20 shadow-sm">
-              <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center mb-6">
+            <div className="bg-white/5 backdrop-blur-md p-8 rounded-3xl border border-white/10 shadow-lg hover:border-amber-500/30 transition-colors">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center mb-6">
                 <AlertTriangle className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold text-nordic-charcoal mb-3">Never Feed or Lure</h3>
-              <p className="text-sm text-nordic-charcoal/70 leading-relaxed">
+              <h3 className="text-xl font-bold text-white mb-3">Never Feed or Lure</h3>
+              <p className="text-sm text-gray-300 leading-relaxed">
                 Feeding wildlife alters natural foraging behaviors and creates dangerous habituation. Keep all camp food and organic waste securely sealed.
               </p>
             </div>
 
-            <div className="bg-white p-8 rounded-3xl border border-nordic-sage/20 shadow-sm">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-6">
+            <div className="bg-white/5 backdrop-blur-md p-8 rounded-3xl border border-white/10 shadow-lg hover:border-emerald-500/30 transition-colors">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-6">
                 <Compass className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold text-nordic-charcoal mb-3">Leash Laws & Nesting Sanctuary</h3>
-              <p className="text-sm text-nordic-charcoal/70 leading-relaxed">
+              <h3 className="text-xl font-bold text-white mb-3">Leash Laws & Nesting Sanctuary</h3>
+              <p className="text-sm text-gray-300 leading-relaxed">
                 Under Norway's <em>Hundeloven</em>, dogs must be kept on a leash from April 1 to August 20 to protect ground-nesting seabirds and reindeer calves.
               </p>
             </div>
