@@ -21,6 +21,7 @@ const CATEGORIES = [
 ];
 
 export const Activities = () => {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const typeFilter = searchParams.get('type') || 'all';
   const { formatPrice } = useCurrencyStore();
@@ -163,9 +164,10 @@ export const Activities = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.05 }}
                     key={activity.id}
+                    onClick={() => navigate(`/activities/${activity.id}`)}
                     className="group relative flex flex-col bg-[#1A2E1F]/20 border border-white/5 hover:border-[#2F5233] transition-all duration-500 overflow-hidden cursor-pointer"
                   >
-                    <Link to={`/activities/${activity.id}`} className="absolute inset-0 z-10" />
+                    <Link to={`/activities/${activity.id}`} className="absolute inset-0 z-30" aria-label={`View details for ${activity.name}`} />
                     
                     <div className="h-64 relative overflow-hidden">
                       <OptimizedImage 
@@ -184,7 +186,7 @@ export const Activities = () => {
                       )}
                     </div>
 
-                    <div className="p-6 flex flex-col flex-grow relative z-20">
+                    <div className="p-6 flex flex-col flex-grow relative z-20 pointer-events-none">
                       <h3 className="text-2xl font-display font-semibold mb-2 group-hover:text-[#A3B899] transition-colors">{activity.name}</h3>
                       <div className="flex items-center gap-4 text-sm font-sans mb-4 text-snow/60">
                         <span className="flex items-center gap-1"><MapPin className="w-4 h-4"/> Fjord Region</span>
@@ -202,9 +204,15 @@ export const Activities = () => {
                           <div className="text-[10px] uppercase font-bold text-snow/50 tracking-widest mb-1">From</div>
                           <div className="text-xl font-bold">{formatPrice(activity.price)}</div>
                         </div>
-                        <button className="text-sm font-bold uppercase tracking-wider text-[#A3B899] group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                        <Link
+                          to={`/activities/${activity.id}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                          className="pointer-events-auto relative z-40 text-sm font-bold uppercase tracking-wider text-[#A3B899] group-hover:translate-x-1 transition-transform flex items-center gap-1 hover:underline cursor-pointer"
+                        >
                           Details <ArrowRight className="w-4 h-4" />
-                        </button>
+                        </Link>
                       </div>
                     </div>
                   </motion.div>

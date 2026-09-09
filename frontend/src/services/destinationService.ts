@@ -150,7 +150,14 @@ export const destinationService = {
         .single();
 
       if (locError || !location) {
-        const fallback = FALLBACK_DESTINATIONS.find(d => d.slug === slug);
+        const cleanSlug = slug.toLowerCase().trim();
+        const fallback = FALLBACK_DESTINATIONS.find(d => 
+          d.slug?.toLowerCase() === cleanSlug || 
+          d.id?.toLowerCase() === cleanSlug ||
+          d.name.toLowerCase() === cleanSlug ||
+          (cleanSlug === 'lofoten' && d.slug === 'lofoten-islands') ||
+          d.name.toLowerCase().replace(/\s+/g, '-') === cleanSlug
+        );
         if (fallback) {
           return {
             ...fallback,
@@ -216,7 +223,14 @@ export const destinationService = {
 
     } catch (error) {
       console.error(`Error fetching destination ${slug}:`, error);
-      const fallback = FALLBACK_DESTINATIONS.find(d => d.slug === slug);
+      const cleanSlug = slug.toLowerCase().trim();
+      const fallback = FALLBACK_DESTINATIONS.find(d => 
+        d.slug?.toLowerCase() === cleanSlug || 
+        d.id?.toLowerCase() === cleanSlug ||
+        d.name.toLowerCase() === cleanSlug ||
+        (cleanSlug === 'lofoten' && d.slug === 'lofoten-islands') ||
+        d.name.toLowerCase().replace(/\s+/g, '-') === cleanSlug
+      );
       if (fallback) {
         return {
           ...fallback,

@@ -268,6 +268,7 @@ function App() {
             <Route path="/explore" element={<Explore />} />
             <Route path="/destinations" element={<Navigate to="/explore" replace />} />
             <Route path="/explore/:slug" element={<DestinationDetails />} />
+            <Route path="/destinations/:slug" element={<DestinationDetails />} />
             <Route path="/smart-city" element={<SmartCity />} />
             <Route path="/smart-map" element={<Navigate to="/map" replace />} />
             <Route path="/insights" element={<Insights />} />

@@ -36,7 +36,9 @@ export const TrendingSection = () => {
             Array(4).fill(0).map((_, i) => (
               <Skeleton key={i} className="h-96 rounded-3xl" />
             ))
-          ) : places?.map((place, index) => (
+          ) : places?.map((place: any, index: number) => {
+            const placeSlug = place.slug || place.id || place.name?.toLowerCase().replace(/\s+/g, '-');
+            return (
             <motion.div
               key={place.id}
               initial={{ opacity: 0, y: 20 }}
@@ -45,6 +47,7 @@ export const TrendingSection = () => {
               transition={{ delay: index * 0.1 }}
               className="group relative h-96 rounded-3xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all"
             >
+              <Link to={`/explore/${placeSlug}`} className="absolute inset-0 z-20" aria-label={`Explore ${place.name}`} />
               <OptimizedImage 
                 src={place.image} 
                 alt={place.name} 
@@ -59,7 +62,7 @@ export const TrendingSection = () => {
                 <span className="text-white text-sm font-bold">{place.rating}</span>
               </div>
 
-              <div className="absolute bottom-0 left-0 right-0 p-6">
+              <div className="absolute bottom-0 left-0 right-0 p-6 pointer-events-none">
                 <div className="flex items-center gap-2 text-aurora-green mb-2">
                   <MapPin size={16} />
                   <span className="text-sm font-bold uppercase tracking-wider">{place.region}</span>
@@ -68,7 +71,8 @@ export const TrendingSection = () => {
                 <p className="text-white/70 text-sm line-clamp-2">{place.short_description}</p>
               </div>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
         
         <Link 

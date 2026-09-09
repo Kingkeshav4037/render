@@ -228,20 +228,22 @@ export const Explore = () => {
           >
             {(data) => (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-              {destinations.map((dest: any, idx: number) => (
+              {destinations.map((dest: any, idx: number) => {
+                const destSlug = dest.slug || dest.id || dest.name?.toLowerCase().replace(/\s+/g, '-');
+                return (
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.05 }}
                   key={dest.id} 
-                  onClick={() => navigate(`/explore/${dest.slug}`)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/explore/${dest.slug}`); }}
+                  onClick={() => navigate(`/explore/${destSlug}`)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/explore/${destSlug}`); }}
                   tabIndex={0}
                   role="link"
                   aria-label={`Discover ${dest.name}`}
                   className="bg-midnight border border-white/5 hover:border-white/20 transition-all duration-500 flex flex-col group cursor-pointer relative h-[500px] select-none"
                 >
-                  <Link to={`/explore/${dest.slug}`} className="absolute inset-0 z-10" aria-label={`Discover ${dest.name}`} />
+                  <Link to={`/explore/${destSlug}`} className="absolute inset-0 z-10" aria-label={`Discover ${dest.name}`} />
                   
                   <div className="h-2/3 overflow-hidden relative bg-black pointer-events-none">
                     <OptimizedImage
@@ -275,7 +277,8 @@ export const Explore = () => {
                     </div>
                   </div>
                 </motion.div>
-              ))}
+                );
+              })}
             </div>
             )}
           </AsyncStateWrapper>

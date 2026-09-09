@@ -80,6 +80,19 @@ describe('Priority 3: Tourism Content, Discovery & Detail Experience Audit', () 
         expect(screen.getAllByText(/Tromsø/i)[0]).toBeInTheDocument();
       });
     });
+
+    it('renders DestinationDetails page for /destinations/:slug and resolves aliases like Lofoten', async () => {
+      renderWithProviders(
+        <Routes>
+          <Route path="/destinations/:slug" element={<DestinationDetails />} />
+        </Routes>,
+        ['/destinations/lofoten']
+      );
+
+      await waitFor(() => {
+        expect(screen.getAllByText(/Lofoten/i)[0]).toBeInTheDocument();
+      });
+    });
   });
 
   describe('2. Wildlife Explorer & Species Detail (/wildlife, /wildlife/:id)', () => {
@@ -149,6 +162,20 @@ describe('Priority 3: Tourism Content, Discovery & Detail Experience Audit', () 
       await waitFor(() => {
         expect(screen.getByText('Activity Not Found')).toBeInTheDocument();
       });
+    });
+
+    it('renders accessible and working Details links on activity cards', async () => {
+      renderWithProviders(
+        <Routes>
+          <Route path="/activities" element={<Activities />} />
+          <Route path="/activities/:id" element={<ActivityDetails />} />
+        </Routes>,
+        ['/activities']
+      );
+
+      const detailsLinks = await screen.findAllByRole('link', { name: /details/i });
+      expect(detailsLinks.length).toBeGreaterThan(0);
+      expect(detailsLinks[0]).toHaveAttribute('href', expect.stringMatching(/^\/activities\//));
     });
   });
 

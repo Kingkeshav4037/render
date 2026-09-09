@@ -326,11 +326,15 @@ export const Navbar = () => {
 
           <div className="space-y-4">
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 px-2">
+              <Link 
+                to="/explore" 
+                onClick={() => setShowMobileMenu(false)}
+                className="block text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-cyan-400 mb-2 px-2 transition-colors cursor-pointer"
+              >
                 {t('nav.explore', 'Explore')}
-              </div>
+              </Link>
               <div className="flex flex-col space-y-1">
-                <Link to="/explore" className="px-3 py-2 font-medium text-sm text-slate-200 hover:bg-white/[0.06] hover:text-white rounded-lg transition-colors" onClick={() => setShowMobileMenu(false)}>{t('nav.destinations', 'Destinations')}</Link>
+                <Link to="/explore" className="px-3 py-2 font-medium text-sm text-slate-200 hover:bg-white/[0.06] hover:text-white rounded-lg transition-colors" onClick={() => setShowMobileMenu(false)}>{t('nav.explore_destinations', 'Explore Destinations')}</Link>
                 <Link to="/nature" className="px-3 py-2 font-medium text-sm text-slate-200 hover:bg-white/[0.06] hover:text-white rounded-lg transition-colors" onClick={() => setShowMobileMenu(false)}>{t('nav.nature', 'Nature & Parks')}</Link>
                 <Link to="/wildlife" className="px-3 py-2 font-medium text-sm text-slate-200 hover:bg-white/[0.06] hover:text-white rounded-lg transition-colors" onClick={() => setShowMobileMenu(false)}>{t('nav.wildlife', 'Wildlife')}</Link>
                 <Link to="/flora" className="px-3 py-2 font-medium text-sm text-slate-200 hover:bg-white/[0.06] hover:text-white rounded-lg transition-colors" onClick={() => setShowMobileMenu(false)}>{t('nav.flora', 'Plants & Trees')}</Link>
@@ -341,9 +345,13 @@ export const Navbar = () => {
             </div>
 
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 px-2">
+              <Link 
+                to="/activities" 
+                onClick={() => setShowMobileMenu(false)}
+                className="block text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-cyan-400 mb-2 px-2 transition-colors cursor-pointer"
+              >
                 {t('nav.experiences', 'Experiences')}
-              </div>
+              </Link>
               <div className="flex flex-col space-y-1">
                 <Link to="/activities" className="px-3 py-2 font-medium text-sm text-slate-200 hover:bg-white/[0.06] hover:text-white rounded-lg transition-colors" onClick={() => setShowMobileMenu(false)}>{t('nav.activities', 'Activities')}</Link>
                 <Link to="/trails" className="px-3 py-2 font-medium text-sm text-slate-200 hover:bg-white/[0.06] hover:text-white rounded-lg transition-colors" onClick={() => setShowMobileMenu(false)}>{t('nav.trails', 'Hiking Trails')}</Link>
@@ -354,9 +362,13 @@ export const Navbar = () => {
             </div>
 
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 px-2">
+              <Link 
+                to="/planner" 
+                onClick={() => setShowMobileMenu(false)}
+                className="block text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-cyan-400 mb-2 px-2 transition-colors cursor-pointer"
+              >
                 {t('nav.plan', 'Plan & Sustainability')}
-              </div>
+              </Link>
               <div className="flex flex-col space-y-1">
                 <Link to="/stay" className="px-3 py-2 font-medium text-sm text-slate-200 hover:bg-white/[0.06] hover:text-white rounded-lg transition-colors" onClick={() => setShowMobileMenu(false)}>{t('nav.stays', 'Fjord Stays')}</Link>
                 <Link to="/food" className="px-3 py-2 font-medium text-sm text-slate-200 hover:bg-white/[0.06] hover:text-white rounded-lg transition-colors" onClick={() => setShowMobileMenu(false)}>{t('nav.food', 'Food & Dining')}</Link>
@@ -372,9 +384,13 @@ export const Navbar = () => {
             </div>
 
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 px-2">
+              <Link 
+                to="/smart-city" 
+                onClick={() => setShowMobileMenu(false)}
+                className="block text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-cyan-400 mb-2 px-2 transition-colors cursor-pointer"
+              >
                 {t('nav.smart_city', 'Smart City & Tech')}
-              </div>
+              </Link>
               <div className="flex flex-col space-y-1">
                 <Link to="/smart-city" className="px-3 py-2 font-medium text-sm text-slate-200 hover:bg-white/[0.06] hover:text-white rounded-lg transition-colors" onClick={() => setShowMobileMenu(false)}>{t('nav.smart_norway', 'Smart Norway Hub')}</Link>
                 <Link to="/map" className="px-3 py-2 font-medium text-sm text-slate-200 hover:bg-white/[0.06] hover:text-white rounded-lg transition-colors" onClick={() => setShowMobileMenu(false)}>Interactive Map</Link>
@@ -607,12 +623,15 @@ const NavLinks: React.FC<NavLinksProps> = ({ t, setShowMobileMenu }) => (
   <>
     {/* 1. Explore */}
     <div className="relative group px-1 py-1">
-      <button className="font-sans font-medium text-[13px] tracking-wide text-slate-200 hover:text-white hover:bg-white/[0.06] px-3.5 py-2 rounded-lg cursor-pointer transition-all duration-200 flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400">
+      <Link 
+        to="/explore"
+        className="font-sans font-medium text-[13px] tracking-wide text-slate-200 hover:text-white hover:bg-white/[0.06] px-3.5 py-2 rounded-lg cursor-pointer transition-all duration-200 flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+      >
         {t('nav.explore', 'Explore')} <ChevronDown size={12} strokeWidth={2.2} className="text-slate-400 group-hover:text-cyan-400 group-hover:rotate-180 transition-transform duration-200" />
-      </button>
+      </Link>
       <div className="absolute top-full left-0 pt-2 w-60 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left group-hover:translate-y-0 translate-y-1 z-50">
         <div className="bg-[#0B1120]/95 backdrop-blur-2xl rounded-xl shadow-2xl shadow-black/70 border border-white/[0.12] overflow-hidden flex flex-col p-1.5 text-white ring-1 ring-white/5">
-          <Link to="/explore" className="px-3 py-2 hover:bg-white/[0.07] hover:text-white rounded-lg text-xs font-medium text-slate-300 transition-colors" onClick={() => setShowMobileMenu(false)}>{t('nav.destinations', 'Destinations')}</Link>
+          <Link to="/explore" className="px-3 py-2 hover:bg-white/[0.07] hover:text-white rounded-lg text-xs font-medium text-slate-300 transition-colors" onClick={() => setShowMobileMenu(false)}>{t('nav.explore_destinations', 'Explore Destinations')}</Link>
           <Link to="/nature" className="px-3 py-2 hover:bg-white/[0.07] hover:text-white rounded-lg text-xs font-medium text-slate-300 transition-colors" onClick={() => setShowMobileMenu(false)}>{t('nav.nature', 'Nature & Parks')}</Link>
           <Link to="/wildlife" className="px-3 py-2 hover:bg-white/[0.07] hover:text-white rounded-lg text-xs font-medium text-slate-300 transition-colors" onClick={() => setShowMobileMenu(false)}>{t('nav.wildlife', 'Wildlife')}</Link>
           <Link to="/flora" className="px-3 py-2 hover:bg-white/[0.07] hover:text-white rounded-lg text-xs font-medium text-slate-300 transition-colors" onClick={() => setShowMobileMenu(false)}>{t('nav.flora', 'Plants & Trees')}</Link>
@@ -625,9 +644,12 @@ const NavLinks: React.FC<NavLinksProps> = ({ t, setShowMobileMenu }) => (
 
     {/* 2. Experiences */}
     <div className="relative group px-1 py-1">
-      <button className="font-sans font-medium text-[13px] tracking-wide text-slate-200 hover:text-white hover:bg-white/[0.06] px-3.5 py-2 rounded-lg cursor-pointer transition-all duration-200 flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400">
+      <Link 
+        to="/activities"
+        className="font-sans font-medium text-[13px] tracking-wide text-slate-200 hover:text-white hover:bg-white/[0.06] px-3.5 py-2 rounded-lg cursor-pointer transition-all duration-200 flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+      >
         {t('nav.experiences', 'Experiences')} <ChevronDown size={12} strokeWidth={2.2} className="text-slate-400 group-hover:text-cyan-400 group-hover:rotate-180 transition-transform duration-200" />
-      </button>
+      </Link>
       <div className="absolute top-full left-0 pt-2 w-60 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left group-hover:translate-y-0 translate-y-1 z-50">
         <div className="bg-[#0B1120]/95 backdrop-blur-2xl rounded-xl shadow-2xl shadow-black/70 border border-white/[0.12] overflow-hidden flex flex-col p-1.5 text-white ring-1 ring-white/5">
           <Link to="/activities" className="px-3 py-2 hover:bg-white/[0.07] hover:text-white rounded-lg text-xs font-medium text-slate-300 transition-colors" onClick={() => setShowMobileMenu(false)}>{t('nav.activities', 'Activities')}</Link>
@@ -641,9 +663,12 @@ const NavLinks: React.FC<NavLinksProps> = ({ t, setShowMobileMenu }) => (
 
     {/* 3. Plan & Sustainability */}
     <div className="relative group px-1 py-1">
-      <button className="font-sans font-medium text-[13px] tracking-wide text-slate-200 hover:text-white hover:bg-white/[0.06] px-3.5 py-2 rounded-lg cursor-pointer transition-all duration-200 flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400">
+      <Link 
+        to="/planner"
+        className="font-sans font-medium text-[13px] tracking-wide text-slate-200 hover:text-white hover:bg-white/[0.06] px-3.5 py-2 rounded-lg cursor-pointer transition-all duration-200 flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+      >
         {t('nav.plan', 'Plan & Sustainability')} <ChevronDown size={12} strokeWidth={2.2} className="text-slate-400 group-hover:text-cyan-400 group-hover:rotate-180 transition-transform duration-200" />
-      </button>
+      </Link>
       <div className="absolute top-full left-0 pt-2 w-60 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left group-hover:translate-y-0 translate-y-1 z-50">
         <div className="bg-[#0B1120]/95 backdrop-blur-2xl rounded-xl shadow-2xl shadow-black/70 border border-white/[0.12] overflow-hidden flex flex-col p-1.5 text-white ring-1 ring-white/5">
           <Link to="/stay" className="px-3 py-2 hover:bg-white/[0.07] hover:text-white rounded-lg text-xs font-medium text-slate-300 transition-colors" onClick={() => setShowMobileMenu(false)}>{t('nav.stays', 'Fjord Stays')}</Link>
@@ -662,9 +687,12 @@ const NavLinks: React.FC<NavLinksProps> = ({ t, setShowMobileMenu }) => (
 
     {/* 4. Smart City & Tech */}
     <div className="relative group px-1 py-1">
-      <button className="font-sans font-medium text-[13px] tracking-wide text-slate-200 hover:text-white hover:bg-white/[0.06] px-3.5 py-2 rounded-lg cursor-pointer transition-all duration-200 flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400">
+      <Link 
+        to="/smart-city"
+        className="font-sans font-medium text-[13px] tracking-wide text-slate-200 hover:text-white hover:bg-white/[0.06] px-3.5 py-2 rounded-lg cursor-pointer transition-all duration-200 flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+      >
         {t('nav.smart_city', 'Smart City & Tech')} <ChevronDown size={12} strokeWidth={2.2} className="text-slate-400 group-hover:text-cyan-400 group-hover:rotate-180 transition-transform duration-200" />
-      </button>
+      </Link>
       <div className="absolute top-full left-0 pt-2 w-60 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left group-hover:translate-y-0 translate-y-1 z-50">
         <div className="bg-[#0B1120]/95 backdrop-blur-2xl rounded-xl shadow-2xl shadow-black/70 border border-white/[0.12] overflow-hidden flex flex-col p-1.5 text-white ring-1 ring-white/5">
           <Link to="/smart-city" className="px-3 py-2 hover:bg-white/[0.07] hover:text-white rounded-lg text-xs font-medium text-slate-300 transition-colors" onClick={() => setShowMobileMenu(false)}>{t('nav.smart_norway', 'Smart Norway Hub')}</Link>
@@ -677,9 +705,12 @@ const NavLinks: React.FC<NavLinksProps> = ({ t, setShowMobileMenu }) => (
 
     {/* 5. Smart Mobility */}
     <div className="relative group px-1 py-1">
-      <button className="font-sans font-medium text-[13px] tracking-wide text-slate-200 hover:text-white hover:bg-white/[0.06] px-3.5 py-2 rounded-lg cursor-pointer transition-all duration-200 flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400">
+      <Link 
+        to="/mobility/ev"
+        className="font-sans font-medium text-[13px] tracking-wide text-slate-200 hover:text-white hover:bg-white/[0.06] px-3.5 py-2 rounded-lg cursor-pointer transition-all duration-200 flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+      >
         {t('nav.smart_mobility', 'Smart Mobility')} <ChevronDown size={12} strokeWidth={2.2} className="text-slate-400 group-hover:text-cyan-400 group-hover:rotate-180 transition-transform duration-200" />
-      </button>
+      </Link>
       <div className="absolute top-full left-0 pt-2 w-60 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left group-hover:translate-y-0 translate-y-1 z-50">
         <div className="bg-[#0B1120]/95 backdrop-blur-2xl rounded-xl shadow-2xl shadow-black/70 border border-white/[0.12] overflow-hidden flex flex-col p-1.5 text-white ring-1 ring-white/5">
           <Link to="/mobility/ev" className="px-3 py-2 hover:bg-white/[0.07] hover:text-white rounded-lg text-xs font-medium text-slate-300 transition-colors" onClick={() => setShowMobileMenu(false)}>{t('nav.ev_charging', 'EV Charging')}</Link>

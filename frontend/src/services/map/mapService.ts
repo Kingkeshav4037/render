@@ -102,15 +102,47 @@ export const mapService = {
     return (data || []) as unknown as Location[];
   },
   getDestinationDetails: async (slug: string): Promise<{ location: Location; scores: DestinationScore } | null> => {
+    if (!slug || slug === 'undefined' || slug === 'null') return null;
     try {
-      const { data: location, error } = await supabase.from('locations').select('id, name, slug, type, region, description, lat, lng, hero_image_url, featured').eq('slug', slug).single();
-      if (!error && location) {
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
+      let locData: any = null;
+
+      if (isUUID) {
+        const { data } = await supabase.from('locations').select('id, name, slug, type, region, description, lat, lng, hero_image_url, featured').eq('id', slug).maybeSingle();
+        locData = data;
+      } else {
+        const { data } = await supabase.from('locations').select('id, name, slug, type, region, description, lat, lng, hero_image_url, featured').eq('slug', slug).maybeSingle();
+        locData = data;
+        if (!locData) {
+          const { data: byName } = await supabase.from('locations').select('id, name, slug, type, region, description, lat, lng, hero_image_url, featured').ilike('name', slug.replace(/-/g, ' ')).maybeSingle();
+          locData = byName;
+        }
+      }
+
+      if (locData) {
+        const loc: Location = {
+          id: locData.id,
+          location_id: locData.id,
+          name: locData.name,
+          slug: locData.slug || slug,
+          type: locData.type || 'DESTINATION',
+          category: locData.type || 'DESTINATION',
+          region: locData.region,
+          description: locData.description || '',
+          latitude: locData.latitude ?? locData.lat ?? 60.3913,
+          longitude: locData.longitude ?? locData.lng ?? 5.3221,
+          image_url: locData.hero_image_url || locData.image_url || null,
+          hero_image_url: locData.hero_image_url || locData.image_url || null,
+          featured: locData.featured ?? true,
+          average_rating: locData.average_rating ?? 4.9
+        };
+
         return {
-          location: location as unknown as Location,
+          location: loc,
           scores: {
-            location_id: location.id,
+            location_id: locData.id,
             score: 8.5,
-            reasons: [],
+            reasons: ['Iconic Destination', 'Top Rated', 'Spectacular Views'],
             composite_ai_score: 9.2,
             sustainability_score: 9,
             aurora_score: 8,
@@ -123,7 +155,18 @@ export const mapService = {
     }
 
     const { FALLBACK_DESTINATIONS } = await import('../destinationService');
-    const fallback = FALLBACK_DESTINATIONS.find(d => d.slug === slug || d.name.toLowerCase() === slug.toLowerCase());
+    const cleanSlug = slug.toLowerCase().trim();
+    const fallback = FALLBACK_DESTINATIONS.find(d => 
+      d.slug?.toLowerCase() === cleanSlug || 
+      d.id?.toLowerCase() === cleanSlug ||
+      d.name.toLowerCase() === cleanSlug ||
+      d.name.toLowerCase().replace(/\s+/g, '-') === cleanSlug ||
+      (cleanSlug === 'lofoten' && d.slug === 'lofoten-islands') ||
+      cleanSlug.includes(d.slug?.toLowerCase() || '') ||
+      (d.slug && cleanSlug.startsWith(d.slug.toLowerCase())) ||
+      cleanSlug.includes(d.name.toLowerCase()) ||
+      d.name.toLowerCase().includes(cleanSlug)
+    );
     if (fallback) {
       return {
         location: {
@@ -133,10 +176,12 @@ export const mapService = {
           slug: fallback.slug,
           type: fallback.type,
           category: fallback.type,
+          region: fallback.region || undefined,
           description: fallback.description || '',
           latitude: fallback.lat || 69.6492,
           longitude: fallback.lng || 18.9553,
           image_url: fallback.hero_image_url,
+          hero_image_url: fallback.hero_image_url,
           featured: true,
           average_rating: 4.9
         },

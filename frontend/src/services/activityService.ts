@@ -356,15 +356,29 @@ export const activityService = {
 
   getActivityById: async (id: string): Promise<Activity | null> => {
     try {
-      const { data, error } = await (supabase as any)
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+      let query = (supabase as any)
         .from('activities')
-        .select('id, location_id, name, type, description, duration_minutes, difficulty, price, currency, image_url, tags, difficulty_level, equipment_needed, featured')
-        .eq('id', id)
-        .maybeSingle();
+        .select('id, location_id, name, type, description, duration_minutes, difficulty, price, currency, image_url, tags, difficulty_level, equipment_needed, featured');
+
+      if (isUUID) {
+        query = query.eq('id', id);
+      } else {
+        query = query.ilike('name', `%${id.replace(/-/g, ' ')}%`);
+      }
+
+      const { data, error } = await query.maybeSingle();
 
       if (error || !data) {
+        const lowerId = id.toLowerCase();
         const found = DEFAULT_ACTIVITIES.find(a => a.id === id) ||
-          DEFAULT_ACTIVITIES.find(a => a.id.toLowerCase().includes(id.toLowerCase()));
+          DEFAULT_ACTIVITIES.find(a => a.id.toLowerCase() === lowerId) ||
+          DEFAULT_ACTIVITIES.find(a => a.id.toLowerCase().includes(lowerId)) ||
+          DEFAULT_ACTIVITIES.find(a => a.name.toLowerCase() === lowerId) ||
+          DEFAULT_ACTIVITIES.find(a => a.name.toLowerCase().includes(lowerId)) ||
+          DEFAULT_ACTIVITIES.find(a => a.type.toLowerCase() === lowerId) ||
+          DEFAULT_ACTIVITIES.find(a => a.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').includes(lowerId)) ||
+          DEFAULT_ACTIVITIES.find(a => lowerId.includes(a.type.toLowerCase()));
         if (!found) return null;
         return {
           ...found,
@@ -377,11 +391,19 @@ export const activityService = {
         image_url: getActivityImage(data.type, data.image_url, data.name)
       };
     } catch {
-      const found = DEFAULT_ACTIVITIES.find(a => a.id === id);
+      const lowerId = id.toLowerCase();
+      const found = DEFAULT_ACTIVITIES.find(a => a.id === id) ||
+        DEFAULT_ACTIVITIES.find(a => a.id.toLowerCase() === lowerId) ||
+        DEFAULT_ACTIVITIES.find(a => a.id.toLowerCase().includes(lowerId)) ||
+        DEFAULT_ACTIVITIES.find(a => a.name.toLowerCase() === lowerId) ||
+        DEFAULT_ACTIVITIES.find(a => a.name.toLowerCase().includes(lowerId)) ||
+        DEFAULT_ACTIVITIES.find(a => a.type.toLowerCase() === lowerId) ||
+        DEFAULT_ACTIVITIES.find(a => a.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').includes(lowerId)) ||
+        DEFAULT_ACTIVITIES.find(a => lowerId.includes(a.type.toLowerCase()));
       if (!found) return null;
       return {
         ...found,
-        image_url: getActivityImage(found.type, found.image_url)
+        image_url: getActivityImage(found.type, found.image_url, found.name)
       };
     }
   },
